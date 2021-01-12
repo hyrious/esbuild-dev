@@ -1,7 +1,16 @@
 {
-    "include": ["src"],
+    "include": ["src/index.ts"],
     "compilerOptions": {
-        "noEmit": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "downlevelIteration": true,
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "dist",
+        "module": "CommonJS",
+        "target": "ESNext",
+        "lib": ["ESNext"]
     }
 }
