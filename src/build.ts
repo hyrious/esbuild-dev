@@ -9,9 +9,12 @@ const common = {
     sourcemap: true,
 } as const;
 
-async function build(service: Service, options: BuildOptions) {
+async function build(
+    service: Service,
+    options: BuildOptions & { entryPoints: string[] }
+) {
     await service.build({ ...common, ...options });
-    console.log(...options.entryPoints!);
+    console.log(...options.entryPoints);
 }
 
 async function main() {

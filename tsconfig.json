@@ -1,5 +1,5 @@
 {
-    "include": ["src/index.ts"],
+    "include": ["src/*.ts"],
     "compilerOptions": {
         "esModuleInterop": true,
         "downlevelIteration": true,
@@ -8,6 +8,7 @@
         "resolveJsonModule": true,
         "declaration": true,
         "emitDeclarationOnly": true,
+        "noImplicitAny": true,
         "outDir": "dist",
         "module": "CommonJS",
         "target": "ESNext",
