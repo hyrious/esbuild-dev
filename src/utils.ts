@@ -58,7 +58,8 @@ export function tryIndexFile(dir: string) {
 
 /**
  * @example
- * findUpperFile('path/to/some/main.ts') // 'path/to/some/package.json'
+ * findUpperFile('path/to/some/main.ts', 'package.json')
+ * // 'path/to/some/package.json'
  */
 export function findUpperFile(filename: string, target: string) {
     let lastdir = "";

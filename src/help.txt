@@ -1,0 +1,3 @@
+usage:
+    esbuild-dev --run main.ts
+    esbuild-dev main.ts

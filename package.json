@@ -1,6 +1,6 @@
 {
     "name": "@hyrious/esbuild-dev",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Just esbuild + chokidar.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -11,10 +11,8 @@
         "dist"
     ],
     "scripts": {
-        "build:build": "esbuild src/build.ts --bundle --platform=node --external:esbuild --outdir=dist --minify --sourcemap=inline",
-        "build:all": "node --enable-source-maps dist/build.js",
-        "build:clean": "rimraf dist/build.js",
-        "build": "run-s build:build build:all build:clean"
+        "clean": "rimraf dist",
+        "build": "esbuild-dev --run src/build.ts"
     },
     "repository": "hyrious/esbuild-dev",
     "keywords": [
@@ -33,6 +31,7 @@
         "tempy": "latest"
     },
     "devDependencies": {
+        "@hyrious/esbuild-dev": "0.1.1",
         "@types/lodash.debounce": "^4.0.6",
         "@types/lodash.isequal": "^4.5.5",
         "@types/minimist": "^1.2.1",
