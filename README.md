@@ -8,7 +8,10 @@ Require Node.js `>=14` to use `--enable-source-maps`.
 
 ```shell-session
 npx @hyrious/esbuild-dev main.ts --args-passed-to-main.ts
+npx @hyrious/esbuild-dev --run main.ts --args-passed-to-main.ts
 ```
+
+With `--run`, it works like `node main.js`.
 
 ### License
 
