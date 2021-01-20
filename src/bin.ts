@@ -1,23 +1,24 @@
-import minimist from "minimist";
 import { esbuildDev, esbuildRun } from ".";
 import help from "./help.txt";
 
+const FlagHelp = "--help";
+const FlagWatch = "--watch";
+
 async function main() {
-    const argv = minimist(process.argv.slice(2));
+    let argv = process.argv.slice(2);
+    const shouldHelp = argv.includes(FlagHelp);
+    const shouldWatch = argv.indexOf(FlagWatch);
 
-    // esbuild-dev --run main.ts
-    if (argv.run) {
-        return await esbuildRun(argv.run, argv._);
-    }
-
-    // esbuild-dev main.ts
-    const [filename, ...args] = argv._;
-
-    if (!filename) {
+    if (shouldHelp) {
         return console.log(help);
     }
 
-    await esbuildDev(filename, args);
+    if (shouldWatch !== -1) {
+        argv.splice(shouldWatch, 1);
+        await esbuildDev(argv[0], argv.slice(1));
+    } else {
+        await esbuildRun(argv[0], argv.slice(1));
+    }
 }
 
 main().catch(console.error);

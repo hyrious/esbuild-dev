@@ -6,6 +6,7 @@ import { basename, resolve } from "path";
 import {
     findTargetDirectory,
     findUpperFile,
+    getMessage,
     resolveDependencies,
     resolveExternal,
 } from "./utils";
@@ -61,14 +62,25 @@ async function esbuild(filename: string, incremental = false) {
  * @param filename - the file, usually ends with `.ts`
  */
 export async function esbuildRun(filename: string, args: string[] = []) {
-    const { outfile } = await esbuild(filename);
+    let outfile: string;
+    try {
+        ({ outfile } = await esbuild(filename));
+    } catch {
+        return;
+    }
+
     const argv = ["--enable-source-maps", outfile, ...args];
-    spawnSync(process.argv0, argv, {
-        stdio: "inherit",
-        cwd: process.cwd(),
-        env: process.env,
-    });
-    stopService();
+    try {
+        spawnSync(process.argv0, argv, {
+            stdio: "inherit",
+            cwd: process.cwd(),
+            env: process.env,
+        });
+    } catch {
+        console.error(getMessage(outfile, args));
+    } finally {
+        stopService();
+    }
 }
 
 /**
@@ -76,81 +88,86 @@ export async function esbuildRun(filename: string, args: string[] = []) {
  * @param filename - the file, usually ends with `.ts`
  */
 export async function esbuildDev(filename: string, args: string[] = []) {
-    let { outfile, result } = await esbuild(filename, true);
+    let outfile: string;
+    let result: BuildIncremental | null = null;
+    let argv: string[];
+    let child: ChildProcess | null = null;
 
-    const argv = ["--enable-source-maps", outfile, ...args];
+    const rebuild = async (needRefresh = false) => {
+        if (result && needRefresh) {
+            result.rebuild.dispose();
+            result = null;
+        }
+
+        try {
+            if (result) {
+                result = await result.rebuild();
+            } else {
+                ({ outfile, result } = await esbuild(filename, true));
+                argv = ["--enable-source-maps", outfile, ...args];
+            }
+            return true;
+        } catch {
+            result = null;
+            // esbuild already prints error message, don't show again
+            return false;
+        }
+    };
+
+    const stop = () => {
+        if (child) {
+            const dying = child;
+            dying.kill("SIGTERM");
+            setTimeout(() => {
+                if (!dying.killed) dying.kill("SIGKILL");
+            }, 1000);
+            child = null;
+        }
+    };
+
+    const restart = () => {
+        stop();
+        if (result) {
+            try {
+                child = spawn(process.argv0, argv, {
+                    stdio: "inherit",
+                    cwd: process.cwd(),
+                    env: process.env,
+                });
+                child.on("close", (code) => {
+                    const msg = "[esbuild-dev] child process stopped with code";
+                    console.log(msg, code);
+                    child = null;
+                });
+                child.on("error", () => {
+                    console.error(getMessage(outfile, args));
+                    stop();
+                });
+            } catch {
+                console.error(getMessage(outfile, args));
+                child = null;
+            }
+        }
+    };
 
     // if the file is in a package, watch pkg.dependencies
     const pkgJson = findUpperFile(filename, "package.json");
     if (pkgJson) {
         watch(pkgJson).on("change", async () => {
-            result.rebuild.dispose();
-            ({ result } = await esbuild(filename, true));
+            if (await rebuild(true)) restart();
         });
     }
-
-    let child: ChildProcess | undefined;
-
-    const rubbish = new Set<Promise<void>>();
-
-    const stop = (ms = 1000) => {
-        if (child) {
-            const tobeKilled = child;
-            tobeKilled.on("exit", (code) => {
-                if (code !== 0) {
-                    console.log(
-                        "child process",
-                        tobeKilled.pid,
-                        "exited with code",
-                        code
-                    );
-                }
-            });
-            const task = new Promise<void>((resolve) => {
-                tobeKilled.kill("SIGTERM");
-                setTimeout(() => {
-                    if (!tobeKilled.killed) {
-                        tobeKilled.kill("SIGKILL");
-                    }
-                    resolve();
-                }, ms);
-            }).then(() => {
-                rubbish.delete(task);
-            });
-            rubbish.add(task);
-            child = undefined;
-        }
-    };
-
-    const waitForRubbishClean = async () => {
-        const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
-        while (rubbish.size > 0) await delay(100);
-    };
 
     let deps = await resolveDependencies(filename);
 
     const watcher = watch([filename, ...deps]);
-    watcher.on("ready", run);
+    watcher.on("ready", restart);
     watcher.on("change", debounce(update, 300));
 
-    process.on("SIGINT", async () => {
-        await waitForRubbishClean();
+    process.on("SIGINT", () => {
+        stopService();
         process.exit();
     });
-
-    async function run() {
-        stop();
-        try {
-            child = spawn(process.argv0, argv, {
-                stdio: "inherit",
-                cwd: process.cwd(),
-                env: process.env,
-            });
-        } catch (e) {
-            console.error(e);
-            stop();
-        }
-    }
 
     async function update() {
         const newDeps = await resolveDependencies(filename);
@@ -165,7 +182,6 @@ export async function esbuildDev(filename: string, args: string[] = []) {
         deps.forEach((e) => toBeAdded.delete(e));
         watcher.add(Array.from(toBeAdded));
 
-        result = await result.rebuild();
-        await run();
+        if (await rebuild()) restart();
     }
 }

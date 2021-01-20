@@ -16,12 +16,12 @@ Require Node.js `>=14` to use `--enable-source-maps`.
 
 ```shell-session
 npx @hyrious/esbuild-dev main.ts --args-passed-to-main.ts
-npx @hyrious/esbuild-dev --run main.ts --args-passed-to-main.ts
+npx @hyrious/esbuild-dev --watch main.ts --args-passed-to-main.ts
 ```
 
-Without `--run`, it works like `node-dev main.js`.
+With `--watch`, it works like `node-dev main.js`.
 
-With `--run`, it works like `node main.js`.
+Without `--watch`, it works like `node main.js`.
 
 ### License
 

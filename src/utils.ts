@@ -2,6 +2,8 @@ import builtinModules from "builtin-modules";
 import fs from "fs";
 import { dirname, resolve } from "path";
 import tempy from "tempy";
+import { inspect } from "util";
+import message from "./message.txt";
 
 /**
  * @example
@@ -142,4 +144,9 @@ export function findTargetDirectory(filename: string) {
         return target;
     }
     return tempy.directory();
+}
+
+export function getMessage(file: string, args: string[]) {
+    const argsString = args.map((e) => inspect(e)).join("");
+    return message.replace("{file}", file).replace("{args}", argsString);
 }

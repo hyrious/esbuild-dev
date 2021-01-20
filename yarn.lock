@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@hyrious/esbuild-dev@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@hyrious/esbuild-dev/-/esbuild-dev-0.1.1.tgz#3f0a5a3deda35f8196f3bb5b0a25d0c3f41e5ec0"
-  integrity sha512-jadknwwB9zgGR9mWnSYhel3PT7UM75adSqr5TgpX43g5J9OnaambJtKB9gxCNpYE91hI5KCpVVNwZv2wqPvprw==
+"@hyrious/esbuild-dev@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@hyrious/esbuild-dev/-/esbuild-dev-0.1.2.tgz#f90d61d9802212d166e4518b23524c55d800eae0"
+  integrity sha512-SDYYLeu3yUUg/01FZRfuPJ10cRqhWs0d9agf6E11l+76fboSkNavvk3AVf555dS85kjHW4uj9BKfjPGDLds9KA==
   dependencies:
     chokidar latest
     esbuild latest
@@ -51,11 +51,6 @@
   version "4.14.167"
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.167.tgz#ce7d78553e3c886d4ea643c37ec7edc20f16765e"
   integrity sha512-w7tQPjARrvdeBkX/Rwg95S592JwxqOjmms3zWQ0XZgSyxSLdzWaYH3vErBhdVS/lRBX7F8aBYcYJYTr5TMGOzw==
-
-"@types/minimist@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/@types/minimist/-/minimist-1.2.1.tgz#283f669ff76d7b8260df8ab7a4262cc83d988256"
-  integrity sha512-fZQQafSREFyuZcdWFAExYjBiCL7AUCdgsk80iO0q4yihYYdcIiH28CcuPTGFgLOCC8RlW49GSQxdHwZP+I7CNg==
 
 "@types/node@^14.14.21":
   version "14.14.21"
