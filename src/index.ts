@@ -184,4 +184,7 @@ export async function esbuildDev(filename: string, args: string[] = []) {
 
         if (await rebuild()) restart();
     }
+
+    // kick start first run
+    if (await rebuild()) restart();
 }

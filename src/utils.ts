@@ -1,7 +1,7 @@
 import builtinModules from "builtin-modules";
 import fs from "fs";
+import os from "os";
 import { dirname, resolve } from "path";
-import tempy from "tempy";
 import { inspect } from "util";
 import message from "./message.txt";
 
@@ -134,7 +134,7 @@ export async function resolveDependencies(filename: string) {
  * @example
  * findTargetDirectory('main.ts')
  * // (file in package) 'path/to/node_modules/.esbuild-dev'
- * // (normal file) '/tmp/xxxx'
+ * // (normal file) '/tmp'
  */
 export function findTargetDirectory(filename: string) {
     const nodeModules = findUpperFile(filename, "node_modules");
@@ -143,7 +143,7 @@ export function findTargetDirectory(filename: string) {
         if (!fs.existsSync(target)) fs.mkdirSync(target);
         return target;
     }
-    return tempy.directory();
+    return os.tmpdir();
 }
 
 export function getMessage(file: string, args: string[]) {
