@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@hyrious/esbuild-dev@0.1.4":
-  version "0.1.4"
-  resolved "https://registry.npmjs.org/@hyrious/esbuild-dev/-/esbuild-dev-0.1.4.tgz#7781c2006579d1596449c1e8cf994b2ef87acc3b"
-  integrity sha512-tH/+gKkJTebBWzj9TfwAy7eM0IHBA9vlLHBN2Iufjp2PaixnDSeTKWoMF7HH0XmKCKemxEGJr4KGdKm/OquG4Q==
+"@hyrious/esbuild-dev@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.npmjs.org/@hyrious/esbuild-dev/-/esbuild-dev-0.1.5.tgz#210a4025313a0fbe9cedc3c7a9e18423a7d89ac7"
+  integrity sha512-PK+il/+6DH+5xzrDHcYmQofmedFis6MkCCmkPfgTdNtFktYWNjsgEvDtIvbGgJiIOvb2k38StM2gwpsJiv5pZg==
   dependencies:
     chokidar latest
     esbuild latest
@@ -17,22 +17,15 @@
   dependencies:
     "@types/lodash" "*"
 
-"@types/lodash.isequal@^4.5.5":
-  version "4.5.5"
-  resolved "https://registry.npmjs.org/@types/lodash.isequal/-/lodash.isequal-4.5.5.tgz#4fed1b1b00bef79e305de0352d797e9bb816c8ff"
-  integrity sha512-4IKbinG7MGP131wRfceK6W4E/Qt3qssEFLF30LnJbjYiSfHGGRU/Io8YxXrZX109ir+iDETC8hw8QsDijukUVg==
-  dependencies:
-    "@types/lodash" "*"
-
 "@types/lodash@*":
   version "4.14.167"
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.167.tgz#ce7d78553e3c886d4ea643c37ec7edc20f16765e"
   integrity sha512-w7tQPjARrvdeBkX/Rwg95S592JwxqOjmms3zWQ0XZgSyxSLdzWaYH3vErBhdVS/lRBX7F8aBYcYJYTr5TMGOzw==
 
-"@types/node@^14.14.21":
-  version "14.14.21"
-  resolved "https://registry.npmjs.org/@types/node/-/node-14.14.21.tgz#d934aacc22424fe9622ebf6857370c052eae464e"
-  integrity sha512-cHYfKsnwllYhjOzuC5q1VpguABBeecUp24yFluHpn/BQaVxB1CuQ1FSRZCzrPxrkIfWISXV2LbeoBthLWg0+0A==
+"@types/node@^14.14.22":
+  version "14.14.22"
+  resolved "https://registry.npmjs.org/@types/node/-/node-14.14.22.tgz#0d29f382472c4ccf3bd96ff0ce47daf5b7b84b18"
+  integrity sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
 
 ansi-styles@^3.2.1:
   version "3.2.1"
@@ -369,11 +362,6 @@ lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
-
-lodash.isequal@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
-  integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
 
 memorystream@^0.3.1:
   version "0.3.1"
