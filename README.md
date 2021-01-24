@@ -6,7 +6,7 @@ Require Node.js `>=14` to use `--enable-source-maps`.
 
 ### Features
 
-- ⚡ **_Fast_** with the help of esbuild, use `esbuild-dev --run` to substitute `tsc`
+- ⚡ **_Fast_** with the help of esbuild, use `esbuild-dev` to substitute `ts-node`
     - pros: checkout [this repo's action](https://github.com/hyrious/esbuild-dev/runs/1712657624), `yarn build` done in 0.30s!
     - cons: you won't get any type checking at all
 - 🐛 **_Easy to Debug_** with the help of node's `--enable-source-maps`
