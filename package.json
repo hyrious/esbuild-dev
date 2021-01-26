@@ -1,6 +1,6 @@
 {
     "name": "@hyrious/esbuild-dev",
-    "version": "0.1.8",
+    "version": "0.2.0",
     "description": "Just esbuild + chokidar.",
     "main": "dist/index.js",
     "types": "src/index.ts",
@@ -30,7 +30,7 @@
         "esbuild": "latest"
     },
     "devDependencies": {
-        "@hyrious/esbuild-dev": "0.1.7",
+        "@hyrious/esbuild-dev": "0.1.8",
         "@types/lodash.debounce": "^4.0.6",
         "@types/node": "^14.14.22",
         "builtin-modules": "^3.2.0",

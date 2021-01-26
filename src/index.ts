@@ -1,6 +1,12 @@
 import { ChildProcess, spawn, spawnSync } from "child_process";
 import { watch } from "chokidar";
-import { BuildIncremental, BuildResult, Service, startService } from "esbuild";
+import {
+    BuildIncremental,
+    BuildOptions,
+    BuildResult,
+    Service,
+    startService,
+} from "esbuild";
 import debounce from "lodash.debounce";
 import { basename, resolve } from "path";
 import {
@@ -29,15 +35,21 @@ function stopService() {
 
 async function esbuild(
     filename: string,
-    incremental: true
+    incremental: true,
+    options?: BuildOptions
 ): Promise<{ outfile: string; result: BuildIncremental }>;
 
 async function esbuild(
     filename: string,
-    incremental?: false
+    incremental?: false,
+    options?: BuildOptions
 ): Promise<{ outfile: string; result: BuildResult }>;
 
-async function esbuild(filename: string, incremental = false) {
+async function esbuild(
+    filename: string,
+    incremental = false,
+    options: BuildOptions = {}
+) {
     const service = await ensureService();
 
     const outdir = findTargetDirectory(filename);
@@ -52,6 +64,7 @@ async function esbuild(filename: string, incremental = false) {
         outfile,
         sourcemap: true,
         incremental,
+        ...options,
     });
 
     return { outfile, result };
@@ -61,10 +74,14 @@ async function esbuild(filename: string, incremental = false) {
  * Like `node filename`, run file without watch.
  * @param filename - the file, usually ends with `.ts`
  */
-export async function esbuildRun(filename: string, args: string[] = []) {
+export async function esbuildRun(
+    filename: string,
+    args: string[] = [],
+    options?: BuildOptions
+) {
     let outfile: string;
     try {
-        ({ outfile } = await esbuild(filename));
+        ({ outfile } = await esbuild(filename, false, options));
     } catch {
         return;
     }
@@ -87,7 +104,11 @@ export async function esbuildRun(filename: string, args: string[] = []) {
  * Like `node-dev filename`, run file with watch and automatically restart.
  * @param filename - the file, usually ends with `.ts`
  */
-export async function esbuildDev(filename: string, args: string[] = []) {
+export async function esbuildDev(
+    filename: string,
+    args: string[] = [],
+    options?: BuildOptions
+) {
     let outfile: string;
     let result: BuildIncremental | null = null;
     let argv: string[];
@@ -103,7 +124,7 @@ export async function esbuildDev(filename: string, args: string[] = []) {
             if (result) {
                 result = await result.rebuild();
             } else {
-                ({ outfile, result } = await esbuild(filename, true));
+                ({ outfile, result } = await esbuild(filename, true, options));
                 argv = ["--enable-source-maps", outfile, ...args];
             }
             return true;

@@ -1,4 +1,5 @@
 import builtinModules from "builtin-modules";
+import { Plugin } from "esbuild";
 import fs from "fs";
 import os from "os";
 import { dirname, resolve } from "path";
@@ -149,4 +150,56 @@ export function findTargetDirectory(filename: string) {
 export function getMessage(file: string, args: string[]) {
     const argsString = args.map((e) => inspect(e)).join(" ");
     return message.replace("{file}", file).replace("{args}", argsString);
+}
+
+function tryRequire(mod: string) {
+    try {
+        return require(mod);
+    } catch {
+        try {
+            return require(resolve(mod));
+        } catch {}
+    }
+}
+
+function indexOfSome<T>(array: Array<T>, values: T[]) {
+    const set = new Set(values);
+    for (let i = 0; i < array.length; ++i) {
+        if (set.has(array[i])) return i;
+    }
+    return -1;
+}
+
+export function resolvePlugins(argv: string[], flags: string[]) {
+    const ret: Plugin[] = [];
+    let flag = false;
+    for (const arg of argv) {
+        if (flag) {
+            flag = false;
+            let mod: Plugin | (() => Plugin);
+            if (arg.startsWith(".") || arg.startsWith("esbuild-")) {
+                mod = tryRequire(arg);
+            } else {
+                mod =
+                    tryRequire(`esbuild-plugin-${arg}`) ||
+                    tryRequire(`esbuild-${arg}`);
+            }
+            if (mod) {
+                if (mod instanceof Function) {
+                    try {
+                        ret.push(mod());
+                    } catch {}
+                } else {
+                    ret.push(mod);
+                }
+            }
+        } else if (flags.includes(arg)) {
+            flag = true;
+        }
+    }
+    let i = -1;
+    while ((i = indexOfSome(argv, flags)) !== -1) {
+        argv.splice(i, 2);
+    }
+    return ret;
 }
