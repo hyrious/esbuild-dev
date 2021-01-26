@@ -1,6 +1,6 @@
 ## esbuild-dev
 
-Just esbuild + ~~nodemon~~ chokidar, like `node-dev`.
+Just esbuild + chokidar, like `node-dev`.
 
 Require Node.js `>=14` to use `--enable-source-maps`.
 
