@@ -135,8 +135,8 @@ export async function esbuildDev(filename: string, args: string[] = []) {
                     env: process.env,
                 });
                 child.on("close", (code) => {
-                    const msg = "[esbuild-dev] child process stopped with code";
-                    console.log(msg, code);
+                    // prettier-ignore
+                    console.log("[esbuild-dev] child process stopped with code", code);
                     child = null;
                 });
                 child.on("error", () => {

@@ -147,6 +147,6 @@ export function findTargetDirectory(filename: string) {
 }
 
 export function getMessage(file: string, args: string[]) {
-    const argsString = args.map((e) => inspect(e)).join("");
+    const argsString = args.map((e) => inspect(e)).join(" ");
     return message.replace("{file}", file).replace("{args}", argsString);
 }
