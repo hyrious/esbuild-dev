@@ -135,19 +135,31 @@ export async function esbuildDev(
         }
     };
 
-    const stop = () => {
-        if (child) {
-            const dying = child;
-            dying.kill("SIGTERM");
-            setTimeout(() => {
-                if (!dying.killed) dying.kill("SIGKILL");
-            }, 1000);
-            child = null;
-        }
-    };
+    const stop = () =>
+        new Promise<void>((resolve) => {
+            if (child) {
+                const dying = child;
+                dying.kill("SIGTERM");
+                setTimeout(() => {
+                    if (dying.killed) {
+                        resolve();
+                    } else {
+                        setTimeout(() => {
+                            if (!dying.killed) {
+                                dying.kill("SIGKILL");
+                            }
+                            resolve();
+                        }, 1000);
+                    }
+                }, 100);
+                child = null;
+            } else {
+                resolve();
+            }
+        });
 
-    const restart = () => {
-        stop();
+    const restart = async () => {
+        await stop();
         if (result) {
             try {
                 child = spawn(process.argv0, argv, {
@@ -175,7 +187,7 @@ export async function esbuildDev(
     const pkgJson = findUpperFile(filename, "package.json");
     if (pkgJson) {
         watch(pkgJson).on("change", async () => {
-            if (await rebuild(true)) restart();
+            if (await rebuild(true)) await restart();
         });
     }
 
@@ -203,9 +215,9 @@ export async function esbuildDev(
         deps.forEach((e) => toBeAdded.delete(e));
         watcher.add(Array.from(toBeAdded));
 
-        if (await rebuild()) restart();
+        if (await rebuild()) await restart();
     }
 
     // kick start first run
-    if (await rebuild()) restart();
+    if (await rebuild()) await restart();
 }
