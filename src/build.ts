@@ -1,4 +1,4 @@
-import { startService, Service, BuildOptions } from "esbuild";
+import esbuild, { BuildOptions } from "esbuild";
 import pkg from "../package.json";
 
 const common = {
@@ -11,24 +11,18 @@ const common = {
 
 type Options = BuildOptions & { entryPoints: string[] };
 
-async function build(service: Service, options: Options) {
-    await service.build({ ...common, ...options });
+async function build(options: Options) {
+    await esbuild.build({ ...common, ...options });
     console.log(...options.entryPoints);
 }
 
-async function main() {
-    const service = await startService();
-    await Promise.all([
-        build(service, {
-            entryPoints: ["src/bin.ts"],
-            minify: true,
-            banner: "#!/usr/bin/env node",
-        }),
-        build(service, {
-            entryPoints: ["src/index.ts"],
-        }),
-    ]);
-    service.stop();
-}
-
-main();
+Promise.all([
+    build({
+        entryPoints: ["src/bin.ts"],
+        minify: true,
+        banner: { js: "#!/usr/bin/env node" },
+    }),
+    build({
+        entryPoints: ["src/index.ts"],
+    }),
+]).catch(console.error);

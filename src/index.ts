@@ -1,11 +1,9 @@
 import { ChildProcess, spawn, spawnSync } from "child_process";
 import { watch } from "chokidar";
-import {
+import esbuild, {
     BuildIncremental,
     BuildOptions,
-    BuildResult,
-    Service,
-    startService,
+    BuildResult
 } from "esbuild";
 import debounce from "lodash.debounce";
 import { basename, resolve } from "path";
@@ -14,48 +12,30 @@ import {
     findUpperFile,
     getMessage,
     resolveDependencies,
-    resolveExternal,
+    resolveExternal
 } from "./utils";
 
-let esbuildService: Service | undefined;
-
-async function ensureService() {
-    if (!esbuildService) {
-        esbuildService = await startService();
-    }
-    return esbuildService!;
-}
-
-function stopService() {
-    if (esbuildService) {
-        esbuildService.stop();
-        esbuildService = undefined;
-    }
-}
-
-async function esbuild(
+async function runEsbuild(
     filename: string,
     incremental: true,
     options?: BuildOptions
 ): Promise<{ outfile: string; result: BuildIncremental }>;
 
-async function esbuild(
+async function runEsbuild(
     filename: string,
     incremental?: false,
     options?: BuildOptions
 ): Promise<{ outfile: string; result: BuildResult }>;
 
-async function esbuild(
+async function runEsbuild(
     filename: string,
     incremental = false,
     options: BuildOptions = {}
 ) {
-    const service = await ensureService();
-
     const outdir = findTargetDirectory(filename);
     const outfile = resolve(outdir, basename(filename) + ".js");
     const external = await resolveExternal(filename);
-    const result = await service.build({
+    const result = await esbuild.build({
         entryPoints: [filename],
         external,
         platform: "node",
@@ -81,7 +61,7 @@ export async function esbuildRun(
 ) {
     let outfile: string;
     try {
-        ({ outfile } = await esbuild(filename, false, options));
+        ({ outfile } = await runEsbuild(filename, false, options));
     } catch {
         return;
     }
@@ -95,8 +75,6 @@ export async function esbuildRun(
         });
     } catch {
         console.error(getMessage(outfile, args));
-    } finally {
-        stopService();
     }
 }
 
@@ -124,7 +102,7 @@ export async function esbuildDev(
             if (result) {
                 result = await result.rebuild();
             } else {
-                ({ outfile, result } = await esbuild(filename, true, options));
+                ({ outfile, result } = await runEsbuild(filename, true, options));
                 argv = ["--enable-source-maps", outfile, ...args];
             }
             return true;
@@ -198,7 +176,6 @@ export async function esbuildDev(
     watcher.on("change", debounce(update, 300));
 
     process.on("SIGINT", () => {
-        stopService();
         process.exit();
     });
 
