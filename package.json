@@ -1,40 +1,40 @@
 {
-    "name": "@hyrious/esbuild-dev",
-    "version": "0.2.2",
-    "description": "Just esbuild + chokidar.",
-    "main": "dist/index.js",
-    "types": "src/index.ts",
-    "bin": {
-        "esbuild-dev": "dist/bin.js"
-    },
-    "files": [
-        "src",
-        "dist"
-    ],
-    "scripts": {
-        "clean": "rimraf dist",
-        "build": "esbuild-dev src/build.ts"
-    },
-    "repository": "hyrious/esbuild-dev",
-    "keywords": [
-        "cli",
-        "esbuild"
-    ],
-    "author": "hyrious <hyrious@outlook.com>",
-    "license": "MIT",
-    "engines": {
-        "node": ">=14.0.0"
-    },
-    "dependencies": {
-        "chokidar": "latest",
-        "esbuild": "^0.9.2"
-    },
-    "devDependencies": {
-        "@hyrious/esbuild-dev": "0.2.1",
-        "@types/lodash.debounce": "^4.0.6",
-        "@types/node": "^14.14.35",
-        "builtin-modules": "^3.2.0",
-        "lodash.debounce": "^4.0.8",
-        "rimraf": "^3.0.2"
-    }
+  "name": "@hyrious/esbuild-dev",
+  "version": "0.2.3",
+  "description": "Just esbuild + chokidar.",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "bin": {
+    "esbuild-dev": "dist/bin.js"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "esbuild-dev src/build.ts"
+  },
+  "repository": "hyrious/esbuild-dev",
+  "keywords": [
+    "cli",
+    "esbuild"
+  ],
+  "author": "hyrious <hyrious@outlook.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.1",
+    "esbuild": "^0.10.2"
+  },
+  "devDependencies": {
+    "@hyrious/esbuild-dev": "0.2.2",
+    "@types/lodash.debounce": "^4.0.6",
+    "@types/node": "^14.14.37",
+    "builtin-modules": "^3.2.0",
+    "lodash.debounce": "^4.0.8",
+    "rimraf": "^3.0.2"
+  }
 }
