@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "chokidar": "^3.5.1",
-    "esbuild": "^0.10.2"
+    "esbuild": "^0.11.5"
   },
   "devDependencies": {
-    "@hyrious/esbuild-dev": "0.2.2",
+    "@hyrious/esbuild-dev": "0.2.3",
     "@types/lodash.debounce": "^4.0.6",
     "@types/node": "^14.14.37",
     "builtin-modules": "^3.2.0",
