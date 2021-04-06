@@ -87,7 +87,9 @@ export async function resolveExternal(filename: string) {
   try {
     const json = await fs.promises.readFile(pkgJson, "utf-8");
     const pkg = JSON.parse(json);
-    return Object.keys(pkg.dependencies ?? {});
+    const deps =  Object.keys(pkg.dependencies ?? {});
+    const devDeps = Object.keys(pkg.devDependencies ?? {});
+    return [...deps, ...devDeps];
   } catch {
     return [];
   }
