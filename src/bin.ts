@@ -1,9 +1,11 @@
 import { esbuildDev, esbuildRun } from ".";
 import help from "./help.txt";
-import { resolvePlugins } from "./utils";
+import { argv2config, resolveExternal, resolvePlugins } from "./utils";
+import { buildSync } from "esbuild";
 
 const FlagHelp = "--help";
 const FlagWatch = "--watch";
+const FlagBuild = "--build";
 const FlagPlugins = ["-p", "--plugin"];
 
 async function main() {
@@ -11,6 +13,7 @@ async function main() {
   const plugins = resolvePlugins(argv, FlagPlugins);
   const shouldHelp = argv.includes(FlagHelp);
   const shouldWatch = argv.indexOf(FlagWatch);
+  const shouldBuild = argv.indexOf(FlagBuild);
 
   if (shouldWatch !== -1) {
     argv.splice(shouldWatch, 1);
@@ -18,6 +21,27 @@ async function main() {
 
   if (shouldHelp || !argv[0]) {
     return console.log(help);
+  }
+
+  if (shouldBuild !== -1) {
+    argv.splice(shouldBuild, 1);
+    let binOptions = {};
+    if (argv[0].includes("bin")) {
+      binOptions = { banner: { js: "#!/usr/bin/env node" } };
+    }
+    buildSync({
+      entryPoints: [argv[0]],
+      external: await resolveExternal(argv[0], false),
+      platform: "node",
+      target: "node12",
+      bundle: true,
+      minify: true,
+      sourcemap: true,
+      outdir: "dist",
+      ...binOptions,
+      ...argv2config(argv.slice(1)),
+    });
+    return;
   }
 
   if (shouldWatch !== -1) {

@@ -1,5 +1,5 @@
 import builtinModules from "builtin-modules";
-import { Plugin } from "esbuild";
+import { BuildOptions, Plugin } from "esbuild";
 import fs from "fs";
 import os from "os";
 import { dirname, resolve } from "path";
@@ -81,15 +81,19 @@ export function findUpperFile(filename: string, target: string) {
  * @example
  * await resolveExternal('main.ts') // ['lodash', 'esbuild']
  */
-export async function resolveExternal(filename: string) {
+export async function resolveExternal(filename: string, includeDev = true) {
   const pkgJson = findUpperFile(filename, "package.json");
   if (!pkgJson) return [];
   try {
     const json = await fs.promises.readFile(pkgJson, "utf-8");
     const pkg = JSON.parse(json);
-    const deps =  Object.keys(pkg.dependencies ?? {});
-    const devDeps = Object.keys(pkg.devDependencies ?? {});
-    return [...deps, ...devDeps];
+    const deps = Object.keys(pkg.dependencies ?? {});
+    if (includeDev) {
+      const devDeps = Object.keys(pkg.devDependencies ?? {});
+      return [...deps, ...devDeps];
+    } else {
+      return deps;
+    }
   } catch {
     return [];
   }
@@ -208,4 +212,69 @@ export function resolvePlugins(argv: string[], flags: string[]) {
     argv.splice(i, 2);
   }
   return ret;
+}
+
+function str2config(str: string) {
+  str = str.trim();
+  if (!str.startsWith("--")) {
+    console.warn("warning: build options must start with '--', got invalid option:");
+    console.warn(inspect(str));
+    return {};
+  }
+  if (str.startsWith("--no-")) {
+    return { [str.substring(/* "--no-".length */ 5)]: false };
+  }
+  str = str.substring(/* "--".length */ 2);
+  const keyMatch = str.match(/^[-\w]+/);
+  if (keyMatch == null) {
+    console.warn("warning: expecting valid build option, got:");
+    console.warn(inspect(str));
+    return {};
+  }
+  const key = keyMatch[0];
+  str = str.substring(key.length).trim();
+  if (!str) {
+    return { [key]: true };
+  }
+  const delim = str[0];
+  str = str.substring(1);
+  if (delim === "=") {
+    if (!str) {
+      return { [key]: str };
+    }
+    const mayBeNumber = Number(str);
+    if (Number.isNaN(mayBeNumber)) {
+      return { [key]: str };
+    } else {
+      return { [key]: mayBeNumber };
+    }
+  } else if (delim === ":") {
+    const [k, v] = str.split("=", 2);
+    if (v === undefined) {
+      return { [key]: [k] };
+    } else {
+      return { [key]: { [k]: v } };
+    }
+  } else {
+    console.warn("warning: expecting valid build option value, got:");
+    console.warn(inspect(str));
+    return {};
+  }
+}
+
+export function argv2config(argv: string[]) {
+  const config: Record<string, unknown> = {};
+  for (const arg of argv.map(str2config)) {
+    for (const key in arg) {
+      const value = arg[key];
+      if (Array.isArray(value)) {
+        config[key] = [...(config[key] as string[] ?? []), ...value];
+      } else if (typeof value === "object") {
+        config[key] = { ...(config[key] as object ?? {}), ...value };
+      } else {
+        config[key] = value;
+      }
+    }
+  }
+  return config as BuildOptions;
 }
