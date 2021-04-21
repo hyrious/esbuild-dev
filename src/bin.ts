@@ -1,7 +1,7 @@
 import { esbuildDev, esbuildRun } from ".";
 import help from "./help.txt";
 import { argv2config, resolveExternal, resolvePlugins } from "./utils";
-import { buildSync } from "esbuild";
+import { BuildOptions, buildSync } from "esbuild";
 
 const FlagHelp = "--help";
 const FlagWatch = "--watch";
@@ -29,7 +29,7 @@ async function main() {
     if (argv[0].includes("bin")) {
       binOptions = { banner: { js: "#!/usr/bin/env node" } };
     }
-    buildSync({
+    const buildOptions: BuildOptions = {
       entryPoints: [argv[0]],
       external: await resolveExternal(argv[0], false),
       platform: "node",
@@ -40,7 +40,12 @@ async function main() {
       outdir: "dist",
       ...binOptions,
       ...argv2config(argv.slice(1)),
-    });
+    }
+    if (buildOptions.outdir && buildOptions.outfile) {
+      // Cannot use both "outfile" and "outdir"
+      delete buildOptions.outdir;
+    }
+    buildSync(buildOptions);
     return;
   }
 
