@@ -22,17 +22,14 @@
   ],
   "author": "hyrious <hyrious@outlook.com>",
   "license": "MIT",
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "dependencies": {
     "chokidar": "^3.5.1",
-    "esbuild": "^0.11.16"
+    "esbuild": "^0.12.0"
   },
   "devDependencies": {
     "@hyrious/esbuild-dev": "0.2.7",
     "@types/lodash.debounce": "^4.0.6",
-    "@types/node": "^15.0.1",
+    "@types/node": "^15.3.0",
     "builtin-modules": "^3.2.0",
     "lodash.debounce": "^4.0.8",
     "rimraf": "^3.0.2"
