@@ -1,4 +1,4 @@
-## esbuild-dev
+## @hyrious/esbuild-dev
 
 Just esbuild + chokidar, like `node-dev`.
 
@@ -7,7 +7,7 @@ Require Node.js `>=14` to use `--enable-source-maps`.
 ### Features
 
 - ⚡ **_Fast_** with the help of esbuild, use `esbuild-dev` to substitute `ts-node`
-  - pros: checkout [this repo's actions](https://github.com/hyrious/esbuild-dev/actions), `yarn build` done in 0.30s!
+  - pros: checkout [this repo's actions](https://github.com/hyrious/esbuild-dev/actions), `npm run build` done in 0.30s!
   - cons: you won't get any type checking at all
 - 🐛 **_Easy to Debug_** with the help of node's `--enable-source-maps`
 - **_No Magic_**. the author refuses to use any `require.extensions`-like things
@@ -27,17 +27,17 @@ Without `--watch`, it works like `node main.js`.
 With `--build`, it calls `esbuild --bundle ...`. By default, it includes these configs:
 
 ```ts
-import type { BuildOptions } from "esbuild";
-import pkg from "./package.json";
+import type { BuildOptions } from 'esbuild'
+import pkg from './package.json'
 const defaultOptions: BuildOptions = {
-  external: Object.keys(pkg.dependencies ?? {}),
-  platform: "node",
-  target: "node12",
+  external: Object.keys({ ...pkg.dependencies, ...pkg.peerDependencies }),
+  platform: 'node',
+  target: 'node12',
   bundle: true,
   minify: true,
   sourcemap: true,
-  outdir: "dist",
-};
+  outdir: 'dist',
+}
 ```
 
 You may want to append more configs, just add them after the filename. For example:
@@ -56,10 +56,6 @@ Internally it follows a simple transform rule to convert command line args into 
 | `--a=b`           | `{ a: 'b' }`              | string           |
 | `--a:b --a:c`     | `{ a: ['b', 'c'] }`       | array            |
 | `--a:b=c --a:d=e` | `{ a: { b: 'c', d: 'e' }` | object           |
-
-### Todo
-
-- [Get rid of resolving dependencies by hand if esbuild provides it](https://github.com/evanw/esbuild/issues/1072).
 
 ### License
 

@@ -1,280 +1,210 @@
-import builtinModules from "builtin-modules";
-import { BuildOptions, Plugin } from "esbuild";
-import fs from "fs";
-import os from "os";
-import { dirname, resolve } from "path";
-import { inspect } from "util";
-import message from "./message.txt";
+import type {
+  BuildIncremental,
+  BuildOptions,
+  BuildResult,
+  Plugin,
+} from 'esbuild'
+import { build } from 'esbuild'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
+import util from 'util'
+import message from './message.txt'
 
-/**
- * @example
- * for (const match of scan('123 456', /(\d+)/)) {
- *     console.log(+match[1])
- * }
- */
-export function* scan(str: string, re: RegExp) {
-  re = new RegExp(re.source, "g");
-  let m: RegExpExecArray | null;
-  do {
-    m = re.exec(str);
-    if (m) yield m;
-  } while (m);
+export function delay(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms))
 }
 
-/**
- * @example
- * function *g(arr) {
- *     yield* arr;
- * }
- * for (const x of concatGen(g([1, 2]), g([3, 4]))) {
- *     console.log(x) // 1 2 3 4
- * }
- */
-export function* concatGen<A>(...gens: Generator<A>[]) {
-  for (const gen of gens) {
-    yield* gen;
+export function lookupFile(dir: string, file: string): string | undefined {
+  const fullPath = path.join(dir, file)
+  if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+    return fullPath
+  }
+  const parentDir = path.dirname(dir)
+  if (parentDir !== dir) {
+    return lookupFile(dir, file)
   }
 }
 
-/**
- * @example
- * isAlpha('a') // true
- */
-export function isAlpha(chr: string) {
-  return /^[A-Z]$/i.test(chr);
+export function resolveOutdir() {
+  const pkgPath = lookupFile(process.cwd(), 'package.json')
+  if (pkgPath) {
+    const outdir = path.join(path.dirname(pkgPath), `node_modules/.esbuild-dev`)
+    fs.mkdirSync(outdir, { recursive: true })
+    return outdir
+  }
+  return os.tmpdir()
 }
 
-/**
- * @example
- * tryIndexFile('.') // path/to/here/index.js
- */
-export function tryIndexFile(dir: string) {
-  const exts = [".js", ".mjs", ".jsx", ".ts", ".tsx"];
-  for (const ext of exts) {
-    if (fs.existsSync(dir + ext)) return dir + ext;
+export function resolveExternal(includeDev = true) {
+  const pkgPath = lookupFile(process.cwd(), 'package.json')
+  if (pkgPath) {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+    return Object.keys({
+      ...pkg.dependencies,
+      ...pkg.peerDependencies,
+      ...(includeDev && pkg.devDependencies),
+    })
   }
-  for (const ext of exts) {
-    const path = resolve(dir, "index" + ext);
-    if (fs.existsSync(path)) return path;
-  }
+  return []
 }
 
-/**
- * @example
- * findUpperFile('path/to/some/main.ts', 'package.json')
- * // 'path/to/some/package.json'
- */
-export function findUpperFile(filename: string, target: string) {
-  let lastdir = "";
-  let dir = filename;
-  while (lastdir !== dir) {
-    lastdir = dir;
-    dir = dirname(dir);
-    const pkg = resolve(dir, target);
-    if (fs.existsSync(pkg)) {
-      return pkg;
-    }
-  }
-}
-
-/**
- * @example
- * await resolveExternal('main.ts') // ['lodash', 'esbuild']
- */
-export async function resolveExternal(filename: string, includeDev = true) {
-  const pkgJson = findUpperFile(filename, "package.json");
-  if (!pkgJson) return [];
-  try {
-    const json = await fs.promises.readFile(pkgJson, "utf-8");
-    const pkg = JSON.parse(json);
-    const deps = Object.keys(pkg.dependencies ?? {});
-    if (includeDev) {
-      const devDeps = Object.keys(pkg.devDependencies ?? {});
-      return [...deps, ...devDeps];
-    } else {
-      return deps;
-    }
-  } catch {
-    return [];
-  }
-}
-
-/**
- * @example
- * // main.ts: import 'a.ts'
- * await resolveDependencies('main.ts') // ['a.ts']
- */
-export async function resolveDependencies(filename: string) {
-  const result: string[] = [];
-  const queue = [filename];
-  while (queue.length > 0) {
-    let filename = queue.shift()!;
-    const code = await fs.promises.readFile(filename, "utf-8");
-    for (const { 1: mod } of concatGen(
-      scan(code, /\bimport\b[^'"]+['"(]([^'")]+)/),
-      scan(code, /\brequire\s*\(['"]([^'"]+)/)
-    )) {
-      // may match nothing
-      if (!mod) continue;
-      // builtin modules
-      if (builtinModules.includes(mod.split("/", 2)[0])) continue;
-      // node_modules
-      if (isAlpha(mod[0])) continue;
-
-      let dep = resolve(dirname(filename), mod);
-      if (!fs.existsSync(dep) || fs.statSync(dep).isDirectory()) {
-        const indexFile = tryIndexFile(dep);
-        if (indexFile) dep = indexFile;
-        else continue;
-      }
-      if (!result.includes(dep)) {
-        queue.push(dep);
-        result.push(dep);
-      }
-    }
-  }
-  return result;
-}
-
-/**
- * Find somewhere to put dist.js.
- * @example
- * findTargetDirectory('main.ts')
- * // (file in package) 'path/to/node_modules/.esbuild-dev'
- * // (normal file) '/tmp'
- */
-export function findTargetDirectory(filename: string) {
-  const nodeModules = findUpperFile(filename, "node_modules");
-  if (nodeModules) {
-    const target = resolve(nodeModules, ".esbuild-dev");
-    if (!fs.existsSync(target)) fs.mkdirSync(target);
-    return target;
-  }
-  return os.tmpdir();
-}
-
-export function getMessage(file: string, args: string[]) {
-  const argsString = args.map((e) => inspect(e)).join(" ");
-  return message.replace("{file}", file).replace("{args}", argsString);
-}
-
-function tryRequire(mod: string) {
-  let result: any;
-  try {
-    result = require(mod);
-  } catch {
-    try {
-      result = require(resolve(mod));
-    } catch {}
-  }
-  if (typeof result === "object" && result.__esModule) {
-    return result.default || result;
+function unwrap(mod: any) {
+  if (typeof mod === 'object' && mod.__esModule) {
+    return mod.default || mod
   } else {
-    return result;
+    return mod
   }
 }
 
-function indexOfSome<T>(array: Array<T>, values: T[]) {
-  const set = new Set(values);
-  for (let i = 0; i < array.length; ++i) {
-    if (set.has(array[i])) return i;
+export function resolvePlugins(argv: string[]) {
+  const pkgPath = lookupFile(process.cwd(), 'package.json')
+  if (!pkgPath) {
+    throw new Error('can not use plugins outside of npm package')
   }
-  return -1;
-}
-
-export function resolvePlugins(argv: string[], flags: string[]) {
-  const ret: Plugin[] = [];
-  let flag = false;
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+  const deps = Object.keys({
+    ...pkg.dependencies,
+    ...pkg.devDependencies,
+  }).filter(e => e.includes('esbuild-'))
+  const flags = new Set(['-p', '--plugin'])
+  const plugins: Plugin[] = []
+  let seeFlag = false
   for (const arg of argv) {
-    if (flag) {
-      flag = false;
-      let mod: Plugin | (() => Plugin);
-      if (arg.startsWith(".") || arg.startsWith("esbuild-")) {
-        mod = tryRequire(arg);
+    if (seeFlag) {
+      seeFlag = false
+      let mod: Plugin | (() => Plugin) | undefined
+      if (fs.existsSync(arg) && fs.statSync(arg).isFile()) {
+        mod = unwrap(require(path.resolve(arg)))
       } else {
-        mod = tryRequire(`esbuild-plugin-${arg}`) || tryRequire(`esbuild-${arg}`);
+        for (const dep of deps) {
+          if (dep.includes(arg)) {
+            mod = unwrap(require(dep))
+            break
+          }
+        }
       }
       if (mod) {
         if (mod instanceof Function) {
           try {
-            ret.push(mod());
+            plugins.push(mod())
           } catch {}
         } else {
-          ret.push(mod);
+          plugins.push(mod)
         }
       }
-    } else if (flags.includes(arg)) {
-      flag = true;
+    } else if (flags.has(arg)) {
+      seeFlag = true
     }
   }
-  let i = -1;
-  while ((i = indexOfSome(argv, flags)) !== -1) {
-    argv.splice(i, 2);
+  for (let i = -1; (i = argv.findIndex(e => flags.has(e))) !== -1; ) {
+    argv.splice(i, 2)
   }
-  return ret;
+  return plugins
+}
+
+export async function esbuild(
+  entryPoint: string,
+  options?: BuildOptions & { incremental: true }
+): Promise<{ outfile: string; result: BuildIncremental }>
+export async function esbuild(
+  entryPoint: string,
+  options?: BuildOptions
+): Promise<{ outfile: string; result: BuildResult }>
+export async function esbuild(entryPoint: string, options: BuildOptions = {}) {
+  const outdir = resolveOutdir()
+  const outfile = path.resolve(outdir, entryPoint + '.mjs')
+  const result = await build({
+    entryPoints: [entryPoint],
+    external: resolveExternal(),
+    platform: 'node',
+    target: 'node14',
+    format: 'esm',
+    bundle: true,
+    sourcemap: true,
+    metafile: true,
+    outfile,
+    define: {
+      __filename: JSON.stringify(outfile),
+      __dirname: JSON.stringify(path.dirname(outfile)),
+    },
+    ...options,
+  })
+  return { outfile, result }
+}
+
+export function errorMessage(file: string, args_: string[]) {
+  const args = args_.map(e => util.inspect(e)).join(' ')
+  const template = { file, args }
+  return message.replaceAll(
+    /{(\w+)}/g,
+    (_, key: 'file' | 'args') => template[key] || ''
+  )
 }
 
 function str2config(str: string) {
-  str = str.trim();
-  if (!str.startsWith("--")) {
-    console.warn("warning: build options must start with '--', got invalid option:");
-    console.warn(inspect(str));
-    return {};
+  str = str.trim()
+  if (!str.startsWith('--')) {
+    console.warn(
+      "warning: build options must start with '--', got invalid option:"
+    )
+    console.warn(util.inspect(str))
+    return {}
   }
-  if (str.startsWith("--no-")) {
-    return { [str.substring(/* "--no-".length */ 5)]: false };
+  if (str.startsWith('--no-')) {
+    return { [str.substring(/* "--no-".length */ 5)]: false }
   }
-  str = str.substring(/* "--".length */ 2);
-  const keyMatch = str.match(/^[-\w]+/);
+  str = str.substring(/* "--".length */ 2)
+  const keyMatch = str.match(/^[-\w]+/)
   if (keyMatch == null) {
-    console.warn("warning: expecting valid build option, got:");
-    console.warn(inspect(str));
-    return {};
+    console.warn('warning: expecting valid build option key, got:')
+    console.warn(util.inspect(str))
+    return {}
   }
-  const key = keyMatch[0];
-  str = str.substring(key.length).trim();
+  const key = keyMatch[0]
+  str = str.substring(key.length).trim()
   if (!str) {
-    return { [key]: true };
+    return { [key]: true }
   }
-  const delim = str[0];
-  str = str.substring(1);
-  if (delim === "=") {
+  const delimiter = str[0]
+  str = str.substring(1)
+  if (delimiter === '=') {
     if (!str) {
-      return { [key]: str };
+      return { [key]: str }
     }
-    const mayBeNumber = Number(str);
+    const mayBeNumber = Number(str)
     if (Number.isNaN(mayBeNumber)) {
-      return { [key]: str };
+      return { [key]: str }
     } else {
-      return { [key]: mayBeNumber };
+      return { [key]: mayBeNumber }
     }
-  } else if (delim === ":") {
-    const [k, v] = str.split("=", 2);
+  } else if (delimiter === ':') {
+    const [k, v] = str.split('=', 2)
     if (v === undefined) {
-      return { [key]: [k] };
+      return { [key]: [k] }
     } else {
-      return { [key]: { [k]: v } };
+      return { [key]: { [k]: v } }
     }
   } else {
-    console.warn("warning: expecting valid build option value, got:");
-    console.warn(inspect(str));
-    return {};
+    console.warn('warning: expecting valid build option value, got:')
+    console.warn(util.inspect(str))
+    return {}
   }
 }
 
 export function argv2config(argv: string[]) {
-  const config: Record<string, unknown> = {};
+  const config: Record<string, unknown> = {}
   for (const arg of argv.map(str2config)) {
     for (const key in arg) {
-      const value = arg[key];
+      const value = arg[key]
       if (Array.isArray(value)) {
-        config[key] = [...(config[key] as string[] ?? []), ...value];
-      } else if (typeof value === "object") {
-        config[key] = { ...(config[key] as object ?? {}), ...value };
+        config[key] = [...((config[key] as string[]) ?? []), ...value]
+      } else if (typeof value === 'object') {
+        config[key] = { ...(config[key] as object), ...value }
       } else {
-        config[key] = value;
+        config[key] = value
       }
     }
   }
-  return config as BuildOptions;
+  return config as BuildOptions
 }

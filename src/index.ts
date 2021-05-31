@@ -1,189 +1,133 @@
-import { ChildProcess, spawn, spawnSync } from "child_process";
-import { watch } from "chokidar";
-import esbuild, { BuildIncremental, BuildOptions, BuildResult } from "esbuild";
-import debounce from "lodash.debounce";
-import { basename, dirname, resolve } from "path";
-import {
-  findTargetDirectory,
-  findUpperFile,
-  getMessage,
-  resolveDependencies,
-  resolveExternal,
-} from "./utils";
-
-async function runEsbuild(
-  filename: string,
-  incremental: true,
-  options?: BuildOptions
-): Promise<{ outfile: string; result: BuildIncremental }>;
-
-async function runEsbuild(
-  filename: string,
-  incremental?: false,
-  options?: BuildOptions
-): Promise<{ outfile: string; result: BuildResult }>;
-
-async function runEsbuild(filename: string, incremental = false, options: BuildOptions = {}) {
-  const outdir = findTargetDirectory(filename);
-  const outfile = resolve(outdir, basename(filename) + ".js");
-  const external = await resolveExternal(filename);
-  const _filename = resolve(filename);
-  const result = await esbuild.build({
-    entryPoints: [filename],
-    external,
-    platform: "node",
-    target: "node14",
-    bundle: true,
-    outfile,
-    sourcemap: true,
-    incremental,
-    define: {
-      __filename: JSON.stringify(_filename),
-      __dirname: JSON.stringify(dirname(_filename)),
-    },
-    ...options,
-  });
-
-  return { outfile, result };
-}
+import type { ChildProcess } from 'child_process'
+import cp from 'child_process'
+import chokidar from 'chokidar'
+import type { BuildIncremental, BuildOptions } from 'esbuild'
+import debounce from 'lodash.debounce'
+import { delay, errorMessage, esbuild, lookupFile } from './utils'
 
 /**
- * Like `node filename`, run file without watch.
- * @param filename - the file, usually ends with `.ts`
+ * Build and run the input file.
+ * @example
+ * runFile("main.ts")
+ * // actually runs `node_modules/.esbuild-dev/main.ts.mjs`
  */
-export async function esbuildRun(filename: string, args: string[] = [], options?: BuildOptions) {
-  let outfile: string;
+export async function runFile(
+  filename: string,
+  args: string[] = [],
+  options?: BuildOptions
+) {
+  let outfile: string
   try {
-    ({ outfile } = await runEsbuild(filename, false, options));
+    ;({ outfile } = await esbuild(filename, options))
   } catch {
-    return;
+    return
   }
 
-  const argv = ["--enable-source-maps", outfile, ...args];
+  const argv = ['--enable-source-maps', outfile, ...args]
   try {
-    spawnSync(process.argv0, argv, {
-      stdio: "inherit",
+    cp.spawnSync(process.argv0, argv, {
+      stdio: 'inherit',
       cwd: process.cwd(),
       env: process.env,
-    });
+    })
   } catch {
-    console.error(getMessage(outfile, args));
+    console.error(errorMessage(outfile, args))
   }
 }
 
 /**
- * Like `node-dev filename`, run file with watch and automatically restart.
- * @param filename - the file, usually ends with `.ts`
+ * Watch and run the input file.
+ * @example
+ * watchFile("main.ts")
+ * // actually runs `node_modules/.esbuild-dev/main.ts.mjs`
  */
-export async function esbuildDev(filename: string, args: string[] = [], options?: BuildOptions) {
-  let outfile: string;
-  let result: BuildIncremental | null = null;
-  let argv: string[];
-  let child: ChildProcess | null = null;
+export async function watchFile(
+  filename: string,
+  args: string[] = [],
+  options?: BuildOptions
+) {
+  let outfile: string
+  let result: BuildIncremental | undefined
+  let argv: string[]
+  let child: ChildProcess | undefined
 
-  const rebuild = async (needRefresh = false) => {
-    if (result && needRefresh) {
-      result.rebuild.dispose();
-      result = null;
+  const rebuild = async (pkgJsonChanged = false) => {
+    if (result && pkgJsonChanged) {
+      result.rebuild.dispose()
+      result = undefined
     }
 
     try {
       if (result) {
-        result = await result.rebuild();
+        result = await result.rebuild()
       } else {
-        ({ outfile, result } = await runEsbuild(filename, true, options));
-        argv = ["--enable-source-maps", outfile, ...args];
+        ;({ outfile, result } = await esbuild(filename, {
+          ...options,
+          incremental: true,
+        }))
+        argv = ['--enable-source-maps', outfile, ...args]
       }
-      return true;
+      return true
     } catch {
-      result = null;
+      result = undefined
       // esbuild already prints error message, don't show again
-      return false;
+      return false
     }
-  };
+  }
 
-  const stop = () =>
-    new Promise<void>((resolve) => {
-      if (child) {
-        const dying = child;
-        dying.kill("SIGTERM");
-        setTimeout(() => {
-          if (dying.killed) {
-            resolve();
-          } else {
-            setTimeout(() => {
-              if (!dying.killed) {
-                dying.kill("SIGKILL");
-              }
-              resolve();
-            }, 1000);
-          }
-        }, 100);
-        child = null;
-      } else {
-        resolve();
-      }
-    });
+  const stop = async () => {
+    if (child) {
+      const dying = child
+      child = undefined
+      dying.kill('SIGTERM')
+      await delay(100)
+      if (dying.killed) return
+      await delay(900)
+      if (!dying.killed) dying.kill('SIGKILL')
+      await delay(100)
+    }
+  }
 
   const restart = async () => {
-    await stop();
+    await stop()
     if (result) {
       try {
-        child = spawn(process.argv0, argv, {
-          stdio: "inherit",
+        child = cp.spawn(process.argv0, argv, {
+          stdio: 'inherit',
           cwd: process.cwd(),
           env: process.env,
-        });
-        child.on("close", (code) => {
-          // prettier-ignore
-          console.log("[esbuild-dev] child process stopped with code", code);
-          child = null;
-        });
-        child.on("error", () => {
-          console.error(getMessage(outfile, args));
-          stop();
-        });
+        })
+        child.on('close', code => {
+          console.log('[esbuild-dev] child process stopped with code', code)
+          child = undefined
+        })
+        child.on('error', () => {
+          console.error(errorMessage(outfile, args))
+          stop()
+        })
       } catch {
-        console.error(getMessage(outfile, args));
-        child = null;
+        console.error(errorMessage(outfile, args))
+        child = undefined
       }
     }
-  };
+  }
 
-  // if the file is in a package, watch pkg.dependencies
-  const pkgJson = findUpperFile(filename, "package.json");
+  const pkgJson = lookupFile(filename, 'package.json')
   if (pkgJson) {
-    watch(pkgJson).on("change", async () => {
-      if (await rebuild(true)) await restart();
-    });
+    chokidar.watch(pkgJson).on('change', async () => {
+      if (await rebuild(true)) await restart()
+    })
   }
 
-  let deps = await resolveDependencies(filename);
+  const watcher = chokidar.watch(filename)
+  watcher.on('ready', async () => {
+    if (await rebuild()) await restart()
+  })
+  watcher.on('change', debounce(updateDepsAndRestart, 300))
 
-  const watcher = watch([filename, ...deps]);
-  watcher.on("ready", restart);
-  watcher.on("change", debounce(update, 300));
-
-  process.on("SIGINT", () => {
-    process.exit();
-  });
-
-  async function update() {
-    const newDeps = await resolveDependencies(filename);
-
-    const toBeRemoved = new Set<string>();
-    deps.forEach((e) => toBeRemoved.add(e));
-    newDeps.forEach((e) => toBeRemoved.delete(e));
-    watcher.unwatch(Array.from(toBeRemoved));
-
-    const toBeAdded = new Set<string>();
-    newDeps.forEach((e) => toBeAdded.add(e));
-    deps.forEach((e) => toBeAdded.delete(e));
-    watcher.add(Array.from(toBeAdded));
-
-    if (await rebuild()) await restart();
+  async function updateDepsAndRestart() {
+    watcher.unwatch(Object.keys(watcher.getWatched()))
+    watcher.add([filename, ...Object.keys({ ...result?.metafile?.inputs })])
+    if (await rebuild()) await restart()
   }
-
-  // kick start first run
-  if (await rebuild()) await restart();
 }
