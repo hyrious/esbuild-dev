@@ -57,18 +57,9 @@ Internally it follows a simple transform rule to convert command line args into 
 | `--a:b --a:c`     | `{ a: ['b', 'c'] }`       | array            |
 | `--a:b=c --a:d=e` | `{ a: { b: 'c', d: 'e' }` | object           |
 
-More examples:
+### Todo
 
-**bin**
-
-```shell-session
-npx @hyrious/esbuild-dev --build main.ts --banner:js="#!/usr/bin/env node"
-```
-
-<dl>
-    <dt>Note</dt>
-    <dd>you don't have to write this if your entry file name includes "bin".</dd>
-</dl>
+- [Get rid of resolving dependencies by hand if esbuild provides it](https://github.com/evanw/esbuild/issues/1072).
 
 ### License
 
