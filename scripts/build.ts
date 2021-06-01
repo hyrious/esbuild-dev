@@ -13,8 +13,7 @@ const common: BuildOptions = {
 build({
   ...common,
   entryPoints: ['src/bin.ts'],
-  minify: true,
-  banner: { js: '#!/usr/bin/env node --enable-source-maps' },
+  banner: { js: '#!/usr/bin/env node' },
 })
 
 build({
