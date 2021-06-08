@@ -113,7 +113,8 @@ export async function esbuild(
 ): Promise<{ outfile: string; result: BuildResult }>
 export async function esbuild(entryPoint: string, options: BuildOptions = {}) {
   const outdir = resolveOutdir()
-  const outfile = path.resolve(outdir, entryPoint + '.mjs')
+  const extname = (options.format || 'esm') === 'esm' ? '.mjs' : '.js'
+  const outfile = path.resolve(outdir, entryPoint + extname)
   const result = await build({
     entryPoints: [entryPoint],
     external: resolveExternal(),

@@ -14,17 +14,31 @@ Require Node.js `>=14` to use `--enable-source-maps`.
 
 ### Usage
 
-```shell-session
-npx @hyrious/esbuild-dev main.ts --args-passed-to-main.ts
-npx @hyrious/esbuild-dev --watch main.ts --args-passed-to-main.ts
-npx @hyrious/esbuild-dev --build main.ts --args-passed-to-esbuild
+**Run file**
+
+```bash
+npx @hyrious/esbuild-dev [--cjs] main.ts [--args]
 ```
 
-With `--watch`, it works like `node-dev main.js`.
+By default, it compiles your file into esm format.
 
-Without `--watch`, it works like `node main.js`.
+Add `--cjs` before the file name to use cjs format (if you want to use `require.resolve`).
 
-With `--build`, it calls `esbuild --bundle ...`. By default, it includes these configs:
+**Watch file**
+
+```bash
+npx @hyrious/esbuild-dev [--cjs] --watch main.ts [--args]
+```
+
+**Build (bundle) file**
+
+```bash
+npx @hyrious/esbuild-dev --build main.ts [--args-for-esbuild]
+```
+
+### Details
+
+By default, `--build` uses this config:
 
 ```ts
 import type { BuildOptions } from 'esbuild'
