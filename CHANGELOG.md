@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.6] - 2021-06-15
+### Added
+- `requireFile()` to dynamically require a file, remember to add `--cjs` to use it
+- `importFile()` to dynamically import a file
+
 ## [0.3.5] - 2021-06-15
 ### Fixed
 - Incorrect watch files on first run.
@@ -38,7 +43,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Shortcut to call `esbuild --bundle`.
 - Plugins support.
 
-[Unreleased]: https://github.com/hyrious/esbuild-dev/compare/v0.3.5...HEAD
+[Unreleased]: https://github.com/hyrious/esbuild-dev/compare/v0.3.6...HEAD
+[0.3.6]: https://github.com/hyrious/esbuild-dev/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/hyrious/esbuild-dev/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/hyrious/esbuild-dev/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/hyrious/esbuild-dev/compare/v0.3.2...v0.3.3

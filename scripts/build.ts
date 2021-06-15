@@ -7,7 +7,7 @@ const common: BuildOptions = {
   bundle: true,
   sourcemap: true,
   outdir: 'dist',
-  target: 'node12',
+  target: 'node14',
 }
 
 build({

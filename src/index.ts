@@ -129,3 +129,37 @@ export async function watchFile(
     watcher.add([filename, ...Object.keys({ ...result?.metafile?.inputs })])
   }
 }
+
+/**
+ * @example
+ * requireFile('main.ts')
+ * // actually runs `require("node_modules/.esbuild-dev/main.ts.js")`
+ * // returns undefined if esbuild failed
+ * // note that require() is forbidden in esm modules
+ * // remember to add "--cjs" when use esbuild-dev to run this file
+ */
+export async function requireFile(filename: string, options?: BuildOptions) {
+  let outfile: string
+  try {
+    ;({ outfile } = await esbuild(filename, { ...options, format: 'cjs' }))
+  } catch {
+    return
+  }
+  return require(outfile)
+}
+
+/**
+ * @example
+ * await importFile('main.ts')
+ * // actually runs `import("node_modules/.esbuild-dev/main.ts.mjs")`
+ * // returns undefined if esbuild failed
+ */
+export async function importFile(filename: string, options?: BuildOptions) {
+  let outfile: string
+  try {
+    ;({ outfile } = await esbuild(filename, { ...options, format: 'esm' }))
+  } catch {
+    return
+  }
+  return import(outfile)
+}
