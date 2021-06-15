@@ -22,7 +22,7 @@ export function lookupFile(dir: string, file: string): string | undefined {
   }
   const parentDir = path.dirname(dir)
   if (parentDir !== dir) {
-    return lookupFile(dir, file)
+    return lookupFile(parentDir, file)
   }
 }
 

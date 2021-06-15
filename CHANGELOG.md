@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.4] - 2021-06-15
+### Fixed
+- `lookupFile` typo error.
+
 ## [0.3.3] - 2021-06-08
 ### Changed
 - Support `--cjs` for `require.resolve` usage.
@@ -30,7 +34,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Shortcut to call `esbuild --bundle`.
 - Plugins support.
 
-[Unreleased]: https://github.com/hyrious/esbuild-dev/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/hyrious/esbuild-dev/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/hyrious/esbuild-dev/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/hyrious/esbuild-dev/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/hyrious/esbuild-dev/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/hyrious/esbuild-dev/compare/v0.2.8...v0.3.1
