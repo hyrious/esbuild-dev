@@ -68,6 +68,7 @@ Internally it follows a simple transform rule to convert command line args into 
 | `--no-a`          | `{ a: false }`            | falsy            |
 | `--a=1`           | `{ a: 1 }`                | numbers (no NaN) |
 | `--a=b`           | `{ a: 'b' }`              | string           |
+| `--a:b,c`         | `{ a: ['b', 'c'] }`       | array            |
 | `--a:b --a:c`     | `{ a: ['b', 'c'] }`       | array            |
 | `--a:b=c --a:d=e` | `{ a: { b: 'c', d: 'e' }` | object           |
 

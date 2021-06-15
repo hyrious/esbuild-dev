@@ -163,28 +163,34 @@ function str2config(str: string) {
     return {}
   }
   const key = keyMatch[0]
+  const camelizeKey = key.replace(/-[a-z]/g, e => e.substring(1).toUpperCase())
   str = str.substring(key.length).trim()
   if (!str) {
-    return { [key]: true }
+    return { [camelizeKey]: true }
   }
   const delimiter = str[0]
   str = str.substring(1)
   if (delimiter === '=') {
     if (!str) {
-      return { [key]: str }
+      return { [camelizeKey]: str }
     }
     const mayBeNumber = Number(str)
     if (Number.isNaN(mayBeNumber)) {
-      return { [key]: str }
+      if (str.includes(',')) {
+        return { [camelizeKey]: str.split(',') }
+      } else {
+        return { [camelizeKey]: str }
+      }
     } else {
-      return { [key]: mayBeNumber }
+      return { [camelizeKey]: mayBeNumber }
     }
   } else if (delimiter === ':') {
     const [k, v] = str.split('=', 2)
+    const camelizeK = k.replace(/-[a-z]/g, e => e.substring(1).toUpperCase())
     if (v === undefined) {
-      return { [key]: [k] }
+      return { [camelizeKey]: [camelizeK] }
     } else {
-      return { [key]: { [k]: v } }
+      return { [camelizeKey]: { [camelizeK]: v } }
     }
   } else {
     console.warn('warning: expecting valid build option value, got:')
