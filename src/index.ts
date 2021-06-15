@@ -120,14 +120,12 @@ export async function watchFile(
   }
 
   const watcher = chokidar.watch(filename)
-  watcher.on('ready', async () => {
-    if (await rebuild()) await restart()
-  })
+  watcher.on('ready', updateDepsAndRestart)
   watcher.on('change', debounce(updateDepsAndRestart, 300))
 
   async function updateDepsAndRestart() {
+    if (await rebuild()) await restart()
     watcher.unwatch(Object.keys(watcher.getWatched()))
     watcher.add([filename, ...Object.keys({ ...result?.metafile?.inputs })])
-    if (await rebuild()) await restart()
   }
 }

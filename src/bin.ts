@@ -1,7 +1,7 @@
-import help from './help.txt'
-import { runFile, watchFile } from '.'
-import { argv2config, resolveExternal, resolvePlugins } from './utils'
 import { BuildOptions, buildSync } from 'esbuild'
+import { runFile, watchFile } from '.'
+import help from './help.txt'
+import { argv2config, resolveExternal, resolvePlugins } from './utils'
 
 function parseArgs(argv: string[]) {
   const flags = { help: false, watch: false, build: false, cjs: false }
