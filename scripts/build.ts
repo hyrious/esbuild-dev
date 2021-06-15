@@ -20,3 +20,11 @@ build({
   ...common,
   entryPoints: ['src/index.ts'],
 })
+
+build({
+  ...common,
+  outdir: undefined,
+  outfile: pkg.module,
+  format: 'esm',
+  entryPoints: ['src/index.ts'],
+})
