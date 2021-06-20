@@ -1,8 +1,8 @@
-import type { ChildProcess } from 'child_process'
-import cp from 'child_process'
+import cp, { ChildProcess } from 'child_process'
 import chokidar from 'chokidar'
 import type { BuildIncremental, BuildOptions } from 'esbuild'
 import debounce from 'lodash.debounce'
+import url from 'url'
 import { delay, errorMessage, esbuild, lookupFile } from './utils'
 
 /**
@@ -161,5 +161,5 @@ export async function importFile(filename: string, options?: BuildOptions) {
   } catch {
     return
   }
-  return import(outfile)
+  return import(url.pathToFileURL(outfile).toString())
 }

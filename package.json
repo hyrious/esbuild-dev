@@ -1,6 +1,6 @@
 {
   "name": "@hyrious/esbuild-dev",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Just esbuild + chokidar.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

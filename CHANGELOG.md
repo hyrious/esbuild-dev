@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+## [Unreleased]
+
+## [0.3.9] - 2021-06-20
+### Fixed
+- `importFile()` use correct path url.
 
 ## [0.3.8] - 2021-06-15
 ### Fixed
@@ -51,6 +55,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Shortcut to call `esbuild --bundle`.
 - Plugins support.
 
+[Unreleased]: https://github.com/hyrious/esbuild-dev/compare/v0.3.9...HEAD
+[0.3.9]: https://github.com/hyrious/esbuild-dev/compare/v0.3.8...v0.3.9
 [0.3.8]: https://github.com/hyrious/esbuild-dev/compare/v0.3.7...v0.3.8
 [0.3.7]: https://github.com/hyrious/esbuild-dev/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/hyrious/esbuild-dev/compare/v0.3.5...v0.3.6
