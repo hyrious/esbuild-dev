@@ -27,13 +27,13 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "chokidar": "^3.5.1",
-    "esbuild": "^0.12.5"
+    "chokidar": "^3.5.2",
+    "esbuild": "^0.12.10"
   },
   "devDependencies": {
-    "@hyrious/esbuild-dev": "0.2.8",
+    "@hyrious/esbuild-dev": "0.3.9",
     "@types/lodash.debounce": "^4.0.6",
-    "@types/node": "^15.6.1",
+    "@types/node": "^15.12.5",
     "lodash.debounce": "^4.0.8",
     "rimraf": "^3.0.2"
   }
