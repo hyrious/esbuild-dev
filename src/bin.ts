@@ -15,19 +15,17 @@ function parseArgs(argv: string[]) {
   } else {
     fileIndex = argv.length
   }
-  // 2. args before filenames are flags passed to me
+  // 2. args after filenames are flags passed to file or esbuild
+  const args = argv.slice(fileIndex + entryPoints.length)
+  // 3. args before filenames are flags passed to me
   for (let i = 0; i < fileIndex; ++i) {
     const flag = argv[i]
     /**/ if (['-h', '--help'].includes(flag)) flags.help = true
     else if (['-w', '--watch'].includes(flag)) flags.watch = true
     else if (['-b', '--build'].includes(flag)) flags.build = true
     else if ('--cjs' === flag) flags.cjs = true
-    else {
-      console.log(`unknown flag: ${flag}`)
-    }
+    else args.push(flag)
   }
-  // 3. args after filenames are flags passed to file or esbuild
-  const args = argv.slice(fileIndex + entryPoints.length)
   return { ...flags, entryPoints, args }
 }
 

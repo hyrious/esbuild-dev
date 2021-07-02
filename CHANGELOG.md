@@ -4,6 +4,8 @@
 
 - **feat**: Support multiple build entries when use `--build`.\
   For example: `esbuild-dev --build src/index.ts src/bin.ts --outdir=lib`.
+- **feat**: Support `--build` without entry file name.\
+  In that case, it will infer your entries through package.json.
 
 ## 0.3.9
 

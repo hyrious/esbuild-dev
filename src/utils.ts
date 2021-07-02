@@ -60,7 +60,8 @@ function unwrap(mod: any) {
 export function resolvePlugins(argv: string[]) {
   const pkgPath = lookupFile(process.cwd(), 'package.json')
   if (!pkgPath) {
-    throw new Error('can not use plugins outside of npm package')
+    console.error('can not use plugins outside of npm package')
+    process.exit(1)
   }
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
   const deps = Object.keys({
@@ -173,6 +174,9 @@ function str2config(str: string) {
   if (delimiter === '=') {
     if (!str) {
       return { [camelizeKey]: str }
+    }
+    if (str === 'true' || str === 'false') {
+      return { [camelizeKey]: str === 'true' }
     }
     const mayBeNumber = Number(str)
     if (Number.isNaN(mayBeNumber)) {

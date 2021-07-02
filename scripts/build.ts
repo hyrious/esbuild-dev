@@ -8,6 +8,7 @@ const common: BuildOptions = {
   sourcemap: true,
   outdir: 'dist',
   target: 'node14',
+  logLevel: 'info',
 }
 
 build({
