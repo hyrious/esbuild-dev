@@ -1,17 +1,21 @@
-import { BuildOptions, buildSync } from 'esbuild'
 import { runFile, watchFile } from '.'
+import { build } from './build'
 import help from './help.txt'
-import { argv2config, resolveExternal, resolvePlugins } from './utils'
+import { resolvePlugins } from './utils'
 
 function parseArgs(argv: string[]) {
   const flags = { help: false, watch: false, build: false, cjs: false }
-  // 1. filename does not start with '-', lets find it
-  const fileIndex = argv.findIndex(e => !e.startsWith('-'))
-  if (fileIndex === -1) {
-    return { ...flags, help: true, filename: '', args: [] }
+  // 1. filenames does not start with '-', lets find them
+  let fileIndex = argv.findIndex(e => !e.startsWith('-'))
+  let entryPoints: string[] = []
+  if (fileIndex !== -1) {
+    let last = fileIndex
+    while (last < argv.length && !argv[last].startsWith('-')) ++last
+    entryPoints = argv.slice(fileIndex, last)
+  } else {
+    fileIndex = argv.length
   }
-  const filename = argv[fileIndex]
-  // 2. args before filename are flags passed to me
+  // 2. args before filenames are flags passed to me
   for (let i = 0; i < fileIndex; ++i) {
     const flag = argv[i]
     /**/ if (['-h', '--help'].includes(flag)) flags.help = true
@@ -22,7 +26,9 @@ function parseArgs(argv: string[]) {
       console.log(`unknown flag: ${flag}`)
     }
   }
-  return { ...flags, filename, args: argv.slice(fileIndex + 1) }
+  // 3. args after filenames are flags passed to file or esbuild
+  const args = argv.slice(fileIndex + entryPoints.length)
+  return { ...flags, entryPoints, args }
 }
 
 async function main() {
@@ -31,40 +37,20 @@ async function main() {
   const flags = parseArgs(argv)
 
   if (flags.help) {
-    return console.log(help)
+    console.log(help)
+    process.exit()
   }
 
   if (flags.build) {
-    let binOptions: BuildOptions | undefined
-    if (flags.filename.includes('bin')) {
-      binOptions = { banner: { js: '#!/usr/bin/env node' } }
-    }
-    const options: BuildOptions = {
-      entryPoints: [flags.filename],
-      external: resolveExternal(false),
-      platform: 'node',
-      target: 'node12',
-      bundle: true,
-      minify: true,
-      sourcemap: true,
-      outdir: 'dist',
-      ...binOptions,
-      ...argv2config(flags.args),
-    }
-    if (options.outdir && options.outfile) {
-      // Cannot use both "outfile" and "outdir"
-      delete options.outdir
-    }
-    return buildSync(options)
+    await build({ ...flags, plugins })
+    process.exit()
   }
 
   const fn = flags.watch ? watchFile : runFile
-  const options: BuildOptions = {
+  await fn(flags.entryPoints[0], flags.args, {
     plugins,
     ...(flags.cjs && { format: 'cjs' }),
-  }
-
-  await fn(flags.filename, flags.args, options)
+  })
 }
 
-main().catch(console.error)
+main().catch()
