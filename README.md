@@ -1,8 +1,8 @@
 ## @hyrious/esbuild-dev
 
-Just esbuild + chokidar, like `node-dev`.
+Build and run your `script.ts`, like `ts-node` or `node-dev`
 
-Require Node.js `>=14` to use `--enable-source-maps`.
+Require Node.js `>=14.8` to use `--enable-source-maps`
 
 ### Features
 
@@ -11,70 +11,37 @@ Require Node.js `>=14` to use `--enable-source-maps`.
     `npm run build` done in 0.30s!
   - cons: you won't get any type checking at all
 - 🐛 **_Easy to Debug_** with the help of node's `--enable-source-maps`
-- **_No Magic_**. the author refuses to use any `require.extensions`-like things
+- ✨ **_No Magic_** other than esbuild itself. the author refuses to use any `require.extensions`-like things
 
 ### Usage
 
 **Run file**
 
 ```bash
-npx @hyrious/esbuild-dev [--cjs] main.ts [--args]
+npx @hyrious/esbuild-dev [--cjs] main.ts ...
 ```
 
 By default, it compiles your file into esm format.
 
-Add `--cjs` before the file name to use cjs format (if you want to use `require.resolve`).
+Add `--cjs` to use cjs format (e.g. using `require.resolve`).
 
 **Watch file**
 
 ```bash
-npx @hyrious/esbuild-dev [--cjs] --watch main.ts [--args]
+npx @hyrious/esbuild-dev [--cjs] --watch main.ts ...
 ```
 
-**Build (bundle) file**
-
-```bash
-npx @hyrious/esbuild-dev --build main.ts [--args-for-esbuild]
-```
-
-### Details
-
-By default, `--build` uses this config:
+**As library**
 
 ```ts
-import type { BuildOptions } from 'esbuild'
-import pkg from './package.json'
-const defaultOptions: BuildOptions = {
-  external: Object.keys({
-    ...pkg.dependencies,
-    ...pkg.peerDependencies,
-  }),
-  platform: 'node',
-  target: 'node12',
-  bundle: true,
-  minify: true,
-  sourcemap: true,
-  outdir: 'dist',
-}
+import { importFile } from "@hyrious/esbuild-dev";
+const a = await importFile("./a.ts");
+// compiles a.ts to node_modules/.esbuild-dev/a.ts.mjs then import()
+
+const { requireFile } = require("@hyrious/esbuild-dev");
+const a = await requireFile("./a.ts");
+// compiles a.ts to node_modules/.esbuild-dev/a.ts.js then require()
 ```
-
-You may want to append more configs, just add them after the filename. For example:
-
-```shell-session
-npx @hyrious/esbuild-dev --build main.ts --tree-shaking=ignore-annotations
-```
-
-Internally it follows a simple transform rule to convert command line args into configs:
-
-| CLI               | JS                        | Description      |
-| ----------------- | ------------------------- | ---------------- |
-| `--a`             | `{ a: true }`             | truthy           |
-| `--no-a`          | `{ a: false }`            | falsy            |
-| `--a=1`           | `{ a: 1 }`                | numbers (no NaN) |
-| `--a=b`           | `{ a: 'b' }`              | string           |
-| `--a:b,c`         | `{ a: ['b', 'c'] }`       | array            |
-| `--a:b --a:c`     | `{ a: ['b', 'c'] }`       | array            |
-| `--a:b=c --a:d=e` | `{ a: { b: 'c', d: 'e' }` | object           |
 
 ### License
 

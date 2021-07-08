@@ -1,3 +1,17 @@
-usage:
-    esbuild-dev main.ts
-    esbuild-dev --watch main.ts
+
+Usage:
+  esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
+
+Options:
+  --cjs                 By default, it compiles your file in ESM format.
+                        This will change it to CJS format. For example,
+                        `__dirname` can only be used in CJS, and
+                        `import.meta` can only be used in ESM.
+
+  --watch               Enable watch mode.
+  alias: -w
+
+  --plugin:name         Load esbuild plugins. For example, `--plugin:style` will
+  alias: -p             try to load `esbuild-plugin-style`, `esbuild-style` and
+                        `style` in your project. This option can not be used
+                        outside of a package.

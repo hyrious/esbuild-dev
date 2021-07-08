@@ -1,21 +1,25 @@
 {
   "name": "@hyrious/esbuild-dev",
-  "version": "0.3.10",
+  "version": "0.4.0",
   "description": "Just esbuild + chokidar.",
+  "repository": "hyrious/esbuild-dev",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "types": "src/index.ts",
-  "bin": {
-    "esbuild-dev": "dist/bin.js"
+  "bin": "dist/bin.mjs",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js"
   },
+  "types": "src/index.ts",
+  "sideEffects": false,
   "files": [
     "src",
     "dist"
   ],
   "scripts": {
-    "build": "esbuild-dev scripts/build.ts"
+    "build": "make",
+    "test": "make test"
   },
-  "repository": "hyrious/esbuild-dev",
   "keywords": [
     "cli",
     "esbuild"
@@ -23,16 +27,12 @@
   "author": "hyrious <hyrious@outlook.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=14.8.0"
   },
   "dependencies": {
-    "chokidar": "^3.5.2",
-    "esbuild": "^0.12.14"
+    "esbuild": "^0.12.15"
   },
   "devDependencies": {
-    "@hyrious/esbuild-dev": "0.3.9",
-    "@types/lodash.debounce": "^4.0.6",
-    "@types/node": "^15.14.0",
-    "lodash.debounce": "^4.0.8"
+    "@types/node": "^16.3.0"
   }
 }

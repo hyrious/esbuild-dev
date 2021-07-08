@@ -1,54 +1,98 @@
-import { runFile, watchFile } from '.'
-import { build } from './build'
-import help from './help.txt'
-import { resolvePlugins } from './utils'
+import cp, { ChildProcess } from "child_process";
+import { BuildOptions, Plugin } from "esbuild";
+import { build, errorMessage, Format } from "./build";
+import document from "./help.txt";
+import { loadPlugin } from "./plugin";
 
-function parseArgs(argv: string[]) {
-  const flags = { help: false, watch: false, build: false, cjs: false }
-  // 1. filenames does not start with '-', lets find them
-  let fileIndex = argv.findIndex(e => !e.startsWith('-'))
-  let entryPoints: string[] = []
-  if (fileIndex !== -1) {
-    let last = fileIndex
-    while (last < argv.length && !argv[last].startsWith('-')) ++last
-    entryPoints = argv.slice(fileIndex, last)
+let format: Format = "esm";
+let entry = "";
+let args: string[] = [];
+let watch = false;
+let plugins: Plugin[] = [];
+
+let help = false;
+let pluginName: string, plugin: any;
+for (const arg of process.argv.slice(2)) {
+  if (arg === "--help") {
+    help = true;
+    break;
+  } else if (arg === "--cjs") {
+    format = "cjs";
+  } else if (arg === "--watch" || arg === "-w") {
+    watch = true;
+  } else if (arg.startsWith("--plugin:") || arg.startsWith("-p:")) {
+    if ((pluginName = arg.slice(arg.indexOf(":") + 1))) {
+      if ((plugin = await loadPlugin(pluginName))) {
+        plugins.push(plugin);
+      }
+    }
+  } else if (!entry && !arg.startsWith("-")) {
+    entry = arg;
   } else {
-    fileIndex = argv.length
+    args.push(arg);
   }
-  // 2. args after filenames are flags passed to file or esbuild
-  const args = argv.slice(fileIndex + entryPoints.length)
-  // 3. args before filenames are flags passed to me
-  for (let i = 0; i < fileIndex; ++i) {
-    const flag = argv[i]
-    /**/ if (['-h', '--help'].includes(flag)) flags.help = true
-    else if (['-w', '--watch'].includes(flag)) flags.watch = true
-    else if (['-b', '--build'].includes(flag)) flags.build = true
-    else if ('--cjs' === flag) flags.cjs = true
-    else args.push(flag)
-  }
-  return { ...flags, entryPoints, args }
+}
+if (help || !entry) {
+  console.log(document);
+  process.exit(0);
 }
 
-async function main() {
-  let argv = process.argv.slice(2)
-  const plugins = resolvePlugins(argv)
-  const flags = parseArgs(argv)
+let outfile: string;
+let stop: (() => void) | undefined;
+let child: ChildProcess | undefined;
 
-  if (flags.help) {
-    console.log(help)
-    process.exit()
+const delay = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
+const kill = async () => {
+  if (child) {
+    child.kill("SIGTERM");
+    await delay(200);
+    if (child && !child.killed) {
+      child.kill("SIGKILL");
+      await delay(100);
+    }
   }
-
-  if (flags.build) {
-    await build({ ...flags, plugins })
-    process.exit()
+};
+const run = async () => {
+  try {
+    await kill();
+    child = cp.spawn(process.argv0, ["--enable-source-maps", outfile, ...args], {
+      stdio: "inherit",
+      cwd: process.cwd(),
+      env: process.env,
+    });
+    child.on("close", code => {
+      watch && console.log("[esbuild-dev] child process stopped with code", code);
+      child = undefined;
+    });
+    child.on("error", () => {
+      console.error(errorMessage(outfile, args));
+      kill();
+    });
+  } catch {
+    console.log(errorMessage(outfile, args));
+    child = undefined;
   }
+};
 
-  const fn = flags.watch ? watchFile : runFile
-  await fn(flags.entryPoints[0], flags.args, {
-    plugins,
-    ...(flags.cjs && { format: 'cjs' }),
-  })
+const options: BuildOptions = { plugins };
+if (watch) {
+  options.watch = {
+    onRebuild(_error, result) {
+      if (result) ({ stop } = result), run();
+    },
+  };
 }
 
-main().catch()
+// prettier-ignore
+({ outfile, result: { stop } } = await build(entry, format, options));
+run();
+
+if (watch) {
+  process.stdin.on("data", async e => {
+    if (e.toString().startsWith("exit")) {
+      await kill();
+      stop?.();
+      process.exit(0);
+    }
+  });
+}

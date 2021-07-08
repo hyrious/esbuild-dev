@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **[BREAKING]**: There's no `--build` any more.
+- Removed `chokidar` dependency, now it uses the builtin watch mode in esbuild.\
+  This makes re-build/run slower, but will eat less CPU.
+
+## 0.3.10
+
 - **feat**: Support multiple build entries when use `--build`.\
   For example: `esbuild-dev --build src/index.ts src/bin.ts --outdir=lib`.
 - **feat**: Support `--build` without entry file name.\

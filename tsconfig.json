@@ -1,5 +1,5 @@
 {
-  "include": ["src"],
+  "include": ["src", "test"],
   "compilerOptions": {
     "noEmit": true,
     "strict": true,
@@ -9,6 +9,7 @@
     "lib": ["ESNext"],
     "module": "ESNext",
     "target": "ESNext",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "types": ["node"]
   }
 }

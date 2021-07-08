@@ -3,5 +3,8 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.sortImports": true
-  }
+  },
+  "prettier.tabWidth": 2,
+  "prettier.endOfLine": "auto",
+  "prettier.arrowParens": "avoid"
 }
