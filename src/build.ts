@@ -4,11 +4,8 @@ import util from "util";
 import error from "./error.txt";
 import { lookupExternal, lookupFile, tmpdir } from "./utils";
 
-type NodeVersion = "14" | "15" | "16";
-type Target = `node${NodeVersion}`;
-
-const nodeVersion = process.versions.node.split(".", 2)[0] as NodeVersion;
-const target = `node${nodeVersion}` as Target;
+const nodeVersion = process.versions.node.split(".", 3).slice(0, 2);
+const target = `node${nodeVersion.join(".")}`;
 
 export type Format = "esm" | "cjs";
 const extname: Record<Format, ".mjs" | ".js"> = { esm: ".mjs", cjs: ".js" };
