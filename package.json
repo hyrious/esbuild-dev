@@ -1,7 +1,7 @@
 {
   "name": "@hyrious/esbuild-dev",
   "version": "0.4.1",
-  "description": "Just esbuild + chokidar.",
+  "description": "Just esbuild --build.",
   "repository": "hyrious/esbuild-dev",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

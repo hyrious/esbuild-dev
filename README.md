@@ -2,7 +2,7 @@
 
 Build and run your `script.ts`, like `ts-node` or `node-dev`
 
-Require Node.js `>=14.8` to use `--enable-source-maps`
+Require Node.js `>=14.8` to use `--enable-source-maps` and top-level await.
 
 ### Features
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0
+## 0.4.1
 
 - **[BREAKING]**: There's no `--build` any more.
 - Removed `chokidar` dependency, now it uses the builtin watch mode in esbuild.\
