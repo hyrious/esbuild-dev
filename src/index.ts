@@ -2,7 +2,10 @@ import { BuildOptions } from "esbuild";
 import url from "url";
 import { build } from "./build";
 
+export { argsToBuildOptions, external } from "./functions";
+
 /**
+ * Build your file in esm format and import() it.
  * @example
  * try { await importFile('main.ts') }
  * catch { console.error('failed to import main.ts') }
@@ -12,6 +15,7 @@ export async function importFile(name: string, options?: BuildOptions) {
 }
 
 /**
+ * Build your file in cjs format and require() it.
  * @example
  * try { await requireFile('main.ts') }
  * catch { console.error('failed to require main.ts') }
@@ -19,5 +23,3 @@ export async function importFile(name: string, options?: BuildOptions) {
 export async function requireFile(name: string, options?: BuildOptions) {
   return require((await build(name, "cjs", options)).outfile);
 }
-
-export { argsToBuildOptions } from "./build";

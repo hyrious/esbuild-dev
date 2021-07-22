@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2
+
+- Added `external()` function to find out external libraries.
+
 ## 0.4.1
 
 - **[BREAKING]**: There's no `--build` any more.
