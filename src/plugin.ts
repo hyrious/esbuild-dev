@@ -28,7 +28,7 @@ export async function loadPlugin(name: string): Promise<Plugin | undefined> {
   if (currentPackage) {
     const installed = lookupExternal(currentPackage);
     for (const packageName of installed) {
-      if (packageName.includes(name)) {
+      if (packageName.endsWith(name)) {
         return extractModule(await import(packageName));
       }
     }

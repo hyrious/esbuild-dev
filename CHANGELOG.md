@@ -3,6 +3,8 @@
 ## 0.4.2
 
 - Added `external()` function to find out external libraries.
+- Added `platform()` function to guess if a file can run on the browser.
+- Added `buildOptionsToArgs()` function to reverse `argsToBuildOptions()`.
 
 ## 0.4.1
 

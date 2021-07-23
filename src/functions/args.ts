@@ -56,3 +56,33 @@ function camelize(s: string) {
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+export function buildOptionsToArgs(options: BuildOptions) {
+  const args: string[] = [];
+  if (Array.isArray(options.entryPoints)) {
+    args.push(...options.entryPoints);
+  } else if (options.entryPoints) {
+    args.push(...Object.entries(options.entryPoints).map(([k, v]) => `${k}=${v}`));
+  }
+  delete options.entryPoints;
+  delete options.plugins;
+  for (const [k, v] of Object.entries(options)) {
+    const key = dashize(k);
+    if (Array.isArray(v)) {
+      if (["resolveExtensions", "mainFields", "conditions", "target"].includes(k)) {
+        args.push(`--${key}=${v.join(",")}`);
+      } else {
+        args.push(...v.map(value => `--${key}:${value}`));
+      }
+    } else if (typeof v === "object" && v !== null) {
+      args.push(...Object.entries(v).map(([sub, val]) => `--${key}:${sub}=${JSON.stringify(val)}`));
+    } else {
+      args.push(`--${key}=${v}`);
+    }
+  }
+  return args;
+}
+
+function dashize(s: string) {
+  return s.replace(/([A-Z])/g, x => "-" + x.toLowerCase());
+}

@@ -2,7 +2,7 @@ import { BuildOptions } from "esbuild";
 import url from "url";
 import { build } from "./build";
 
-export { argsToBuildOptions, external } from "./functions";
+export * from "./functions";
 
 /**
  * Build your file in esm format and import() it.

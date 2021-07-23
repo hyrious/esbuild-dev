@@ -1,5 +1,5 @@
 BASE=--bundle --log-level=warning --target=node14.8
-EXTERNAL=--platform=node --external:chokidar --external:esbuild
+EXTERNAL=--platform=node --external:esbuild
 SOURCEMAP=--sourcemap --sources-content=false
 FLAGS=${BASE} ${EXTERNAL} ${SOURCEMAP}
 ESM=--format=esm
