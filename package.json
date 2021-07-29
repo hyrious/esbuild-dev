@@ -33,6 +33,6 @@
     "esbuild": "^0.12.15"
   },
   "devDependencies": {
-    "@types/node": "^16.4.1"
+    "@types/node": "^16.4.6"
   }
 }
