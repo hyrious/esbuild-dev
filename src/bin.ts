@@ -11,8 +11,10 @@ if (process.argv[2] === "external") {
   if (!file || !isFile(file)) {
     console.log(document);
   } else {
+    // make sure to show the error message of `argsToBuildOptions`
+    const buildOptions = argsToBuildOptions(args);
     try {
-      console.log(await external(file, {}, argsToBuildOptions(args)));
+      console.log(await external(file, {}, buildOptions));
     } catch {}
   }
   process.exit(0);
