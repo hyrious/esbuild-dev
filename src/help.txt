@@ -1,7 +1,7 @@
 
 Usage:
   esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
-  esbuild-dev external main.ts ...
+  esbuild-dev external [--bare] main.ts ...
 
 Options:
   --cjs                 By default, it compiles your file in ESM format.
@@ -20,3 +20,6 @@ Options:
 Sub Commands:
   external              Show potential external libraries of a file.
                         Additional arguments are passed to build options.
+
+    --bare              Use bare format (one name per line, no quotes).
+    alias: -b

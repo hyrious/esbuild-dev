@@ -7,14 +7,22 @@ import { loadPlugin } from "./plugin";
 import { isFile } from "./utils";
 
 if (process.argv[2] === "external") {
-  let [file, ...args] = process.argv.slice(3);
+  let bare = false;
+  let [file, ...args] = process.argv.slice(3).filter(arg => {
+    if (arg === "--bare" || arg === "-b") {
+      bare = true;
+      return false;
+    }
+    return true;
+  });
   if (!file || !isFile(file)) {
     console.log(document);
   } else {
     // make sure to show the error message of `argsToBuildOptions`
     const buildOptions = argsToBuildOptions(args);
     try {
-      console.log(await external(file, {}, buildOptions));
+      let result = await external(file, {}, buildOptions);
+      console.log(bare ? result.join("\n") : result);
     } catch {}
   }
   process.exit(0);
