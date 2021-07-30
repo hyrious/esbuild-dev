@@ -71,7 +71,14 @@ export async function external(
   options?: BuildOptions
 ) {
   const result = new Set<string>();
-  options = { entryPoints: [entry], bundle: true, format: "esm", write: false, ...options };
+  options = {
+    entryPoints: [entry],
+    bundle: true,
+    format: "esm",
+    target: "esnext",
+    write: false,
+    ...options,
+  };
   (options.plugins ??= []).push(externalPlugin(result, config));
   await esbuild.build(options);
   return Array.from(result);
