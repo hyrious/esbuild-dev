@@ -88,7 +88,7 @@ const run = async () => {
   }
 };
 
-const options: BuildOptions = { plugins };
+const options: BuildOptions = { sourcesContent: false, plugins };
 if (watch) {
   options.watch = {
     onRebuild(_error, result) {
