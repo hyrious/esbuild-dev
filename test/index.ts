@@ -8,7 +8,7 @@ if (require.main) {
   console.log("__filename =", __filename);
 } else {
   console.log("require =", require, require.toString());
-  external("./test/external.ts").then(e => {
+  external("./src/bin.ts").then(e => {
     console.log("test external():", e);
   });
 }

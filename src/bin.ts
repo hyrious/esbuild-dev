@@ -1,8 +1,22 @@
 import cp, { ChildProcess } from "child_process";
 import { BuildOptions, Plugin } from "esbuild";
+import { argsToBuildOptions, external } from ".";
 import { build, errorMessage, Format } from "./build";
 import document from "./help.txt";
 import { loadPlugin } from "./plugin";
+import { isFile } from "./utils";
+
+if (process.argv[2] === "external") {
+  let [file, ...args] = process.argv.slice(3);
+  if (!file || !isFile(file)) {
+    console.log(document);
+  } else {
+    try {
+      console.log(await external(file, {}, argsToBuildOptions(args)));
+    } catch {}
+  }
+  process.exit(0);
+}
 
 let format: Format = "esm";
 let entry = "";
