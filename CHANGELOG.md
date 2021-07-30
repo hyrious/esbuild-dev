@@ -2,8 +2,9 @@
 
 ## 0.4.2
 
-- Added `external()` function to find out external libraries.
-- Added `buildOptionsToArgs()` function to reverse `argsToBuildOptions()`.
+- **feat**: `external()` to search external libraries.
+- **cli**: sub command `external` to call `external()`.
+- **feat**: `buildOptionsToArgs()` to reverse `argsToBuildOptions()`.
 
 ## 0.4.1
 
