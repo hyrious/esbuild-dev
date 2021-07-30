@@ -1,9 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: Add `--bare` option to cli command `external`.\
+  This option makes the output in the format of "one name per line".
+
 ## 0.4.2
 
 - **feat**: `external()` to search external libraries.
-- **cli**: sub command `external` to call `external()`.
+- **cli**: Sub command `external` to call `external()`.
 - **feat**: `buildOptionsToArgs()` to reverse `argsToBuildOptions()`.
 
 ## 0.4.1
