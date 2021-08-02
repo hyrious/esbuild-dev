@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.4.3
 
 - **feat**: Add `--bare` option to cli command `external`.\
   This option makes the output in the format of "one name per line".
+- **refactor**: `--target=esnext` by default in `external()`.
 - **refactor**: Use `{}` instead of `Set` in `external()`.\
   This minor change makes the result keep order on some platforms, which may be useful.
 
@@ -31,8 +32,8 @@
 - **fix**: `importFile()` use correct path url.
 - **fix**: Camelize keys when parsing args from command line.
 - **fix**: Support `pkg.module`.
-- **feat**: `requireFile()` to dynamically require a file, remember to add `--cjs` to use it
-- **feat**: `importFile()` to dynamically import a file
+- **feat**: `requireFile()` to dynamically require a file, remember to add `--cjs` to use it.
+- **feat**: `importFile()` to dynamically import a file.
 
 ## 0.3.5
 
