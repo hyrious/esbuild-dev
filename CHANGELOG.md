@@ -4,6 +4,8 @@
 
 - **feat**: Add `--bare` option to cli command `external`.\
   This option makes the output in the format of "one name per line".
+- **refactor**: Use `{}` instead of `Set` in `external()`.\
+  This minor change makes the result keep order on some platforms, which may be useful.
 
 ## 0.4.2
 

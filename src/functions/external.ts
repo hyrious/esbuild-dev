@@ -23,7 +23,7 @@ interface ExternalPluginOptions {
 
 const createMarkFn = (mark: RegExp) => (path: string) => mark.exec(path)?.[0];
 
-const externalPlugin = (result: Set<string>, options?: ExternalPluginOptions): Plugin => ({
+const externalPlugin = (result: Record<string, true>, options?: ExternalPluginOptions): Plugin => ({
   name: "external",
   setup({ onResolve }) {
     const filter = options?.filter ?? packageNameRegex;
@@ -32,7 +32,7 @@ const externalPlugin = (result: Set<string>, options?: ExternalPluginOptions): P
 
     onResolve({ filter, namespace: "file" }, args => {
       const ret = markFn(args.path);
-      ret && result.add(ret);
+      ret && (result[ret] = true);
       return { path: args.path, external: true };
     });
 
@@ -70,7 +70,6 @@ export async function external(
   config?: ExternalPluginOptions,
   options?: BuildOptions
 ) {
-  const result = new Set<string>();
   options = {
     entryPoints: [entry],
     bundle: true,
@@ -79,7 +78,8 @@ export async function external(
     write: false,
     ...options,
   };
+  const result: Record<string, true> = {};
   (options.plugins ??= []).push(externalPlugin(result, config));
   await esbuild.build(options);
-  return Array.from(result);
+  return Object.keys(result);
 }
