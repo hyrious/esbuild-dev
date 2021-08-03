@@ -2,8 +2,6 @@ import { BuildOptions } from "esbuild";
 import url from "url";
 import { build } from "./build";
 
-export * from "./functions";
-
 /**
  * Build your file in esm format and import() it.
  * @example
@@ -23,3 +21,6 @@ export async function importFile(name: string, options?: BuildOptions) {
 export async function requireFile(name: string, options?: BuildOptions) {
   return require((await build(name, "cjs", options)).outfile);
 }
+
+export { argsToBuildOptions, buildOptionsToArgs } from "./args";
+export { external } from "./external";

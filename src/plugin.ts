@@ -1,4 +1,4 @@
-import type { Plugin } from "esbuild";
+import { Plugin } from "esbuild";
 import { importFile } from ".";
 import { currentPackage, isFile, lookupExternal } from "./utils";
 

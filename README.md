@@ -15,32 +15,38 @@ Require Node.js `>=14.8` to use `--enable-source-maps` and top-level await.
 
 ### Usage
 
-**Run file**
+**CLI**: see [help.txt](./src/help.txt) for more info.
 
 ```bash
-npx @hyrious/esbuild-dev [--cjs] main.ts ...
+esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
+esbuild-dev external [--bare] main.ts ...
 ```
 
-By default, it compiles your file into esm format.
-
-Add `--cjs` to use cjs format (e.g. using `require.resolve`).
-
-**Watch file**
-
-```bash
-npx @hyrious/esbuild-dev [--cjs] --watch main.ts ...
-```
-
-**As library**
+**Library**
 
 ```ts
-import { importFile } from "@hyrious/esbuild-dev";
-const a = await importFile("./a.ts");
+import {
+  argsToBuildOptions,
+  buildOptionsToArgs,
+  external,
+  importFile,
+  requireFile,
+} from "@hyrious/esbuild-dev";
+
+await importFile("./a.ts");
 // compiles a.ts to node_modules/.esbuild-dev/a.ts.mjs then import()
 
-const { requireFile } = require("@hyrious/esbuild-dev");
-const a = await requireFile("./a.ts");
+await requireFile("./a.ts");
 // compiles a.ts to node_modules/.esbuild-dev/a.ts.js then require()
+
+await external("./a.ts");
+// if a.ts has `import "b"`, returns ["b"]
+
+argsToBuildOptions(["--target=es6"]);
+// { target: "es6" }
+
+buildOptionsToArgs({ target: "es6" });
+// ["--target=es6"]
 ```
 
 ### License

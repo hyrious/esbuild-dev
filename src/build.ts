@@ -1,6 +1,5 @@
 import esbuild, { BuildOptions } from "esbuild";
 import path from "path";
-import util from "util";
 import error from "./error.txt";
 import { lookupExternal, lookupFile, tmpdir } from "./utils";
 
@@ -29,6 +28,6 @@ export async function build(entry: string, format: Format = "esm", options?: Bui
 }
 
 export function errorMessage(file: string, args: string[]) {
-  const template = { file, args: args.map(e => util.inspect(e)).join(" ") };
+  const template = { file, args: args.map(e => JSON.stringify(e)).join(" ") };
   return error.replace(/{(\w+)}/g, (_, key: "file" | "args") => template[key] || "");
 }

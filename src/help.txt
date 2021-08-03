@@ -12,9 +12,9 @@ Options:
   --watch               Enable watch mode.
   alias: -w
 
-  --plugin:name         Load esbuild plugins. For example, `--plugin:style` will
-  alias: -p             try to load `esbuild-plugin-style`, `esbuild-style` and
-                        `style` in your project. This option can not be used
+  --plugin:name         Load esbuild plugins. For example, `--plugin:style`
+  alias: -p             will try to load `style` package in your project.
+                        This option can not be used
                         outside of a package.
 
 Sub Commands:

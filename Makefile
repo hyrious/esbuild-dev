@@ -1,19 +1,16 @@
-BASE=--bundle --log-level=warning --target=node14.8
+BASE=--bundle --target=node14.8 --outdir=dist
 EXTERNAL=--platform=node --external:esbuild
 SOURCEMAP=--minify-syntax --sourcemap --sources-content=false
 FLAGS=${BASE} ${EXTERNAL} ${SOURCEMAP}
-ESM=--format=esm
+ESM=--format=esm --splitting --chunk-names=chunks/dep-[hash] --out-extension:.js=.mjs
 
-all: dist/index.js dist/index.mjs dist/bin.mjs
+all: dist/index.js dist/bin.mjs
 
 dist/index.js: src/index.ts
-	esbuild $^ --outfile=$@ ${FLAGS}
+	esbuild $^ ${FLAGS}
 
-dist/index.mjs: src/index.ts
-	esbuild $^ ${ESM} --outfile=$@ ${FLAGS}
-
-dist/bin.mjs: src/bin.ts
-	esbuild $^ ${ESM} --banner:js="#!/usr/bin/env node" --outfile=$@ ${FLAGS}
+dist/bin.mjs: src/index.ts src/bin.ts src/args.ts
+	esbuild $^ ${ESM} ${FLAGS}
 
 .PHONY: test
 test: dist/bin.mjs

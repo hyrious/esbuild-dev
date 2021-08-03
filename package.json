@@ -7,8 +7,11 @@
   "module": "dist/index.mjs",
   "bin": "dist/bin.mjs",
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./args": "./dist/args.mjs"
   },
   "types": "src/index.ts",
   "sideEffects": false,

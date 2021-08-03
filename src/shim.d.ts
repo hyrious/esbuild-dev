@@ -1,3 +1,4 @@
 declare module "*.txt" {
-  export default "";
+  const contents: string;
+  export default contents;
 }
