@@ -33,4 +33,6 @@ export async function loadPlugin(name: string): Promise<Plugin | undefined> {
       }
     }
   }
+
+  return;
 }

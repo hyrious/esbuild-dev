@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import cp, { ChildProcess } from "child_process";
 import { BuildOptions, Plugin } from "esbuild";
-import { argsToBuildOptions, external } from ".";
+import { argsToBuildOptions } from "./args";
 import { build, errorMessage, Format } from "./build";
+import { external } from "./external";
 import document from "./help.txt";
 import { loadPlugin } from "./plugin";
 import { isFile } from "./utils";

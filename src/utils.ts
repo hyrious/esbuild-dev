@@ -16,6 +16,7 @@ export function lookupFile(filename = "package.json", dir = process.cwd()): stri
       return lookupFile(filename, parent);
     }
   }
+  return;
 }
 
 export const currentPackage = lookupFile("package.json");

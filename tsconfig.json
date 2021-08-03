@@ -1,8 +1,16 @@
 {
   "include": ["src", "test"],
   "compilerOptions": {
-    "noEmit": true,
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    // TODO: ts4.4 "exactOptionalPropertyTypes": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,

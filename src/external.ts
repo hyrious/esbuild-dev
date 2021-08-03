@@ -37,20 +37,21 @@ const externalPlugin = (result: Record<string, true>, options?: ExternalPluginOp
     });
 
     // https://github.com/vitejs/vite/blob/main/packages/vite/src/node/optimizer/scan.ts
+    const markAsExternal = ({ path }: { path: string }) => ({ path, external: true });
 
     // external url
-    onResolve({ filter: /^(https?:)?\/\// }, ({ path }) => ({ path, external: true }));
+    onResolve({ filter: /^(https?:)?\/\// }, markAsExternal);
 
     // data url
-    onResolve({ filter: /^\s*data:/i }, ({ path }) => ({ path, external: true }));
+    onResolve({ filter: /^\s*data:/i }, markAsExternal);
 
     // css & json
     // prettier-ignore
-    onResolve({ filter: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|json)$/ }, ({ path }) => ({ path, external: true }));
+    onResolve({ filter: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|json)$/ }, markAsExternal);
 
     // assets
     // prettier-ignore
-    onResolve({ filter: /\.(png|jpe?g|gif|svg|ico|webp|avif|mp4|webm|ogg|mp3|wav|flac|aac|woff2?|eot|ttf|otf|wasm)$/ }, ({ path }) => ({ path, external: true }));
+    onResolve({ filter: /\.(png|jpe?g|gif|svg|ico|webp|avif|mp4|webm|ogg|mp3|wav|flac|aac|woff2?|eot|ttf|otf|wasm)$/ }, markAsExternal);
   },
 });
 
