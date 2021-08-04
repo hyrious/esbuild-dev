@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.4
+
+- **refactor**: Split esm dist files, so that `args()` can be used without importing esbuild.
+
 ## 0.4.3
 
 - **feat**: Add `--bare` option to cli command `external`.\
