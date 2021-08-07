@@ -1,0 +1,23 @@
+lockfileVersion: 5.3
+
+specifiers:
+  '@types/node': ^16.4.13
+  esbuild: ^0.12.18
+
+dependencies:
+  esbuild: 0.12.18
+
+devDependencies:
+  '@types/node': 16.4.13
+
+packages:
+
+  /@types/node/16.4.13:
+    resolution: {integrity: sha512-bLL69sKtd25w7p1nvg9pigE4gtKVpGTPojBFLMkGHXuUgap2sLqQt2qUnqmVCDfzGUL0DRNZP+1prIZJbMeAXg==}
+    dev: true
+
+  /esbuild/0.12.18:
+    resolution: {integrity: sha512-arWhBQSy+oiBAp8VRRCFvAU+3jyf0gGacABLO3haMHboXCDjzq4WUqyQklst2XRuFS8MXgap+9uvODqj9Iygpg==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
