@@ -6,6 +6,8 @@ const booleans = { true: true, false: false } as const;
 /**
  * Convert argv to esbuild build options.
  * This function does not check any typo error, nor plugin support.
+ *
+ * NOTE: The args should not have `""` surroundings. e.g. use `--a=b c` to pass `--a="b c"`.
  * @example
  * argsToBuildOptions(["--target=es6"]) // { target: "es6" }
  */
@@ -57,6 +59,14 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/**
+ * Convert esbuild build options to argv.
+ * This function does not check any typo error, nor plugin support.
+ *
+ * NOTE: Result does not have `""` surroundings. e.g. it returns `--a=b c` instead of `--a="b c"`.
+ * @example
+ * buildOptionsToArgs({ target: "es6" }) // ["--target=es6"]
+ */
 export function buildOptionsToArgs(options: BuildOptions) {
   const args: string[] = [];
   if (Array.isArray(options.entryPoints)) {

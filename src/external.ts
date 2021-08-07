@@ -46,7 +46,6 @@ const externalPlugin = (result: Record<string, true>, options?: ExternalPluginOp
     onResolve({ filter: /^\s*data:/i }, markAsExternal);
 
     // css & json
-    // prettier-ignore
     onResolve({ filter: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|json)$/ }, markAsExternal);
 
     // assets
