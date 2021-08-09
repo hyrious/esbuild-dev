@@ -3,7 +3,7 @@ import esbuild, { BuildOptions, Plugin } from "esbuild";
 // npm:package-name-regex, removed $ to match nested files
 const packageNameRegex = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*/;
 
-interface ExternalPluginOptions {
+export interface ExternalPluginOptions {
   /**
    * passed to `onResolve`, indicating that the path is external
    * @default

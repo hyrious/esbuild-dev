@@ -1,4 +1,4 @@
-import { BuildOptions } from "esbuild";
+import { BuildOptions, TransformOptions } from "esbuild";
 
 const cliRE = /^--([-a-z]+)(?::([^=]+))?(?:=(.+))?$/;
 const booleans = { true: true, false: false } as const;
@@ -12,18 +12,18 @@ const booleans = { true: true, false: false } as const;
  * argsToBuildOptions(["--target=es6"]) // { target: "es6" }
  */
 export function argsToBuildOptions(args: string[]) {
-  const buildOptions: BuildOptions = {};
+  const buildOptions: BuildOptions | TransformOptions = {};
   for (const arg of args) {
     const m = cliRE.exec(arg);
     if (m) {
       const [, slashKey, subKey, value] = m;
-      const key = camelize(slashKey) as keyof BuildOptions;
+      const key = camelize(slashKey) as keyof typeof buildOptions;
       if (subKey && value) {
         // define, loader, banner, footer, stdin
         // their values are all string
         (buildOptions[key] ||= {} as any)[subKey] = value;
       } else if (subKey) {
-        // pure, external, inject
+        // pure, external, inject, tsconfig-raw
         // their values are all string
         (buildOptions[key] ||= [] as any).push(subKey);
       } else if (value) {
@@ -67,15 +67,17 @@ function capitalize(s: string) {
  * @example
  * buildOptionsToArgs({ target: "es6" }) // ["--target=es6"]
  */
-export function buildOptionsToArgs(options: BuildOptions) {
+export function buildOptionsToArgs(options: BuildOptions | TransformOptions) {
   const args: string[] = [];
-  if (Array.isArray(options.entryPoints)) {
-    args.push(...options.entryPoints);
-  } else if (options.entryPoints) {
-    args.push(...Object.entries(options.entryPoints).map(([k, v]) => `${k}=${v}`));
+  if (isBuildOptions(options)) {
+    if (Array.isArray(options.entryPoints)) {
+      args.push(...options.entryPoints);
+    } else if (options.entryPoints) {
+      args.push(...Object.entries(options.entryPoints).map(([k, v]) => `${k}=${v}`));
+    }
+    delete options.entryPoints;
+    delete options.plugins;
   }
-  delete options.entryPoints;
-  delete options.plugins;
   for (const [k, v] of Object.entries(options)) {
     const key = dashize(k);
     if (Array.isArray(v)) {
@@ -84,6 +86,8 @@ export function buildOptionsToArgs(options: BuildOptions) {
       } else {
         args.push(...v.map(value => `--${key}:${value}`));
       }
+    } else if (k === "tsconfig-raw" && typeof v === "object") {
+      args.push(`--${key}=${JSON.stringify(v)}`);
     } else if (typeof v === "object" && v !== null) {
       args.push(...Object.entries(v).map(([sub, val]) => `--${key}:${sub}=${JSON.stringify(val)}`));
     } else {
@@ -95,4 +99,8 @@ export function buildOptionsToArgs(options: BuildOptions) {
 
 function dashize(s: string) {
   return s.replace(/([A-Z])/g, x => "-" + x.toLowerCase());
+}
+
+function isBuildOptions(options: BuildOptions | TransformOptions): options is BuildOptions {
+  return "entryPoints" in options || "plugins" in options;
 }
