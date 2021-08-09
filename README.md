@@ -49,6 +49,20 @@ buildOptionsToArgs({ target: "es6" });
 // ["--target=es6"]
 ```
 
+### Known Issue
+
+Although I have exported a separated `@hyrious/esbuild-dev/args`, its types are not exported well.
+You may have to write a shim.d.ts:
+
+```ts
+declare module "@hyrious/esbuild-dev/args" {
+  export { argsToBuildOptions, buildOptionsToArgs } from "@hyrious/esbuild-dev";
+}
+```
+
+I don't know how to emit this type declaration without [api-extractor](https://api-extractor.com) or [rollup-plugin-dts](https://github.com/Swatinem/rollup-plugin-dts).
+I will keep this issue open until [Microsoft/TypeScript#4433](https://github.com/Microsoft/TypeScript/issues/4433) get resolved.
+
 ### License
 
 MIT @ [hyrious](https://github.com/hyrious)
