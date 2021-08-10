@@ -14,8 +14,7 @@ Options:
 
   --plugin:name         Load esbuild plugins. For example, `--plugin:style`
   alias: -p             will try to load `style` package in your project.
-                        This option can not be used
-                        outside of a package.
+                        This option can not be used outside of a package.
 
 Sub Commands:
   external              Show potential external libraries of a file.
