@@ -21,7 +21,8 @@
   ],
   "scripts": {
     "build": "make",
-    "test": "make test"
+    "test:esm": "node dist/bin.mjs test/index.ts -p:./test/example-plugin.ts",
+    "test:cjs": "node dist/bin.mjs --cjs test/index.ts -p:./test/example-plugin.ts"
   },
   "keywords": [
     "cli",

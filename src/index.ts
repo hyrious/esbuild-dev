@@ -23,4 +23,4 @@ export async function requireFile(name: string, options?: BuildOptions) {
 }
 
 export { argsToBuildOptions, buildOptionsToArgs } from "./args";
-export { external } from "./external";
+export { external, ExternalPluginOptions } from "./external";

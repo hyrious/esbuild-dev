@@ -19,4 +19,5 @@ jobs:
           cache: "pnpm"
       - run: pnpm i
       - run: pnpm build
-      - run: pnpm t
+      - run: pnpm test:esm
+      - run: pnpm test:cjs

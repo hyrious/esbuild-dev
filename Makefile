@@ -11,10 +11,3 @@ dist/index.js: src/index.ts
 
 dist/bin.mjs: src/index.ts src/bin.ts src/args.ts
 	esbuild $^ ${ESM} ${FLAGS}
-
-.PHONY: test
-test: dist/bin.mjs
-	@echo ""; echo Run test/index.ts in ESM mode
-	@node --enable-source-maps $^ test/index.ts -p:./test/example-plugin.ts
-	@echo ""; echo Run test/index.ts in CJS mode
-	@node --enable-source-maps $^ --cjs test/index.ts -p:./test/example-plugin.ts
