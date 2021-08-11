@@ -97,7 +97,7 @@ const run = async () => {
       kill();
     });
   } catch {
-    console.log(errorMessage(outfile, args));
+    console.error(errorMessage(outfile, args));
     child = undefined;
   }
 };
