@@ -1,8 +1,19 @@
 # Changelog
 
+## 0.4.5 (Unreleased)
+
+- **refactor**: All flags after entry are passed to script.
+
 ## 0.4.4
 
-- **refactor**: Split esm dist files, so that `args()` can be used without importing esbuild.
+- **refactor**: Split esm dist files, so that `args()` can be used without importing esbuild.\
+  Note: you may have to add such shim.d.ts for correct types:
+
+  ```ts
+  declare module "@hyrious/esbuild-dev/args" {
+    export { argsToBuildOptions, buildOptionsToArgs } from "@hyrious/esbuild-dev";
+  }
+  ```
 
 ## 0.4.3
 
