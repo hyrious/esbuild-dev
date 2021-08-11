@@ -21,7 +21,7 @@ if (process.argv[2] === "external") {
     console.log(document);
   } else {
     // make sure to show the error message of `argsToBuildOptions`
-    const buildOptions = argsToBuildOptions(args);
+    const buildOptions = argsToBuildOptions(args) as BuildOptions;
     try {
       let result = await external(file, {}, buildOptions);
       console.log(bare ? result.join("\n") : result);
@@ -39,7 +39,9 @@ let plugins: Plugin[] = [];
 let help = false;
 let pluginName: string, plugin: any;
 for (const arg of process.argv.slice(2)) {
-  if (arg === "--help") {
+  if (entry) {
+    args.push(arg);
+  } else if (arg === "--help") {
     help = true;
     break;
   } else if (arg === "--cjs") {
