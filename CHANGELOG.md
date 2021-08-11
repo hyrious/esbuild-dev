@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.5 (Unreleased)
+## 0.4.5
 
 - **refactor**: All flags after the entry are passed to script.\
   Previously, all flags are processed despite the side of them. This leads to a bad behavior:
