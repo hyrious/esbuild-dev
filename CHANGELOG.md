@@ -2,7 +2,25 @@
 
 ## 0.4.5 (Unreleased)
 
-- **refactor**: All flags after entry are passed to script.
+- **refactor**: All flags after the entry are passed to script.\
+  Previously, all flags are processed despite the side of them. This leads to a bad behavior:
+
+  ```bash
+  esbuild-dev --cjs --unknown-flag main.ts --help
+  # prints esbuild-dev's help instead of calling `node main.js --help`
+  # same as `esbuild-dev --help`
+  ```
+
+  Now it was fixed. Flags after the entry are always passed to script.
+  Note that unknown flags are also passed to the script for loose rule.
+
+  ```bash
+  esbuild-dev --cjs --unknown-flag main.ts --help
+  # same as `node main.js --unknown-flag --help`
+  ```
+
+- **refactor**: `argsToBuildOptions` and `buildOptionsToArgs` now accept & return
+  both `BuildOptions` and `TransformOptions`.
 
 ## 0.4.4
 
