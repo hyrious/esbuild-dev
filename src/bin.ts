@@ -111,8 +111,12 @@ if (watch) {
   };
 }
 
-// prettier-ignore
-({ outfile, result: { stop } } = await build(entry, format, options));
+try {
+  // prettier-ignore
+  ({ outfile, result: { stop } } = await build(entry, format, options));
+} catch {
+  process.exit(1);
+}
 run();
 
 if (watch) {
