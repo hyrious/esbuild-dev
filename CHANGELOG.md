@@ -1,8 +1,13 @@
 # Changelog
 
+## 0.4.6
+
+- **fix**: Fix a conversion bug in `buildOptionsToArgs()`.
+- **refactor**: Now errors throw-ed by esbuild will not be printed twice.
+
 ## 0.4.5
 
-- **refactor**: All flags after the entry are passed to script.\
+- **fix**: All flags after the entry are passed to script.\
   Previously, all flags are processed despite the side of them. This leads to a bad behavior:
 
   ```bash

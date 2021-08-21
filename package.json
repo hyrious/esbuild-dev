@@ -34,9 +34,9 @@
     "node": ">=14.8.0"
   },
   "dependencies": {
-    "esbuild": "^0.12.20"
+    "esbuild": "^0.12.22"
   },
   "devDependencies": {
-    "@types/node": "^16.6.1"
+    "@types/node": "^16.7.1"
   }
 }

@@ -89,6 +89,7 @@ export function buildOptionsToArgs(options: BuildOptions | TransformOptions) {
     } else if (key === "tsconfig-raw" && typeof v === "object") {
       args.push(`--${key}=${JSON.stringify(v)}`);
     } else if (typeof v === "object" && v !== null) {
+      // --define:process.env={} --footer:js="// hello"
       args.push(...Object.entries(v).map(([sub, val]) => `--${key}:${sub}=${val}`));
     } else if (v === true) {
       args.push(`--${key}`);
