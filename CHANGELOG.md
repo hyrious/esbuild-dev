@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.7
+
+- **fix**: Make it work in workspace by looking up 2 parent's package.json.
+
 ## 0.4.6
 
 - **fix**: Fix a conversion bug in `buildOptionsToArgs()`.
