@@ -9,7 +9,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
-    // TODO: ts4.4 "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": true,
     "noEmit": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

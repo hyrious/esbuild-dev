@@ -11,3 +11,6 @@ dist/index.js: src/index.ts
 
 dist/bin.mjs: src/index.ts src/bin.ts src/args.ts
 	esbuild $^ ${ESM} ${FLAGS}
+
+args.d.ts: src/args.ts
+	echo 'export * from "./src/args";' > $@

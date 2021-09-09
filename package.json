@@ -20,7 +20,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "make",
+    "build": "make && make args.d.ts",
     "test:esm": "node dist/bin.mjs test/index.ts -p:./test/example-plugin.ts",
     "test:cjs": "node dist/bin.mjs --cjs test/index.ts -p:./test/example-plugin.ts"
   },
@@ -34,9 +34,9 @@
     "node": ">=14.8.0"
   },
   "dependencies": {
-    "esbuild": "^0.12.24"
+    "esbuild": "^0.12.25"
   },
   "devDependencies": {
-    "@types/node": "^16.7.5"
+    "@types/node": "^16.9.0"
   }
 }

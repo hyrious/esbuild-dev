@@ -3,6 +3,7 @@
 ## 0.4.7
 
 - **fix**: Make it work in workspace by looking up 2 parent's package.json.
+- **types**: Include args.d.ts in root path.
 
 ## 0.4.6
 
