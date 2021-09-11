@@ -17,7 +17,8 @@
   "sideEffects": false,
   "files": [
     "src",
-    "dist"
+    "dist",
+    "args.d.ts"
   ],
   "scripts": {
     "build": "make && make args.d.ts",
@@ -34,9 +35,9 @@
     "node": ">=14.8.0"
   },
   "dependencies": {
-    "esbuild": "^0.12.25"
+    "esbuild": "^0.12.26"
   },
   "devDependencies": {
-    "@types/node": "^16.9.0"
+    "@types/node": "^16.9.1"
   }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.8
+
+- **fix**: Missing args.d.ts in release.
+
 ## 0.4.7
 
 - **fix**: Make it work in workspace by looking up 2 parent's package.json.
