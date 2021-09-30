@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+- **dep**: Upgrade esbuild to 0.13.x.
+
 ## 0.4.8
 
 - **fix**: Missing args.d.ts in release.
