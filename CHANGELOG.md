@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- **refactor**: It will log warnings about not able to load plugins.
+
 ## 0.5.0
 
 - **dep**: Upgrade esbuild to 0.13.x.

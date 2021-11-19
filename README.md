@@ -15,11 +15,32 @@ Require Node.js `>=14.8` to use `--enable-source-maps` and top-level await.
 
 ### Usage
 
-**CLI**: see [help.txt](./src/help.txt) for more info.
+**CLI**:
 
 ```bash
-esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
-esbuild-dev external [--bare] main.ts ...
+Usage:
+  esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
+  esbuild-dev external [--bare] main.ts ...
+
+Options:
+  --cjs                 By default, it compiles your file in ESM format.
+                        This will change it to CJS format. For example,
+                        `__dirname` can only be used in CJS, and
+                        `import.meta` can only be accessed in ESM.
+
+  --watch               Enable watch mode.
+  alias: -w
+
+  --plugin:name         Load esbuild plugins. For example, `--plugin:style`
+  alias: -p             will try to load `style` package in your project.
+                        This option can not be used outside of a package.
+
+Sub Commands:
+  external              Show potential external libraries of a file.
+                        Additional arguments are passed to build options.
+
+    --bare              Use bare format (one name per line, no quotes).
+    alias: -b
 ```
 
 **Library**

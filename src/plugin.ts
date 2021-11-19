@@ -34,5 +34,6 @@ export async function loadPlugin(name: string): Promise<Plugin | undefined> {
     }
   }
 
+  console.error("[esbuild-dev] could not load plugin", name);
   return;
 }
