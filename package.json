@@ -22,8 +22,8 @@
   ],
   "scripts": {
     "build": "make && make args.d.ts",
-    "test:esm": "node dist/bin.mjs test/index.ts -p:./test/example-plugin.ts",
-    "test:cjs": "node dist/bin.mjs --cjs test/index.ts -p:./test/example-plugin.ts"
+    "test:esm": "node dist/bin.mjs -p:./test/example-plugin.ts test/index.ts",
+    "test:cjs": "node dist/bin.mjs --cjs -p:./test/example-plugin.ts test/index.ts"
   },
   "keywords": [
     "cli",
