@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2
+
+- **dep**: Upgrade esbuild to 0.14.x.\
+  This is **not** a minor version upgrade. I guess there won't be any issue.
+  Finally I will find a way to make esbuild a peer dependency, so that their versions can be decoupled.
+
 ## 0.5.1
 
 - **refactor**: It will log warnings about not able to load plugins.
