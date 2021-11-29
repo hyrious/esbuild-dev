@@ -1,8 +1,8 @@
 ## @hyrious/esbuild-dev
 
-Build and run your `script.ts`, like `ts-node` or `node-dev`
+Build and run your `script.ts`, like `ts-node` or `node-dev`.
 
-Require Node.js `>=14.8` to use `--enable-source-maps` and top-level await.
+Require Node.js `>=16.13` to use `--enable-source-maps` and top-level await.
 
 ### Features
 
@@ -12,6 +12,12 @@ Require Node.js `>=14.8` to use `--enable-source-maps` and top-level await.
   - cons: you won't get any type checking at all
 - 🐛 **_Easy to Debug_** with the help of node's `--enable-source-maps`
 - ✨ **_No Magic_** other than esbuild itself. the author refuses to use any `require.extensions`-like things
+
+### Install
+
+```bash
+npm i -g esbuild esbuild-dev
+```
 
 ### Usage
 
@@ -28,8 +34,8 @@ Options:
                         `__dirname` can only be used in CJS, and
                         `import.meta` can only be accessed in ESM.
 
-  --watch               Enable watch mode.
-  alias: -w
+  --watch               Enable watch mode. This is built on top of the
+  alias: -w             built-in `watch` option of esbuild.
 
   --plugin:name         Load esbuild plugins. For example, `--plugin:style`
   alias: -p             will try to load `style` package in your project.
@@ -38,6 +44,8 @@ Options:
 Sub Commands:
   external              Show potential external libraries of a file.
                         Additional arguments are passed to build options.
+                        This command uses a custom resolve plugin to scan
+                        and gather all package name imports and exclude them.
 
     --bare              Use bare format (one name per line, no quotes).
     alias: -b
@@ -45,30 +53,7 @@ Sub Commands:
 
 **Library**
 
-```ts
-import {
-  argsToBuildOptions,
-  buildOptionsToArgs,
-  external,
-  importFile,
-  requireFile,
-} from "@hyrious/esbuild-dev";
-
-await importFile("./a.ts");
-// compiles a.ts to node_modules/.esbuild-dev/a.ts.mjs then import()
-
-await requireFile("./a.ts");
-// compiles a.ts to node_modules/.esbuild-dev/a.ts.js then require()
-
-await external("./a.ts");
-// if a.ts has `import "b"`, returns ["b"]
-
-argsToBuildOptions(["--target=es6"]);
-// { target: "es6" }
-
-buildOptionsToArgs({ target: "es6" });
-// ["--target=es6"]
-```
+[Read the Docs to Learn More](https://hyrious.me/esbuild-dev).
 
 ### License
 

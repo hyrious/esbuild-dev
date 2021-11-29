@@ -1,14 +1,6 @@
-export const a = 42;
-import { external } from "../src";
-export default 1;
+// node dist/bin.js --define:__ESM__=true test/index.ts
 
-console.log("import.meta =", import.meta);
-if (require.main) {
-  console.log("require.main === module", require.main === module, module.exports);
-  console.log("__filename =", __filename);
-} else {
-  console.log("require =", require, require.toString());
-  external("./src/bin.ts").then(e => {
-    console.log("test external():", e);
-  });
-}
+import { importFile, requireFile } from "../src";
+
+console.log("importFile:", await importFile("./test/lib.ts"));
+console.log("requireFile:", await requireFile("./test/lib.ts"));

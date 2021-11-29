@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.6.0
+
+- **dep**: Move esbuild to peer dependencies.\
+  If you can not use this package at global environment, try `npm i -g esbuild`.
+
+- **refactor**: You can pass esbuild options through command line.
+
+  ```bash
+  usage: esbuild-dev [esbuild options | esbuild-dev options] entry [...args]
+
+  esbuild-dev --cjs --unknown-flag1 --jsx-factory=h main.ts --unknown-flag2
+  # same as `node main.js --unknown-flag1 --unknown-flag2`
+  ```
+
+  Internally, it shares the [same](https://github.com/evanw/esbuild/blob/master/pkg/cli/cli_impl.go) processing logic as esbuild's.
+
+- **package**: Target `node14.8` &rarr; `node16.13`.
+
 ## 0.5.2
 
 - **dep**: Upgrade esbuild to 0.14.x.\
@@ -57,7 +75,10 @@
 
   ```ts
   declare module "@hyrious/esbuild-dev/args" {
-    export { argsToBuildOptions, buildOptionsToArgs } from "@hyrious/esbuild-dev";
+    export {
+      argsToBuildOptions,
+      buildOptionsToArgs,
+    } from "@hyrious/esbuild-dev";
   }
   ```
 

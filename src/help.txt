@@ -9,8 +9,8 @@ Options:
                         `__dirname` can only be used in CJS, and
                         `import.meta` can only be accessed in ESM.
 
-  --watch               Enable watch mode.
-  alias: -w
+  --watch               Enable watch mode. This is built on top of the
+  alias: -w             built-in `watch` option of esbuild.
 
   --plugin:name         Load esbuild plugins. For example, `--plugin:style`
   alias: -p             will try to load `style` package in your project.
@@ -19,6 +19,8 @@ Options:
 Sub Commands:
   external              Show potential external libraries of a file.
                         Additional arguments are passed to build options.
+                        This command uses a custom resolve plugin to scan
+                        and gather all package name imports and exclude them.
 
     --bare              Use bare format (one name per line, no quotes).
     alias: -b

@@ -1,4 +1,4 @@
-// run node dist/bin.mjs test/argv.ts --help
+// run node dist/bin.js test/argv.ts --help
 // should return ["--help"]
 
 import { argsToBuildOptions, buildOptionsToArgs } from "../src/args";

@@ -1,5 +1,0 @@
-
-[esbuild-dev] something went wrong on spawn node process
-              but you can try to run the file by hand:
-
-    > node --enable-source-maps {file} {args}
