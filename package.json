@@ -3,8 +3,9 @@
   "version": "0.6.0",
   "description": "Build and run your script.ts with esbuild.",
   "repository": "hyrious/esbuild-dev",
-  "main": "dist/bin.js",
+  "main": "dist/index.js",
   "module": "dist/index.mjs",
+  "bin": "dist/bin.js",
   "types": "src/index.ts",
   "sideEffects": false,
   "exports": {
