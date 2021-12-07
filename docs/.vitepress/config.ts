@@ -15,6 +15,7 @@ const guideSidebar = [
 export default {
   title: "@hyrious/esbuild-dev",
   description: "A simple wrapper of esbuild to run your script file.",
+  base: "/esbuild-dev/",
   themeConfig: {
     repo: "hyrious/esbuild-dev",
     docsDir: "docs",

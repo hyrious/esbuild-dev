@@ -3,6 +3,7 @@ name: GitHub Pages
 on:
   push:
     tags: "*"
+  workflow_dispatch:
 
 jobs:
   build:
