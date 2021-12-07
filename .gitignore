@@ -1,3 +1,2 @@
-/node_modules
-/dist
-/args.d.ts
+node_modules
+dist

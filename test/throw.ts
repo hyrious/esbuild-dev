@@ -1,4 +1,4 @@
-// run node dist/bin.mjs test/throw.ts
+// run node dist/bin.js test/throw.ts
 // should print the typescript source content
 
 const message: string = "Hello, world!";

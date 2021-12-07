@@ -1,16 +1,19 @@
-BASE=--bundle --target=node14.8 --outdir=dist
+BASE=--bundle --target=node16.13 --outdir=dist --tree-shaking=true
 EXTERNAL=--platform=node --external:esbuild
 SOURCEMAP=--minify-syntax --sourcemap --sources-content=false
 FLAGS=${BASE} ${EXTERNAL} ${SOURCEMAP}
-ESM=--format=esm --splitting --chunk-names=chunks/dep-[hash] --out-extension:.js=.mjs
+ESM=--format=esm --define:__ESM__=true --out-extension:.js=.mjs --splitting --chunk-names=chunks/dep-[hash]
+CJS=--format=cjs --define:__ESM__=false
+BIN=--banner:js="\#!/usr/bin/env node"
 
-all: dist/index.js dist/bin.mjs
+.PHONY: all
+all: dist/index.js dist/bin.js dist/index.mjs
 
 dist/index.js: src/index.ts
-	esbuild $^ ${FLAGS}
+	esbuild $^ ${CJS} ${FLAGS}
 
-dist/bin.mjs: src/index.ts src/bin.ts src/args.ts
+dist/bin.js: src/bin.ts
+	esbuild $^ ${CJS} ${FLAGS} ${BIN}
+
+dist/index.mjs: src/index.ts src/args.ts
 	esbuild $^ ${ESM} ${FLAGS}
-
-args.d.ts: src/args.ts
-	echo 'export * from "./src/args";' > $@

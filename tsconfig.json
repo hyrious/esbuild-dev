@@ -1,5 +1,5 @@
 {
-  "include": ["src"],
+  "include": ["src", "args.d.ts"],
   "compilerOptions": {
     "strict": true,
     "noFallthroughCasesInSwitch": true,
