@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2
+
+- **fix**: Fix using plugin from local file.
+- **package**: Peer dependency `esbuild` &rarr; `*`.
+
 ## 0.6.0
 
 - **dep**: Move esbuild to peer dependencies.\

@@ -149,7 +149,7 @@ export async function loadPlugin(name: string): Promise<Plugin> {
     try {
       if (name[0] === ".") {
         name = resolve(name);
-        plugin = importFile(name);
+        plugin = await importFile(name);
       } else {
         plugin = await requireOrImport(name);
       }
