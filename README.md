@@ -16,7 +16,7 @@ Require Node.js `>=16.13` to use `--enable-source-maps` and top-level await.
 ### Install
 
 ```bash
-npm i -g esbuild esbuild-dev
+npm i -g @hyrious/esbuild-dev esbuild
 ```
 
 ### Usage
