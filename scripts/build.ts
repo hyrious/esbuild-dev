@@ -1,5 +1,6 @@
 import { build, Plugin } from "esbuild";
-import { rmSync, promises } from "fs";
+import { rmSync, promises, readdirSync } from "fs";
+import { join } from "path";
 const read = promises.readFile;
 
 rmSync("dist", { recursive: true, maxRetries: 3, force: true });
@@ -16,7 +17,9 @@ const shebang: Plugin = {
 };
 
 await build({
-  entryPoints: ["src/bin.ts", "src/index.ts", "src/args.ts", "src/loader.ts"],
+  entryPoints: readdirSync("src")
+    .filter(path => path.endsWith(".ts") && !path.endsWith(".d.ts"))
+    .map(path => join("src", path)),
   bundle: true,
   platform: "node",
   format: "esm",
