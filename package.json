@@ -5,7 +5,7 @@
   "repository": "hyrious/esbuild-dev",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "bin": "dist/bin.js",
+  "bin": "dist/bin.mjs",
   "types": "src/index.ts",
   "sideEffects": false,
   "exports": {
@@ -25,7 +25,7 @@
     "args.d.ts"
   ],
   "scripts": {
-    "build": "make",
+    "build": "esbuild scripts/build.ts --bundle --platform=node --format=esm --external:esbuild | node --input-type=module",
     "docs": "npx vitepress build docs",
     "docs:dev": "npx vitepress dev docs"
   },
@@ -43,6 +43,6 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.12",
-    "esbuild": "^0.14.2"
+    "esbuild": "^0.14.3"
   }
 }
