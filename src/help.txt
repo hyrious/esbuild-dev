@@ -1,13 +1,17 @@
 
 Usage:
-  esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
+  esbuild-dev [--bundle] [--cjs] [--watch] [--plugin:name] main.ts ...
   esbuild-dev external [--bare] main.ts ...
 
 Options:
-  --cjs                 By default, it compiles your file in ESM format.
-                        This will change it to CJS format. For example,
+  --bundle[=outfile.js] Bundle the script file to some place then execute it.
+  alias: -b             This is the same behavior as esbuild-dev < 0.7.
+                        The default outdir is node_modules/.esbuild-dev.
+
+  --cjs                 Change the outfile format to CJS. For example,
                         `__dirname` can only be used in CJS, and
-                        `import.meta` can only be accessed in ESM.
+                        `import.meta` can only be accessed in ESM (default).
+                        This option only works with --bundle.
 
   --watch               Enable watch mode. This is built on top of the
   alias: -w             built-in `watch` option of esbuild.
