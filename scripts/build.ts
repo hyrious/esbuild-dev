@@ -2,7 +2,7 @@ import { build, Plugin } from "esbuild";
 import { rmSync, promises } from "fs";
 const read = promises.readFile;
 
-rmSync("dist", { recursive: true, maxRetries: 3 });
+rmSync("dist", { recursive: true, maxRetries: 3, force: true });
 
 const shebang: Plugin = {
   name: "shebang",
