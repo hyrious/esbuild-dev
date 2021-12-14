@@ -9,6 +9,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
+    "useUnknownInCatchVariables": false,
     "exactOptionalPropertyTypes": true,
     "noEmit": true,
     "skipLibCheck": true,

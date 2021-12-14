@@ -1,6 +1,6 @@
 {
   "name": "@hyrious/esbuild-dev",
-  "version": "0.6.2",
+  "version": "0.7.0-beta.1",
   "description": "Build and run your script.ts with esbuild.",
   "repository": "hyrious/esbuild-dev",
   "main": "dist/index.js",
@@ -17,6 +17,7 @@
       "default": "./dist/args.mjs",
       "types": "./src/args.ts"
     },
+    "./loader": "./dist/loader.mjs",
     "./package.json": "./package.json"
   },
   "files": [
