@@ -4,6 +4,10 @@ Usage:
   esbuild-dev external [--bare] main.ts ...
 
 Options:
+  --no-warnings         Using experimental loader api will cause node
+                        print warnings. Set this flag to turn off them all.
+                        This is only a temporary workaround to please eyes.
+
   --bundle[=outfile.js] Bundle the script file to some place then execute it.
   alias: -b             This is the same behavior as esbuild-dev < 0.7.
                         The default outdir is node_modules/.esbuild-dev.
