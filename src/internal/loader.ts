@@ -1,48 +1,35 @@
-import { TypedArray } from "./utils";
+import * as types from "./types";
+import process from "process";
+import { Plugin } from "esbuild";
+import { loadPlugins } from "./build";
 
-export interface ResolveContext {
-  conditions: string[];
-  parentURL?: string;
+function getPluginsFromEnv(): Promise<Plugin[]> {
+  let longestKey = "__ESBUILD_PLUGINS__";
+  while (process.env[longestKey]) {
+    longestKey += "_";
+  }
+  const raw = process.env[longestKey.slice(0, -1)];
+  return raw ? loadPlugins(JSON.parse(raw)) : Promise.resolve([]);
 }
 
-export interface ResolveResult {
-  format?: "builtin" | "commonjs" | "json" | "module" | "wasm" | null;
-  url: string;
-}
-
-export type Resolver = (
-  id: string,
-  context: ResolveContext,
-  defaultResolve: Resolver
-) => ResolveResult;
+let plugins!: Plugin[];
 
 export async function resolve(
   id: string,
-  context: ResolveContext,
-  defaultResolve: Resolver
+  context: types.ResolveContext,
+  defaultResolve: types.Resolver
 ) {
+  plugins ||= await getPluginsFromEnv();
+
   return defaultResolve(id, context, defaultResolve);
 }
 
-export interface LoadContext {
-  format?: ResolveResult["format"];
-}
-
-export interface LoadResult {
-  format: NonNullable<ResolveResult["format"]>;
-  source: string | ArrayBuffer | TypedArray;
-}
-
-export type Loader = (
-  url: string,
-  context: LoadContext,
-  defaultLoad: Loader
-) => LoadResult;
-
 export async function load(
   url: string,
-  context: LoadContext,
-  defaultLoad: Loader
+  context: types.LoadContext,
+  defaultLoad: types.Loader
 ) {
+  plugins ||= await getPluginsFromEnv();
+
   return defaultLoad(url, context, defaultLoad);
 }
