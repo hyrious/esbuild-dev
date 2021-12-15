@@ -1,4 +1,4 @@
-import esbuild, { BuildOptions, Plugin } from "esbuild";
+import { build as esbuild, BuildOptions, Plugin } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
@@ -53,7 +53,7 @@ export async function build(
     ...options,
   };
   (options.plugins ||= []).push(external());
-  const result = await esbuild.build(options);
+  const result = await esbuild(options);
   return { outfile: options.outfile!, result };
 }
 

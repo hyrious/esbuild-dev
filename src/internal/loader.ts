@@ -1,14 +1,14 @@
 import * as types from "./types";
-import process from "process";
+import { env } from "process";
 import { Plugin } from "esbuild";
 import { loadPlugins } from "./build";
 
 function getPluginsFromEnv(): Promise<Plugin[]> {
   let longestKey = "__ESBUILD_PLUGINS__";
-  while (process.env[longestKey]) {
+  while (env[longestKey]) {
     longestKey += "_";
   }
-  const raw = process.env[longestKey.slice(0, -1)];
+  const raw = env[longestKey.slice(0, -1)];
   return raw ? loadPlugins(JSON.parse(raw)) : Promise.resolve([]);
 }
 
