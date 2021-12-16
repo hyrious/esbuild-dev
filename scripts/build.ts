@@ -21,7 +21,7 @@ const shaking: Plugin = {
   name: "shaking",
   setup({ onLoad, initialOptions: { format } }) {
     const __ESM__ = format === "esm";
-    onLoad({ filter: /build\.ts$/ }, async args => {
+    onLoad({ filter: /\b(build|index)\.ts$/ }, async args => {
       let code = await read(args.path, "utf8");
       for (let i = 0; (i = code.indexOf("if (__ESM__) {", i)) >= 0; ++i) {
         let ifLeft = code.indexOf("{", i);
