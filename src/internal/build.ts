@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
-import { cwd, versions } from "process";
+import { cwd, env, versions } from "process";
 import { pathToFileURL } from "url";
 import { external } from "./external";
 import { isObj } from "./utils";
@@ -142,4 +142,38 @@ async function requireOrImport(name: string): Promise<any> {
   } catch {
     return import(name);
   }
+}
+
+export function getPluginsFromEnv(): Promise<Plugin[]> {
+  let longestKey = "__ESBUILD_PLUGINS__";
+  while (env[longestKey]) {
+    longestKey += "_";
+  }
+  const raw = env[longestKey.slice(0, -1)];
+  return raw ? loadPlugins(JSON.parse(raw)) : Promise.resolve([]);
+}
+
+export async function resolveByEsbuild(id: string, resolveDir: string) {
+  let result: string | undefined;
+  await esbuild({
+    stdin: {
+      contents: `import ${JSON.stringify(id)}`,
+      resolveDir,
+    },
+    write: false,
+    bundle: true,
+    platform: "node",
+    plugins: [
+      {
+        name: "resolve",
+        setup({ onLoad }) {
+          onLoad({ filter: /.*/ }, args => {
+            result = args.path;
+            return { contents: "" };
+          });
+        },
+      },
+    ],
+  });
+  return result;
 }

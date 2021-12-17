@@ -23,7 +23,7 @@ export type Resolver = (
   id: string,
   context: ResolveContext,
   defaultResolve: Resolver
-) => ResolveResult;
+) => ResolveResult | Promise<ResolveResult>;
 
 export interface LoadContext {
   format?: ResolveResult["format"];
@@ -38,7 +38,7 @@ export type Loader = (
   url: string,
   context: LoadContext,
   defaultLoad: Loader
-) => LoadResult;
+) => LoadResult | Promise<LoadResult>;
 
 export interface EsbuildDevOptions {
   noWarnings?: boolean;
