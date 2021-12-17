@@ -2,7 +2,7 @@ import { build as esbuild, BuildOptions, Plugin } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
-import { dirname, join, resolve } from "path";
+import { dirname, join } from "path";
 import { cwd, versions } from "process";
 import { pathToFileURL } from "url";
 import { external } from "./external";
@@ -89,8 +89,11 @@ export async function loadPlugins(args: string[]) {
         throw new Error(`invalid plugin argument: ${JSON.stringify(text)}`);
       }
       try {
-        if (text[0] === ".") text = resolve(text);
-        plugin = await requireOrImport(text);
+        if (text[0] === ".") {
+          plugin = await importFile(text);
+        } else {
+          plugin = await requireOrImport(text);
+        }
       } catch (err) {
         throw new Error(
           `cannot load plugin ${JSON.stringify(text)}: ${err.message}.`

@@ -104,13 +104,15 @@ function colon(arg: string, key: string, alias?: string[]) {
   );
 }
 
+export type Parsed = { _: string[]; [key: string]: any };
+
 /**
  * @example
  * parseFlag(parsed = {}, "--bundle", ["bundle", EnumFlagType.Truthy])
  * => true, parsed = { bundle: true }
  */
 export function parseFlag(
-  parsed: Record<string, unknown>,
+  parsed: Parsed,
   arg: string,
   [flag, type, alias]: FlagConfig
 ): boolean {
@@ -150,7 +152,7 @@ export function parseFlag(
       return false;
     case EnumFlagType.List:
       if (colon(arg, flag, alias)) {
-        const value = arg.slice(arg.indexOf("=") + 1);
+        const value = arg.slice(arg.indexOf(":") + 1);
         ((parsed[key] as string[]) ||= []).push(value);
         return true;
       }
@@ -176,4 +178,14 @@ export function parseFlag(
     default:
       return false;
   }
+}
+
+export function parse(args: readonly string[], configs: readonly FlagConfig[]) {
+  const parsed: Parsed = { _: [] };
+
+  for (const arg of args)
+    if (!configs.some(config => parseFlag(parsed, arg, config)))
+      parsed._.push(arg);
+
+  return parsed;
 }

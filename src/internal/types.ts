@@ -39,3 +39,11 @@ export type Loader = (
   context: LoadContext,
   defaultLoad: Loader
 ) => LoadResult;
+
+export interface EsbuildDevOptions {
+  noWarnings?: boolean;
+  bundle?: boolean | string;
+  cjs?: boolean;
+  watch?: boolean;
+  plugin?: string[];
+}

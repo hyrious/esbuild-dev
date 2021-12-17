@@ -33,9 +33,16 @@ const shaking: Plugin = {
         let elseRight = code.indexOf("}", elseLeft);
 
         if (__ESM__) {
-          code = code.slice(0, elseLeft) + code.slice(elseRight);
+          code =
+            code.slice(0, elseLeft) +
+            // replace with whitespace, so that sourcemap will point to correct position
+            code.slice(elseLeft, elseRight).replace(/\S/g, " ") +
+            code.slice(elseRight);
         } else {
-          code = code.slice(0, ifLeft) + code.slice(ifRight);
+          code =
+            code.slice(0, ifLeft) +
+            code.slice(ifLeft, ifRight).replace(/\S/g, " ") +
+            code.slice(ifRight);
         }
       }
       return { contents: code, loader: "default" };
