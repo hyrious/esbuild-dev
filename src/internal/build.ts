@@ -52,7 +52,7 @@ export async function build(
     outfile: join(tmpdir(), entry + extname[options.format]),
     ...options,
   };
-  (options.plugins ||= []).push(external());
+  (options.plugins ||= []).push(external({ exclude: false }));
   const result = await esbuild(options);
   return { outfile: options.outfile!, result };
 }
