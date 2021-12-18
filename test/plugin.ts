@@ -1,4 +1,5 @@
 import { Plugin } from "esbuild";
+import { readFile } from "fs/promises";
 
 export default function example(): Plugin {
   return {
@@ -14,9 +15,11 @@ export default function example(): Plugin {
         console.log("[example-plugin] resolve", args.path);
         return undefined;
       });
-      onLoad({ filter: /.*/ }, args => {
+      onLoad({ filter: /\.m?tsx?$/ }, async args => {
         console.log("[example-plugin] load", args.path);
-        return undefined;
+        let contents = await readFile(args.path, "utf-8");
+        contents += `\nconsole.log("this file has been hooked by example plugin!")`;
+        return { contents, loader: "default" };
       });
     },
   };
