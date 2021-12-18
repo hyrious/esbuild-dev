@@ -6,10 +6,10 @@ export default function example(): Plugin {
     name: "example",
     setup({ onStart, onEnd, onResolve, onLoad }) {
       onStart(() => {
-        console.log("[example-plugin]: on start");
+        console.log("[example-plugin] on start");
       });
       onEnd(() => {
-        console.log("[example-plugin]: on end");
+        console.log("[example-plugin] on end");
       });
       onResolve({ filter: /.*/ }, args => {
         console.log("[example-plugin] resolve", args.path);
