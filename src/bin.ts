@@ -63,11 +63,10 @@ for (let i = 0; i < args.length; ++i) {
   }
   argsBeforeEntry.push(arg);
 }
-help ||= !entry;
 
 if (version) console.log(`${name} ${versionText}, esbuild ${esbuild.version}`);
-if (help) console.log(helpText);
-if (help || version) exit(0);
+if (help || (!version && !entry)) console.log(helpText);
+if (help || !entry || version) exit(0);
 
 const entryPoint = entry!;
 
