@@ -18,22 +18,22 @@ npm i -g @hyrious/esbuild-dev esbuild
 
 ```
 Usage:
-  esbuild-dev [--bundle] [--cjs] [--watch] [--plugin:name] main.ts ...
+  esbuild-dev [--loader] [--cjs] [--watch] [--plugin:name] main.ts ...
   esbuild-dev external [--bare] main.ts ...
 
 Options:
+  --loader              Use `--experimental-loader` to run the file, which
+                        is helpful when using other coverage tools.
+                        In this mode, plugins are not supported.
+
   --no-warnings         Using experimental loader api will cause node
                         print warnings. Set this flag to turn off them all.
                         This is only a temporary workaround to please eyes.
 
-  --bundle[=outfile.js] Bundle the script file to some place then execute it.
-  alias: -b             This is the same behavior as esbuild-dev < 0.7.
-                        The default outdir is node_modules/.esbuild-dev.
-
   --cjs                 Change the outfile format to CJS. For example,
                         `__dirname` can only be used in CJS, and
                         `import.meta` can only be accessed in ESM.
-                        This option will turn on --bundle automatically.
+                        This option cannot be used with `--loader`.
 
   --watch               Enable watch mode. This is built on top of the
   alias: -w             built-in `watch` option of esbuild.

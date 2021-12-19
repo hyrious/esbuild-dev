@@ -15,7 +15,7 @@ import { delay } from "./utils";
 
 interface EsbuildDevOptions {
   noWarnings?: boolean;
-  bundle?: boolean | string;
+  loader?: boolean;
   cjs?: boolean;
   watch?: boolean;
   plugin?: string[];
@@ -101,11 +101,33 @@ if (command === "external") {
 
   const devOptions = devOptionsRaw as EsbuildDevOptions;
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
-  if (devOptions.cjs) devOptions.bundle = true;
+  if (
+    devOptions.loader &&
+    (devOptions.cjs || devOptions.plugin || devOptions.watch)
+  ) {
+    throw new Error(
+      `--cjs, --plugin and --watch are not supported with --loader`
+    );
+  }
+
   buildOptions.format = devOptions.cjs ? "cjs" : "esm";
 
   let spawnArgs: string[];
-  if (devOptions.bundle) {
+  if (devOptions.loader) {
+    spawnArgs = [
+      "--experimental-loader",
+      loaderPath,
+      "--enable-source-maps",
+      entryPoint,
+      ...argsToEntry,
+    ];
+    if (devOptions.noWarnings) spawnArgs.unshift("--no-warnings");
+
+    exit(
+      spawnSync(argv0, spawnArgs, { stdio: "inherit", cwd: cwd(), env })
+        .status || 0
+    );
+  } else {
     if (devOptions.plugin) {
       const plugins = await loadPlugins(devOptions.plugin);
       (buildOptions.plugins ||= []).push(...plugins);
@@ -142,9 +164,7 @@ if (command === "external") {
     const run = async () => {
       try {
         await kill();
-
         spawnArgs = ["--enable-source-maps", outfile, ...argsToEntry];
-
         child = spawn(argv0, spawnArgs, { stdio: "inherit", cwd: cwd(), env });
         child.on("close", on_close);
         child.on("error", on_error);
@@ -181,29 +201,5 @@ if (command === "external") {
         }
       });
     }
-  } else {
-    spawnArgs = [
-      "--experimental-loader",
-      loaderPath,
-      "--enable-source-maps",
-      entryPoint,
-      ...argsToEntry,
-    ];
-    if (devOptions.noWarnings) spawnArgs.unshift("--no-warnings");
-
-    const env2 = { ...env };
-    let longestKey = "__ESBUILD_PLUGINS__";
-    while (longestKey in env2) {
-      longestKey += "_";
-    }
-    env2[longestKey] = JSON.stringify(devOptions.plugin || []);
-
-    exit(
-      spawnSync(argv0, spawnArgs, {
-        stdio: "inherit",
-        cwd: cwd(),
-        env: env2,
-      }).status || 0
-    );
   }
 }

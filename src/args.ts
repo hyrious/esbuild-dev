@@ -71,8 +71,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
 
 export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["no-warnings", EnumFlagType.Truthy],
-  ["bundle", EnumFlagType.Truthy, ["b"]],
-  ["bundle", EnumFlagType.String, ["b"]],
+  ["loader", EnumFlagType.Truthy],
   ["cjs", EnumFlagType.Truthy],
   ["watch", EnumFlagType.Truthy, ["w"]],
   ["plugin", EnumFlagType.List, ["p"]],

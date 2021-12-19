@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.3
+
+- **feat**: Add `--loader` to run file with `--experimental-loader`.\
+  Note that it does not support esbuild plugins.
+
 ## 0.6.2
 
 - **fix**: Fix using plugin from local file.
