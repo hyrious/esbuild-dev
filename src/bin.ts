@@ -8,16 +8,18 @@ import {
   EsbuildFlags,
   parse,
 } from "./args";
+import { build, Format, loaderPath, loadPlugins } from "./build";
+import { external } from "./external";
 import helpText from "./help.txt";
-import {
-  build,
-  delay,
-  EsbuildDevOptions,
-  external,
-  Format,
-  loaderPath,
-  loadPlugins,
-} from "./internal";
+import { delay } from "./utils";
+
+interface EsbuildDevOptions {
+  noWarnings?: boolean;
+  bundle?: boolean | string;
+  cjs?: boolean;
+  watch?: boolean;
+  plugin?: string[];
+}
 
 const error = `
 [esbuild-dev] something went wrong on spawn node process

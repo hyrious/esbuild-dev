@@ -3,8 +3,8 @@ import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
-import { cwd, env, versions } from "process";
-import { pathToFileURL } from "url";
+import { cwd, versions } from "process";
+import { pathToFileURL, URL } from "url";
 import { external } from "./external";
 import { isObj } from "./utils";
 
@@ -144,13 +144,11 @@ async function requireOrImport(name: string): Promise<any> {
   }
 }
 
-export function getPluginsFromEnv(): Promise<Plugin[]> {
-  let longestKey = "__ESBUILD_PLUGINS__";
-  while (env[longestKey]) {
-    longestKey += "_";
-  }
-  const raw = env[longestKey.slice(0, -1)];
-  return raw ? loadPlugins(JSON.parse(raw)) : Promise.resolve([]);
+export let loaderPath: string;
+if (__ESM__) {
+  loaderPath = new URL("./loader.mjs", import.meta.url).pathname;
+} else {
+  loaderPath = require.resolve("./loader.mjs");
 }
 
 export async function resolveByEsbuild(id: string, resolveDir: string) {
