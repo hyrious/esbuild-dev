@@ -9,9 +9,8 @@ import {
   parse,
 } from "./args";
 import { build, Format, loaderPath, loadPlugins } from "./build";
-import { external } from "./external";
 import helpText from "./help.txt";
-import { delay } from "./utils";
+import { delay, external } from "./utils";
 
 interface EsbuildDevOptions {
   noWarnings?: boolean;

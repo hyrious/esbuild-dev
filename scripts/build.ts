@@ -1,6 +1,5 @@
 import { build, Plugin } from "esbuild";
-import { rmSync, promises, readdirSync } from "fs";
-import { join } from "path";
+import { promises, rmSync } from "fs";
 const read = promises.readFile;
 
 rmSync("dist", { recursive: true, maxRetries: 3, force: true });
@@ -51,9 +50,7 @@ const shaking: Plugin = {
 };
 
 await build({
-  entryPoints: readdirSync("src")
-    .filter(path => path.endsWith(".ts") && !path.endsWith(".d.ts"))
-    .map(path => join("src", path)),
+  entryPoints: ["src/bin.ts", "src/index.ts", "src/args.ts", "src/loader.ts"],
   bundle: true,
   platform: "node",
   format: "esm",
@@ -68,7 +65,7 @@ await build({
   define: {
     __ESM__: "true",
   },
-});
+}).catch(() => process.exit(1));
 
 await build({
   entryPoints: ["src/index.ts"],
@@ -83,4 +80,4 @@ await build({
   define: {
     __ESM__: "false",
   },
-});
+}).catch(() => process.exit(1));

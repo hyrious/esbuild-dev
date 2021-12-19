@@ -1,12 +1,11 @@
-import { build as esbuild, BuildOptions, Plugin } from "esbuild";
+import esbuild, { BuildOptions, Plugin } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
 import { cwd, versions } from "process";
 import { pathToFileURL, URL } from "url";
-import { external } from "./external";
-import { isObj } from "./utils";
+import { external, isObj } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
 
@@ -53,7 +52,7 @@ export async function build(
     ...options,
   };
   (options.plugins ||= []).push(external({ exclude: false }));
-  const result = await esbuild(options);
+  const result = await esbuild.build(options);
   return { outfile: options.outfile!, result };
 }
 
@@ -153,7 +152,7 @@ if (__ESM__) {
 
 export async function resolveByEsbuild(id: string, resolveDir: string) {
   let result: string | undefined;
-  await esbuild({
+  await esbuild.build({
     stdin: {
       contents: `import ${JSON.stringify(id)}`,
       resolveDir,
