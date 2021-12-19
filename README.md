@@ -19,20 +19,30 @@ Require Node.js `>=16.13` to use `--enable-source-maps` and top-level await.
 npm i -g @hyrious/esbuild-dev esbuild
 ```
 
+> **Note:** esbuild is a peer dependency!
+
 ### Usage
 
 **CLI**:
 
-```bash
+```
 Usage:
-  esbuild-dev [--cjs] [--watch] [--plugin:name] main.ts ...
+  esbuild-dev [--loader] [--cjs] [--watch] [--plugin:name] main.ts ...
   esbuild-dev external [--bare] main.ts ...
 
 Options:
-  --cjs                 By default, it compiles your file in ESM format.
-                        This will change it to CJS format. For example,
+  --loader              Use `--experimental-loader` to run the file, which
+                        is helpful when using other coverage tools.
+                        In this mode, plugins are not supported.
+
+  --no-warnings         Using experimental loader api will cause node
+                        print warnings. Set this flag to turn off them all.
+                        This is only a temporary workaround to please eyes.
+
+  --cjs                 Change the outfile format to CJS. For example,
                         `__dirname` can only be used in CJS, and
                         `import.meta` can only be accessed in ESM.
+                        This option cannot be used with `--loader`.
 
   --watch               Enable watch mode. This is built on top of the
   alias: -w             built-in `watch` option of esbuild.

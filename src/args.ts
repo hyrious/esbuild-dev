@@ -1,226 +1,190 @@
-import { BuildOptions, TransformOptions } from "esbuild";
+export enum EnumFlagType {
+  Truthy, // --bundle
+  Boolean, // --tree-shaking=true
+  String, // --charset=utf8
+  Array, // --main-fields=main,module
+  List, // --pure:console.log
+  Pair, // --define:key=value
+  Number, // --log-limit=100
+}
+
+export type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export type FlagConfig = [dash_case: string, type: FlagType, alias?: string[]];
+
+export const EsbuildFlags: readonly FlagConfig[] = [
+  ["bundle", EnumFlagType.Truthy],
+  ["preserve-symlinks", EnumFlagType.Truthy],
+  ["splitting", EnumFlagType.Truthy],
+  ["allow-overwrite", EnumFlagType.Truthy],
+  ["watch", EnumFlagType.Truthy],
+  ["minify", EnumFlagType.Truthy],
+  ["minify-syntax", EnumFlagType.Truthy],
+  ["minify-whitespace", EnumFlagType.Truthy],
+  ["minify-identifiers", EnumFlagType.Truthy],
+  ["legal-comments", EnumFlagType.String],
+  ["charset", EnumFlagType.String],
+  ["tree-shaking", EnumFlagType.Boolean],
+  ["ignore-annotations", EnumFlagType.Truthy],
+  ["keep-names", EnumFlagType.Truthy],
+  ["sourcemap", EnumFlagType.Truthy],
+  ["sourcemap", EnumFlagType.String],
+  ["source-root", EnumFlagType.String],
+  ["sources-content", EnumFlagType.Boolean],
+  ["sourcefile", EnumFlagType.String],
+  ["resolve-extensions", EnumFlagType.Array],
+  ["main-fields", EnumFlagType.Array],
+  ["conditions", EnumFlagType.Array],
+  ["public-path", EnumFlagType.String],
+  ["global-name", EnumFlagType.String],
+  ["metafile", EnumFlagType.Truthy],
+  ["metafile", EnumFlagType.String],
+  ["outfile", EnumFlagType.String],
+  ["outdir", EnumFlagType.String],
+  ["outbase", EnumFlagType.String],
+  ["tsconfig", EnumFlagType.String],
+  ["tsconfig-raw", EnumFlagType.String],
+  ["entry-names", EnumFlagType.String],
+  ["chunk-names", EnumFlagType.String],
+  ["asset-names", EnumFlagType.String],
+  ["define", EnumFlagType.Pair],
+  ["pure", EnumFlagType.List],
+  ["loader", EnumFlagType.Pair],
+  ["loader", EnumFlagType.String],
+  ["target", EnumFlagType.String],
+  ["out-extension", EnumFlagType.Pair],
+  ["platform", EnumFlagType.String],
+  ["format", EnumFlagType.String],
+  ["external", EnumFlagType.List],
+  ["inject", EnumFlagType.List],
+  ["jsx", EnumFlagType.String],
+  ["jsx-factory", EnumFlagType.String],
+  ["jsx-fragment", EnumFlagType.String],
+  ["banner", EnumFlagType.String],
+  ["footer", EnumFlagType.String],
+  ["banner", EnumFlagType.Pair],
+  ["footer", EnumFlagType.Pair],
+  ["log-limit", EnumFlagType.Number],
+  ["color", EnumFlagType.Boolean],
+  ["log-level", EnumFlagType.String],
+];
+
+export const EsbuildDevFlags: readonly FlagConfig[] = [
+  ["no-warnings", EnumFlagType.Truthy],
+  ["loader", EnumFlagType.Truthy],
+  ["cjs", EnumFlagType.Truthy],
+  ["watch", EnumFlagType.Truthy, ["w"]],
+  ["plugin", EnumFlagType.List, ["p"]],
+];
+
+export const EsbuildDevExternalFlags: readonly FlagConfig[] = [
+  ["bare", EnumFlagType.Truthy, ["b"]],
+];
+
+function camelize(key: string) {
+  return key.replace(/-(\w)/g, (_, w: string) => w.toUpperCase());
+}
+
+function single(arg: string, key: string, alias?: string[]) {
+  return arg === "--" + key || !!(alias && alias.some(a => arg === "-" + a));
+}
+
+function equal(arg: string, key: string, alias?: string[]) {
+  return (
+    arg.startsWith("--" + key + "=") ||
+    !!(alias && alias.some(a => arg.startsWith("-" + a + "=")))
+  );
+}
+
+function colon(arg: string, key: string, alias?: string[]) {
+  return (
+    arg.startsWith("--" + key + ":") ||
+    !!(alias && alias.some(a => arg.startsWith("-" + a + ":")))
+  );
+}
+
+export type Parsed = { _: string[]; [key: string]: any };
 
 /**
  * @example
- * let args = ["--bundle", "--flag"]
- * parseAndRemoveArgs(args) // { bundle: true }
- * args // ["--flag"]
+ * parseFlag(parsed = {}, "--bundle", ["bundle", EnumFlagType.Truthy])
+ * => true, parsed = { bundle: true }
  */
-export function parseAndRemoveArgs(
-  args: string[]
-): BuildOptions & TransformOptions {
-  let { length: n } = args;
-  const options: BuildOptions & TransformOptions = {};
-
-  type Options = BuildOptions & TransformOptions;
-  type KeysMatching<T, V> = {
-    [K in keyof T]-?: NonNullable<V> extends T[K] ? K : never;
-  }[keyof T];
-  type Flag = `--${string}`;
-  type Prefix = `${Flag}=`;
-  type Prefix2 = `${Flag}:`;
-
-  type Booleans = KeysMatching<Options, boolean>;
-  function truthy(arg: string, flag: Flag, key: Booleans) {
-    if (arg === flag) {
-      options[key] = true;
-      return true;
-    }
-    return false;
-  }
-
-  type Strings = KeysMatching<Options, string>;
-  function string(arg: string, prefix: Prefix, key: Strings) {
-    if (arg.startsWith(prefix)) {
-      options[key] = arg.slice(prefix.length);
-      return true;
-    }
-    return false;
-  }
-
-  function boolean(arg: string, prefix: Prefix, key: Booleans) {
-    if (arg.startsWith(prefix)) {
-      const value = arg.slice(prefix.length);
-      if (value === "true") {
-        options[key] = true;
-        return true;
-      } else if (value === "false") {
-        options[key] = false;
+export function parseFlag(
+  parsed: Parsed,
+  arg: string,
+  [flag, type, alias]: FlagConfig
+): boolean {
+  const key = camelize(flag);
+  switch (type) {
+    case EnumFlagType.Truthy:
+      if (single(arg, flag, alias)) {
+        parsed[key] = true;
         return true;
       }
-    }
-    return false;
-  }
-
-  type Arrays = KeysMatching<Options, Array<string>>;
-  function array(arg: string, prefix: Prefix, key: Arrays) {
-    if (arg.startsWith(prefix)) {
-      const value = arg.slice(prefix.length);
-      options[key] = value ? value.split(",") : [];
-      return true;
-    }
-    return false;
-  }
-
-  type Pair = KeysMatching<Options, Record<string, string>>;
-  function pair(arg: string, prefix: Prefix2, key: Pair) {
-    if (arg.startsWith(prefix)) {
-      const value = arg.slice(prefix.length);
-      const equals = value.indexOf("=");
-      if (equals !== -1) {
-        (options[key] ||= {})[value.slice(0, equals)] = value.slice(equals + 1);
+      return false;
+    case EnumFlagType.Boolean:
+      if (equal(arg, flag, alias)) {
+        const value = arg.slice(arg.indexOf("=") + 1);
+        if (value === "true") {
+          parsed[key] = true;
+          return true;
+        }
+        if (value === "false") {
+          parsed[key] = false;
+          return true;
+        }
+      }
+      return false;
+    case EnumFlagType.String:
+      if (equal(arg, flag, alias)) {
+        parsed[key] = arg.slice(arg.indexOf("=") + 1);
         return true;
       }
-    }
-    return false;
-  }
-
-  function append(arg: string, prefix: Prefix2, key: Arrays) {
-    if (arg.startsWith(prefix)) {
-      const value = arg.slice(prefix.length);
-      (options[key] ||= []).push(value);
-      return true;
-    }
-    return false;
-  }
-
-  type Numbers = KeysMatching<Options, number>;
-  function number(arg: string, prefix: Prefix, key: Numbers) {
-    if (arg.startsWith(prefix)) {
-      options[key] = parseInt(arg.slice(prefix.length), 10);
-      return true;
-    }
-    return false;
-  }
-
-  while (n--) {
-    const arg = args.shift()!;
-    false ||
-      truthy(arg, "--bundle", "bundle") ||
-      truthy(arg, "--preserve-symlinks", "preserveSymlinks") ||
-      truthy(arg, "--splitting", "splitting") ||
-      truthy(arg, "--allow-overwrite", "allowOverwrite") ||
-      truthy(arg, "--watch", "watch") ||
-      truthy(arg, "--minify", "minify") ||
-      truthy(arg, "--minify-syntax", "minifySyntax") ||
-      truthy(arg, "--minify-whitespace", "minifyWhitespace") ||
-      truthy(arg, "--minify-identifiers", "minifyIdentifiers") ||
-      string(arg, "--legal-comments=", "legalComments" as Strings) ||
-      string(arg, "--charset=", "charset" as Strings) ||
-      boolean(arg, "--tree-shaking=", "treeShaking") ||
-      truthy(arg, "--ignore-annotations", "ignoreAnnotations") ||
-      truthy(arg, "--keep-names", "keepNames") ||
-      truthy(arg, "--sourcemap", "sourcemap") ||
-      string(arg, "--sourcemap=", "sourcemap" as Strings) ||
-      string(arg, "--source-root=", "sourceRoot") ||
-      boolean(arg, "--sources-content=", "sourcesContent") ||
-      string(arg, "--sourcefile=", "sourcefile") ||
-      array(arg, "--resolve-extensions=", "resolveExtensions") ||
-      array(arg, "--main-fields=", "mainFields") ||
-      array(arg, "--conditions=", "conditions") ||
-      string(arg, "--public-path=", "publicPath") ||
-      string(arg, "--global-name=", "globalName") ||
-      truthy(arg, "--metafile", "metafile") ||
-      string(arg, "--metafile=", "metafile" as Strings) ||
-      string(arg, "--outfile=", "outfile") ||
-      string(arg, "--outdir=", "outdir") ||
-      string(arg, "--outbase=", "outbase") ||
-      string(arg, "--tsconfig=", "tsconfig") ||
-      string(arg, "--tsconfig-raw=", "tsconfigRaw") ||
-      string(arg, "--entry-names=", "entryNames") ||
-      string(arg, "--chunk-names=", "chunkNames") ||
-      string(arg, "--asset-names=", "assetNames") ||
-      pair(arg, "--define:", "define") ||
-      append(arg, "--pure:", "pure") ||
-      pair(arg, "--loader:", "loader" as Pair) ||
-      string(arg, "--loader=", "loader" as Strings) ||
-      string(arg, "--target=", "target") ||
-      pair(arg, "--out-extension:", "outExtension") ||
-      string(arg, "--platform=", "platform" as Strings) ||
-      string(arg, "--format=", "format" as Strings) ||
-      append(arg, "--external:", "external") ||
-      append(arg, "--inject:", "inject") ||
-      string(arg, "--jsx=", "jsx" as Strings) ||
-      string(arg, "--jsx-factory=", "jsxFactory") ||
-      string(arg, "--jsx-fragment=", "jsxFragment") ||
-      string(arg, "--banner=", "banner" as Strings) ||
-      string(arg, "--footer=", "footer" as Strings) ||
-      pair(arg, "--banner:", "banner" as Pair) ||
-      pair(arg, "--footer:", "footer" as Pair) ||
-      number(arg, "--log-limit=", "logLimit") ||
-      boolean(arg, "--color=", "color") ||
-      string(arg, "--log-level=", "logLevel" as Strings) ||
-      args.push(arg);
-  }
-
-  return options;
-}
-
-function dashize(s: string) {
-  return s.replace(/([A-Z])/g, x => "-" + x.toLowerCase());
-}
-
-function isBuildOptions(
-  options: BuildOptions | TransformOptions
-): options is BuildOptions {
-  return "entryPoints" in options || "plugins" in options;
-}
-
-/**
- * Convert argv to esbuild build options.
- * This function does not check any typo error, nor plugin support.
- *
- * NOTE: The args should not have `""` surroundings. e.g. use `--a=b c` to pass `--a="b c"`.
- * @example
- * argsToBuildOptions(["--target=es6"]) // { target: "es6" }
- */
-export function argsToBuildOptions(args: string[]) {
-  return parseAndRemoveArgs(args.slice());
-}
-
-/**
- * Convert esbuild build options to argv.
- * This function does not check any typo error, nor plugin support.
- *
- * NOTE: Result does not have `""` surroundings. e.g. it returns `--a=b c` instead of `--a="b c"`.
- * @example
- * buildOptionsToArgs({ target: "es6" }) // ["--target=es6"]
- */
-export function buildOptionsToArgs(options: BuildOptions | TransformOptions) {
-  const args: string[] = [];
-  if (isBuildOptions(options)) {
-    if (Array.isArray(options.entryPoints)) {
-      args.push(...options.entryPoints);
-    } else if (options.entryPoints) {
-      args.push(
-        ...Object.entries(options.entryPoints).map(([k, v]) => `${k}=${v}`)
-      );
-    }
-    delete options.entryPoints;
-    delete options.plugins;
-  }
-  for (const [k, v] of Object.entries(options)) {
-    const key = dashize(k);
-    if (Array.isArray(v)) {
-      if (
-        ["resolveExtensions", "mainFields", "conditions", "target"].includes(k)
-      ) {
-        args.push(`--${key}=${v.join(",")}`);
-      } else {
-        args.push(...v.map(value => `--${key}:${value}`));
+      return false;
+    case EnumFlagType.Array:
+      if (equal(arg, flag, alias)) {
+        const value = arg.slice(arg.indexOf("=") + 1);
+        parsed[key] = value ? value.split(",") : [];
+        return true;
       }
-    } else if (key === "tsconfig-raw" && typeof v === "object") {
-      args.push(`--${key}=${JSON.stringify(v)}`);
-    } else if (typeof v === "object" && v !== null) {
-      // --define:process.env={} --footer:js="// hello"
-      args.push(
-        ...Object.entries(v).map(([sub, val]) => `--${key}:${sub}=${val}`)
-      );
-    } else if (v === true) {
-      args.push(`--${key}`);
-    } else {
-      args.push(`--${key}=${v}`);
-    }
+      return false;
+    case EnumFlagType.List:
+      if (colon(arg, flag, alias)) {
+        const value = arg.slice(arg.indexOf(":") + 1);
+        ((parsed[key] as string[]) ||= []).push(value);
+        return true;
+      }
+      return false;
+    case EnumFlagType.Pair:
+      if (colon(arg, flag, alias)) {
+        const value = arg.slice(arg.indexOf(":") + 1);
+        const equalSign = value.indexOf("=");
+        if (equalSign !== -1) {
+          ((parsed[key] as Record<string, string>) ||= {})[
+            value.slice(0, equalSign)
+          ] = value.slice(equalSign + 1);
+          return true;
+        }
+      }
+      return false;
+    case EnumFlagType.Number:
+      if (equal(arg, flag, alias)) {
+        parsed[key] = parseInt(arg.slice(arg.indexOf("=") + 1));
+        return true;
+      }
+      return false;
+    default:
+      return false;
   }
-  return args;
+}
+
+export function parse(args: readonly string[], configs: readonly FlagConfig[]) {
+  const parsed: Parsed = { _: [] };
+
+  for (const arg of args)
+    if (!configs.some(config => parseFlag(parsed, arg, config)))
+      parsed._.push(arg);
+
+  return parsed;
 }

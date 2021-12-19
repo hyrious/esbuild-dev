@@ -1,11 +1,11 @@
 {
   "name": "@hyrious/esbuild-dev",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Build and run your script.ts with esbuild.",
   "repository": "hyrious/esbuild-dev",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "bin": "dist/bin.js",
+  "bin": "dist/bin.mjs",
   "types": "src/index.ts",
   "sideEffects": false,
   "exports": {
@@ -17,6 +17,7 @@
       "default": "./dist/args.mjs",
       "types": "./src/args.ts"
     },
+    "./loader": "./dist/loader.mjs",
     "./package.json": "./package.json"
   },
   "files": [
@@ -25,7 +26,7 @@
     "args.d.ts"
   ],
   "scripts": {
-    "build": "make",
+    "build": "esbuild scripts/build.ts | node --input-type=module",
     "docs": "npx vitepress build docs",
     "docs:dev": "npx vitepress dev docs"
   },
@@ -42,7 +43,7 @@
     "esbuild": "*"
   },
   "devDependencies": {
-    "@types/node": "^16.11.12",
-    "esbuild": "^0.14.2"
+    "@types/node": "^17.0.0",
+    "esbuild": "^0.14.5"
   }
 }

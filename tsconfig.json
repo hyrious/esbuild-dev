@@ -1,5 +1,5 @@
 {
-  "include": ["src", "args.d.ts"],
+  "include": ["src", "test", "args.d.ts"],
   "compilerOptions": {
     "strict": true,
     "noFallthroughCasesInSwitch": true,
@@ -9,7 +9,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
-    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": false,
     "noEmit": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
