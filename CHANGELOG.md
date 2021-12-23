@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.6.3
+## 0.7.1
+
+- **fix**: (loader) Ignore url that are not file url in `load()`.
+
+## 0.7.0
 
 - **feat**: Add `--loader` to run file with `--experimental-loader`.\
   Note that it does not support esbuild plugins.

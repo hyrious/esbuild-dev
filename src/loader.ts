@@ -117,7 +117,8 @@ export async function load(
   context: LoadContext,
   defaultLoad: Loader
 ): Promise<LoadResult> {
-  const path = fileURLToPath(url);
+  // do a quick test if the url is not File URL, don't process it
+  const path = url.startsWith("file:///") ? fileURLToPath(url) : "";
   const loader = ExtToLoader[extname(path)];
 
   if (loader) {

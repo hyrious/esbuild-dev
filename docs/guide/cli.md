@@ -16,6 +16,10 @@ $ esbuild-dev --watch main.ts
 $ esbuild-dev -p:./plugin.ts main.ts
 # build and run main.ts, with plugin from file ./plugin.ts
 # longhand: --plugin
+
+$ esbuild-dev --loader main.ts
+# run main.ts with esm loader
+# in this mode, --cjs, --watch and --plugin are not supported.
 ```
 
 ### Plugin Details

@@ -2,32 +2,34 @@
 
 ## Helper Methods
 
-### `buildOptionsToArgs`
+### `parse`
 
-- **Type:** `(options: BuildOptions | TransformOptions) => string[]`
-
-Transform build options object to command line arguments.
+- **Type:** `(args: string[], configs: FlagConfig[]) => string[]`
 
 ```ts
-buildOptionsToArgs({ target: "es6" }); // => ["--target=es6"]
+enum EnumFlagType {
+  Truthy, // --bundle
+  Boolean, // --tree-shaking=true
+  String, // --charset=utf8
+  Array, // --main-fields=main,module
+  List, // --pure:console.log
+  Pair, // --define:key=value
+  Number, // --log-limit=100
+}
+
+type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+type FlagConfig = [dash_case: string, type: FlagType, alias?: string[]];
 ```
 
-- It does not check whether the options are valid.
-- The output array does not including `"`s around the arguments.\
-  i.e. It will output `--banner:js=a b c` instead of `--banner:js="a b c"`.
-
-### `argsToBuildOptions`
-
-- **Type:** `(args: string[]) => BuildOptions & TransformOptions`
-
-The reverse of `buildOptionsToArgs`.
+Parse command line arguments in the esbuild way.
 
 ```ts
-argsToBuildOptions(["--target=es6"]); // => { target: "es6" }
-```
+import { parse, EsbuildFlags } from "@hyrious/esbuild-dev/args";
 
-Same caveats as `buildOptionsToArgs`. You should pass in `--banner:js=a b c`
-instead of `--banner:js="a b c"`.
+parse(["--target=es6", "other args"], EsbuildFlags);
+// => { target: "es6", _: ["other args"] }
+```
 
 ## Requires `esbuild`
 
@@ -39,6 +41,8 @@ Imports a file like the built-in `import()`, except that it can also accept
 several other file extensions including `.ts`.
 
 ```ts
+import { importFile } from "@hyrious/esbuild-dev";
+
 const config = await importFile("config.ts");
 ```
 
@@ -52,19 +56,71 @@ Similar to `importFile()`, but internally it uses commonjs format.
 
 ### `external`
 
-- **Type:** `(path: string) => Promise<string[]>`
-
-Scan an entry file to guess potential external libraries of your project.
+- **Type:** `(options?: ExternalPluginOptions) => esbuild.Plugin`
 
 ```ts
-const externals = await external("src/index.ts");
-// => ["esbuild", "path", "fs"]
+interface ExternalPluginOptions {
+  /**
+   * Passed to `onResolve()`, mark them as external.
+   * @default /^[\w@][^:]/
+   */
+  filter?: RegExp;
+
+  /**
+   * Called on each external id.
+   * @example
+   * external({ onResolve(args) { externals.push(args.path) } })
+   */
+  onResolve?: (args: OnResolveArgs) => void;
+
+  /**
+   * Silently exclude some common file extensions.
+   * @default true
+   */
+  exclude?: boolean | RegExp;
+}
 ```
 
-It works by bundling your source once with a custom plugin that externalizes
-all [<q>package-name-like</q>][package-name-regex] imports. This function is
-suitable for implementing the pre-bundling optimization of vite. Although
-they achieve this with [es-module-lexer].
+This is an esbuild plugin that externalizes all names look like [<q>package-name</q>][package-name-regex].
+
+```ts
+import { build } from "esbuild";
+import { external } from "@hyrious/esbuild-dev";
+
+build({
+  entryPoints: ["index.ts"],
+  bundle: true,
+  plugins: [
+    external({
+      onResolve(id) {
+        console.log("marked as external:", id);
+      },
+    }),
+  ],
+});
+```
+
+This function is suitable for implementing the pre-bundling optimization of vite.
+Although they achieved this with [es-module-lexer].
 
 [package-name-regex]: https://github.com/dword-design/package-name-regex
 [es-module-lexer]: https://github.com/guybedford/es-module-lexer
+
+### `resolveByEsbuild`
+
+- **Type:** `(id: string, resolveDir: string) => Promise<string | undefined>`
+
+Use esbuild to resolve a module id from the dir `resolveDir`.
+
+```ts
+import { resolveByEsbuild } from "@hyrious/esbuild-dev";
+
+resolveByEsbuild("./a", "./src");
+// => "./src/a.ts"
+```
+
+Because esbuild will parse tsconfig and correctly resolve the file from the
+bundler side, this function is a cheap(?) way to achieve the well-known
+[`resolve`][resolve] behavior of other bundlers.
+
+[resolve]: https://github.com/browserify/resolve
