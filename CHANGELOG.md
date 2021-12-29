@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: Add `--drop:debugger` to `EsbuildFlags`.
+
 ## 0.7.1
 
 - **fix**: (loader) Ignore url that are not file url in `load()`.

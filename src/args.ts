@@ -22,6 +22,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["minify-syntax", EnumFlagType.Truthy],
   ["minify-whitespace", EnumFlagType.Truthy],
   ["minify-identifiers", EnumFlagType.Truthy],
+  ["drop", EnumFlagType.List],
   ["legal-comments", EnumFlagType.String],
   ["charset", EnumFlagType.String],
   ["tree-shaking", EnumFlagType.Boolean],
