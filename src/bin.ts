@@ -179,16 +179,17 @@ if (command === "external") {
       };
     }
 
-    try {
+    const restart = async () => {
+      await kill();
+      stop && stop();
       ({
         outfile,
         result: { stop },
       } = await build(entryPoint, buildOptions));
-    } catch {
-      exit(1);
-    }
+      await run();
+    };
 
-    run();
+    restart().catch(() => exit(1));
 
     if (devOptions.watch) {
       stdin.on("data", async e => {
@@ -196,6 +197,8 @@ if (command === "external") {
           await kill();
           stop && stop();
           exit(0);
+        } else if (e.toString().startsWith("rs")) {
+          await restart();
         }
       });
     }
