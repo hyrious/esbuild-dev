@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **feat**: Add `--drop:debugger` to `EsbuildFlags`.
+- **feat**: Add `rs` in watch mode to force rebuild and run.
 
 ## 0.7.1
 
