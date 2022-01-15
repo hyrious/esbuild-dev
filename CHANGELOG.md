@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.7.2
 
-- **feat**: Add `--drop:debugger` to `EsbuildFlags`.
+- **feat**: Add `--drop:` to `EsbuildFlags`.
 - **feat**: Add `rs` in watch mode to force rebuild and run.
 
 ## 0.7.1

@@ -51,6 +51,9 @@ Options:
   alias: -p             will try to load `style` package in your project.
                         This option can not be used outside of a package.
 
+  --[esbuild-options]   Additional flags left of the filename will be passed
+                        to esbuild build options.
+
 Sub Commands:
   external              Show potential external libraries of a file.
                         Additional arguments are passed to build options.
