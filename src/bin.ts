@@ -113,7 +113,7 @@ if (command === "external") {
   let spawnArgs: string[];
   if (devOptions.loader) {
     spawnArgs = [
-      "--experimental-loader",
+      "--loader",
       loaderPath,
       "--enable-source-maps",
       entryPoint,
