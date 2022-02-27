@@ -24,7 +24,7 @@ $ esbuild-dev script.ts
 
 That's it. Simple and naive.
 
-Originally, I developed this tool to run achieve <q>zero `*.js`</q> in some
+Originally, I developed this tool to achieve <q>zero `*.js`</q> in some
 projects.
 
 ## Alternatives
