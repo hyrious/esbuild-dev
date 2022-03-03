@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: Add `mangle` related flags to `EsbuildFlags`.\
+  Now this list is generated.
+
 ## 0.7.2
 
 - **feat**: Add `--drop:` to `EsbuildFlags`.

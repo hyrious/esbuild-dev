@@ -1,6 +1,6 @@
 export enum EnumFlagType {
-  Truthy, // --bundle
-  Boolean, // --tree-shaking=true
+  Truthy, // --sourcemap
+  Boolean, // --bundle, --tree-shaking=true
   String, // --charset=utf8
   Array, // --main-fields=main,module
   List, // --pure:console.log
@@ -13,21 +13,25 @@ export type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type FlagConfig = [dash_case: string, type: FlagType, alias?: string[]];
 
 export const EsbuildFlags: readonly FlagConfig[] = [
-  ["bundle", EnumFlagType.Truthy],
-  ["preserve-symlinks", EnumFlagType.Truthy],
-  ["splitting", EnumFlagType.Truthy],
-  ["allow-overwrite", EnumFlagType.Truthy],
-  ["watch", EnumFlagType.Truthy],
-  ["minify", EnumFlagType.Truthy],
-  ["minify-syntax", EnumFlagType.Truthy],
-  ["minify-whitespace", EnumFlagType.Truthy],
-  ["minify-identifiers", EnumFlagType.Truthy],
+  ["bundle", EnumFlagType.Boolean],
+  ["preserve-symlinks", EnumFlagType.Boolean],
+  ["splitting", EnumFlagType.Boolean],
+  ["allow-overwrite", EnumFlagType.Boolean],
+  ["watch", EnumFlagType.Boolean],
+  ["minify", EnumFlagType.Boolean],
+  ["minify-syntax", EnumFlagType.Boolean],
+  ["minify-whitespace", EnumFlagType.Boolean],
+  ["minify-identifiers", EnumFlagType.Boolean],
+  ["mangle-quoted", EnumFlagType.Boolean],
+  ["mangle-props", EnumFlagType.String],
+  ["reserve-props", EnumFlagType.String],
+  ["mangle-cache", EnumFlagType.String],
   ["drop", EnumFlagType.List],
   ["legal-comments", EnumFlagType.String],
   ["charset", EnumFlagType.String],
   ["tree-shaking", EnumFlagType.Boolean],
-  ["ignore-annotations", EnumFlagType.Truthy],
-  ["keep-names", EnumFlagType.Truthy],
+  ["ignore-annotations", EnumFlagType.Boolean],
+  ["keep-names", EnumFlagType.Boolean],
   ["sourcemap", EnumFlagType.Truthy],
   ["sourcemap", EnumFlagType.String],
   ["source-root", EnumFlagType.String],
@@ -52,7 +56,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["pure", EnumFlagType.List],
   ["loader", EnumFlagType.Pair],
   ["loader", EnumFlagType.String],
-  ["target", EnumFlagType.String],
+  ["target", EnumFlagType.Array],
   ["out-extension", EnumFlagType.Pair],
   ["platform", EnumFlagType.String],
   ["format", EnumFlagType.String],
@@ -118,13 +122,17 @@ export function parseFlag(
 ): boolean {
   const key = camelize(flag);
   switch (type) {
-    case EnumFlagType.Truthy:
+    case EnumFlagType.Truthy: // can only use --sourcemap
       if (single(arg, flag, alias)) {
         parsed[key] = true;
         return true;
       }
       return false;
-    case EnumFlagType.Boolean:
+    case EnumFlagType.Boolean: // can use both --bundle and --bundle=true
+      if (single(arg, flag, alias)) {
+        parsed[key] = true;
+        return true;
+      }
       if (equal(arg, flag, alias)) {
         const value = arg.slice(arg.indexOf("=") + 1);
         if (value === "true") {
