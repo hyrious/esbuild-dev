@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.4
+
+- **fix**: Transform `mangle` related flags to RegExp.\
+  This is still hand-written because there's no obvious way to generate it.
+
 ## 0.7.3
 
 - **feat**: Add `mangle` related flags to `EsbuildFlags`.\

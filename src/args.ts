@@ -6,6 +6,7 @@ export enum EnumFlagType {
   List, // --pure:console.log
   Pair, // --define:key=value
   Number, // --log-limit=100
+  RegExp, // --mangle-props=/^[a-z]/
 }
 
 export type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -23,8 +24,8 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["minify-whitespace", EnumFlagType.Boolean],
   ["minify-identifiers", EnumFlagType.Boolean],
   ["mangle-quoted", EnumFlagType.Boolean],
-  ["mangle-props", EnumFlagType.String],
-  ["reserve-props", EnumFlagType.String],
+  ["mangle-props", EnumFlagType.RegExp],
+  ["reserve-props", EnumFlagType.RegExp],
   ["mangle-cache", EnumFlagType.String],
   ["drop", EnumFlagType.List],
   ["legal-comments", EnumFlagType.String],
@@ -180,6 +181,12 @@ export function parseFlag(
     case EnumFlagType.Number:
       if (equal(arg, flag, alias)) {
         parsed[key] = parseInt(arg.slice(arg.indexOf("=") + 1));
+        return true;
+      }
+      return false;
+    case EnumFlagType.RegExp:
+      if (equal(arg, flag, alias)) {
+        parsed[key] = new RegExp(arg.slice(arg.indexOf("=") + 1));
         return true;
       }
       return false;
