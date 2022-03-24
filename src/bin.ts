@@ -150,6 +150,7 @@ if (command === "external") {
       if (devOptions.watch) {
         console.log(`[esbuild-dev] child process stopped with code`, code);
       }
+      process.exitCode = code;
       child = undefined;
     };
 
