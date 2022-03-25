@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.5
+
+- **feat**: Forward child process exit code. (#19)\
+  This feature was contributed by [@tmueller](https://github.com/tmueller).
+
 ## 0.7.4
 
 - **fix**: Transform `mangle` related flags to RegExp.\
