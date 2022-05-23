@@ -17,6 +17,9 @@ Options:
                         `import.meta` can only be accessed in ESM.
                         This option cannot be used with `--loader`.
 
+  --shims               Replace `import.meta.url` and `__dirname` with absolute
+                        path in .[tj]s files.
+
   --watch               Enable watch mode. This is built on top of the
   alias: -w             built-in `watch` option of esbuild.
 
