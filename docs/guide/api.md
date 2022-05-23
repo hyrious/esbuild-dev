@@ -8,16 +8,17 @@
 
 ```ts
 enum EnumFlagType {
-  Truthy, // --bundle
-  Boolean, // --tree-shaking=true
+  Truthy, // --sourcemap
+  Boolean, // --bundle, --tree-shaking=true
   String, // --charset=utf8
   Array, // --main-fields=main,module
   List, // --pure:console.log
   Pair, // --define:key=value
   Number, // --log-limit=100
+  RegExp, // --mangle-props=_$
 }
 
-type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 type FlagConfig = [dash_case: string, type: FlagType, alias?: string[]];
 ```

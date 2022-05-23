@@ -6,7 +6,7 @@ export enum EnumFlagType {
   List, // --pure:console.log
   Pair, // --define:key=value
   Number, // --log-limit=100
-  RegExp, // --mangle-props=/^[a-z]/
+  RegExp, // --mangle-props=_$
 }
 
 export type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -79,9 +79,19 @@ export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["no-warnings", EnumFlagType.Truthy],
   ["loader", EnumFlagType.Truthy],
   ["cjs", EnumFlagType.Truthy],
+  ["shims", EnumFlagType.Truthy],
   ["watch", EnumFlagType.Truthy, ["w"]],
   ["plugin", EnumFlagType.List, ["p"]],
 ];
+
+export interface EsbuildDevOptions {
+  noWarnings?: boolean;
+  loader?: boolean;
+  cjs?: boolean;
+  shims?: boolean;
+  watch?: boolean;
+  plugin?: string[];
+}
 
 export const EsbuildDevExternalFlags: readonly FlagConfig[] = [
   ["bare", EnumFlagType.Truthy, ["b"]],

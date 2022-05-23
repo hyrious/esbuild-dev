@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.7.6
+
+- **feat**: Add `--shims` to polyfill `import.meta.url` and `__dirname`, `__filename`.\
+  Below is the different with/without this option:
+
+  **without `--shims`**:
+
+  ```js
+  $ cat test/index.ts
+  // WARN: do not use these words as key
+  console.log({ import_meta_url: import.meta.url } as any);
+  console.log({ filename: __filename } as any);
+
+  $ esbuild-dev test/index.ts
+  { import_meta_url: 'file:///Users/hyrious/esbuild-dev/node_modules/.esbuild-dev/test/index.ts.js' }
+  /Users/hyrious/esbuild-dev/test/index.ts:3
+  console.log({ filename: __filename } as any);
+                          ^
+  ReferenceError: __filename is not defined in ES module scope
+
+  $ esbuild-dev --cjs test/index.ts
+  { import_meta_url: undefined }
+  { filename: '/Users/hyrious/esbuild-dev/node_modules/.esbuild-dev/test/index.ts.cjs' }
+  ```
+
+  **with `--shims`**:
+
+  ```js
+  $ esbuild-dev --shims test/index.ts
+  { import_meta_url: 'file:///Users/hyrious/esbuild-dev/test/index.ts' }
+  { filename: '/Users/hyrious/esbuild-dev/test/index.ts' }
+
+  $ esbuild-dev --cjs --shims test/index.ts
+  { import_meta_url: 'file:///Users/hyrious/esbuild-dev/test/index.ts' }
+  { filename: '/Users/hyrious/esbuild-dev/test/index.ts' }
+  ```
+
 ## 0.7.5
 
 - **feat**: Forward child process exit code. (#19)\

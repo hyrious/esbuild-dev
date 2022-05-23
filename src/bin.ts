@@ -1,24 +1,17 @@
 import { ChildProcess, spawn, spawnSync } from "child_process";
-import esbuild, { BuildOptions } from "esbuild";
+import { BuildOptions, version as esbuildVersion } from "esbuild";
 import { argv, argv0, cwd, env, exit, stdin } from "process";
 import { name, version as versionText } from "../package.json";
 import {
   EsbuildDevExternalFlags,
   EsbuildDevFlags,
+  EsbuildDevOptions,
   EsbuildFlags,
   parse,
 } from "./args";
 import { build, Format, loaderPath, loadPlugins } from "./build";
 import helpText from "./help.txt";
-import { delay, external } from "./utils";
-
-interface EsbuildDevOptions {
-  noWarnings?: boolean;
-  loader?: boolean;
-  cjs?: boolean;
-  watch?: boolean;
-  plugin?: string[];
-}
+import { delay, external, replaceImportMeta } from "./utils";
 
 const error = `
 [esbuild-dev] something went wrong on spawn node process
@@ -63,7 +56,7 @@ for (let i = 0; i < args.length; ++i) {
   argsBeforeEntry.push(arg);
 }
 
-if (version) console.log(`${name} ${versionText}, esbuild ${esbuild.version}`);
+if (version) console.log(`${name} ${versionText}, esbuild ${esbuildVersion}`);
 if (help || (!version && !entry)) console.log(helpText);
 if (help || !entry || version) exit(0);
 
@@ -126,10 +119,14 @@ if (command === "external") {
         .status || 0
     );
   } else {
-    if (devOptions.plugin) {
-      const plugins = await loadPlugins(devOptions.plugin);
-      (buildOptions.plugins ||= []).push(...plugins);
+    let plugins = buildOptions.plugins || [];
+    if (devOptions.shims) {
+      plugins.push(replaceImportMeta());
     }
+    if (devOptions.plugin) {
+      plugins = plugins.concat(await loadPlugins(devOptions.plugin));
+    }
+    buildOptions.plugins = plugins;
 
     let outfile: string;
     let stop: (() => void) | undefined;
