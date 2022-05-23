@@ -3,7 +3,7 @@
 ## 0.7.6
 
 - **feat**: Add `--shims` to polyfill `import.meta.url` and `__dirname`, `__filename`.\
-  Below is the different with/without this option:
+  Below is the difference with/without this option:
 
   **without `--shims`**:
 
