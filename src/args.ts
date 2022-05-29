@@ -54,6 +54,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["chunk-names", EnumFlagType.String],
   ["asset-names", EnumFlagType.String],
   ["define", EnumFlagType.Pair],
+  ["log-override", EnumFlagType.Pair],
   ["pure", EnumFlagType.List],
   ["loader", EnumFlagType.Pair],
   ["loader", EnumFlagType.String],
