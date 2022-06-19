@@ -51,6 +51,8 @@ function parse_line(line: string, content: string) {
         console.log(`["${real_flag.slice(2)}", EnumFlagType.Array],`);
       } else if (content.includes("strconv.Atoi")) {
         console.log(`["${real_flag.slice(2)}", EnumFlagType.Number],`);
+      } else if (["--mangle-props", "--reserve-props"].includes(real_flag)) {
+        console.log(`["${real_flag.slice(2)}", EnumFlagType.RegExp],`);
       } else {
         console.log(`["${real_flag.slice(2)}", EnumFlagType.String],`);
       }
