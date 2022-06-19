@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.7
+
+- **feat**: Add `--supported` and `--log-override` to `EsbuildFlags`.
+
 ## 0.7.6
 
 - **feat**: Add `--shims` to polyfill `import.meta.url` and `__dirname`, `__filename`.\
