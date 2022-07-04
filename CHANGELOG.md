@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **refactor**: Correctly transform `--supported` to record of booleans.\
+  I may need to re-implement the "args" module again to fully support esbuild-style flags.
+
 ## 0.7.7
 
 - **feat**: Add `--supported` and `--log-override` to `EsbuildFlags`.

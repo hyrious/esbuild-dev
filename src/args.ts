@@ -6,12 +6,23 @@ export enum EnumFlagType {
   List, // --pure:console.log
   Pair, // --define:key=value
   Number, // --log-limit=100
-  RegExp, // --mangle-props=_$
 }
 
 export type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export type FlagConfig = [dash_case: string, type: FlagType, alias?: string[]];
+export type FlagConfig = [
+  dash_case: string,
+  type: FlagType,
+  opts?: { alias?: string[]; transform?: (value: any) => any }
+];
+
+function transformToRegExp(str: string) {
+  return new RegExp(str);
+}
+
+function transformToBoolean(str: string) {
+  return str === "true";
+}
 
 export const EsbuildFlags: readonly FlagConfig[] = [
   ["bundle", EnumFlagType.Boolean],
@@ -24,8 +35,8 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["minify-whitespace", EnumFlagType.Boolean],
   ["minify-identifiers", EnumFlagType.Boolean],
   ["mangle-quoted", EnumFlagType.Boolean],
-  ["mangle-props", EnumFlagType.RegExp],
-  ["reserve-props", EnumFlagType.RegExp],
+  ["mangle-props", EnumFlagType.String, { transform: transformToRegExp }],
+  ["reserve-props", EnumFlagType.String, { transform: transformToRegExp }],
   ["mangle-cache", EnumFlagType.String],
   ["drop", EnumFlagType.List],
   ["legal-comments", EnumFlagType.String],
@@ -55,7 +66,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["asset-names", EnumFlagType.String],
   ["define", EnumFlagType.Pair],
   ["log-override", EnumFlagType.Pair],
-  ["supported", EnumFlagType.Pair],
+  ["supported", EnumFlagType.Pair, { transform: transformToBoolean }],
   ["pure", EnumFlagType.List],
   ["loader", EnumFlagType.Pair],
   ["loader", EnumFlagType.String],
@@ -82,8 +93,8 @@ export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["loader", EnumFlagType.Truthy],
   ["cjs", EnumFlagType.Truthy],
   ["shims", EnumFlagType.Truthy],
-  ["watch", EnumFlagType.Truthy, ["w"]],
-  ["plugin", EnumFlagType.List, ["p"]],
+  ["watch", EnumFlagType.Truthy, { alias: ["w"] }],
+  ["plugin", EnumFlagType.List, { alias: ["p"] }],
 ];
 
 export interface EsbuildDevOptions {
@@ -96,7 +107,7 @@ export interface EsbuildDevOptions {
 }
 
 export const EsbuildDevExternalFlags: readonly FlagConfig[] = [
-  ["bare", EnumFlagType.Truthy, ["b"]],
+  ["bare", EnumFlagType.Truthy, { alias: ["b"] }],
 ];
 
 function camelize(key: string) {
@@ -131,74 +142,69 @@ export type Parsed = { _: string[]; [key: string]: any };
 export function parseFlag(
   parsed: Parsed,
   arg: string,
-  [flag, type, alias]: FlagConfig
+  [flag, type, opts = {}]: FlagConfig
 ): boolean {
+  const transform = opts.transform ? opts.transform : (value: any) => value;
   const key = camelize(flag);
   switch (type) {
     case EnumFlagType.Truthy: // can only use --sourcemap
-      if (single(arg, flag, alias)) {
-        parsed[key] = true;
+      if (single(arg, flag, opts.alias)) {
+        parsed[key] = transform(true);
         return true;
       }
       return false;
     case EnumFlagType.Boolean: // can use both --bundle and --bundle=true
-      if (single(arg, flag, alias)) {
-        parsed[key] = true;
+      if (single(arg, flag, opts.alias)) {
+        parsed[key] = transform(true);
         return true;
       }
-      if (equal(arg, flag, alias)) {
+      if (equal(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf("=") + 1);
         if (value === "true") {
-          parsed[key] = true;
+          parsed[key] = transform(true);
           return true;
         }
         if (value === "false") {
-          parsed[key] = false;
+          parsed[key] = transform(false);
           return true;
         }
       }
       return false;
     case EnumFlagType.String:
-      if (equal(arg, flag, alias)) {
-        parsed[key] = arg.slice(arg.indexOf("=") + 1);
+      if (equal(arg, flag, opts.alias)) {
+        parsed[key] = transform(arg.slice(arg.indexOf("=") + 1));
         return true;
       }
       return false;
     case EnumFlagType.Array:
-      if (equal(arg, flag, alias)) {
+      if (equal(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf("=") + 1);
-        parsed[key] = value ? value.split(",") : [];
+        parsed[key] = transform(value ? value.split(",") : []);
         return true;
       }
       return false;
     case EnumFlagType.List:
-      if (colon(arg, flag, alias)) {
+      if (colon(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf(":") + 1);
-        ((parsed[key] as string[]) ||= []).push(value);
+        ((parsed[key] as string[]) ||= []).push(transform(value));
         return true;
       }
       return false;
     case EnumFlagType.Pair:
-      if (colon(arg, flag, alias)) {
+      if (colon(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf(":") + 1);
         const equalSign = value.indexOf("=");
         if (equalSign !== -1) {
-          ((parsed[key] as Record<string, string>) ||= {})[
-            value.slice(0, equalSign)
-          ] = value.slice(equalSign + 1);
+          const subKey = value.slice(0, equalSign);
+          const result = transform(value.slice(equalSign + 1));
+          ((parsed[key] as Record<string, string>) ||= {})[subKey] = result;
           return true;
         }
       }
       return false;
     case EnumFlagType.Number:
-      if (equal(arg, flag, alias)) {
-        parsed[key] = parseInt(arg.slice(arg.indexOf("=") + 1));
-        return true;
-      }
-      return false;
-    case EnumFlagType.RegExp:
-      if (equal(arg, flag, alias)) {
-        parsed[key] = new RegExp(arg.slice(arg.indexOf("=") + 1));
+      if (equal(arg, flag, opts.alias)) {
+        parsed[key] = transform(parseInt(arg.slice(arg.indexOf("=") + 1)));
         return true;
       }
       return false;

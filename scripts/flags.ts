@@ -12,19 +12,16 @@ function fetch(url: string) {
 
 async function main() {
   let text = await fetch(
-    "https://cdn.jsdelivr.net/gh/evanw/esbuild@master/pkg/cli/cli_impl.go"
+    "https://raw.githubusercontent.com/evanw/esbuild/master/pkg/cli/cli_impl.go"
   );
   let start = text.indexOf("func parseOptionsImpl(");
   let working = true;
   text = text.slice(start);
-  text.replace(
-    /(?:^\t\tcase (.+):|^\t\tdefault:)\n([^]+?)(?=^\t\t[cd])/gm,
-    (_, line, content) => {
-      if (!line) working = false;
-      if (working) parse_line(line, content);
-      return "";
-    }
-  );
+  text.replace(/(?:^\t\tcase (.+):|^\t\tdefault:)\n([^]+?)(?=^\t\t[cd])/gm, (_, line, content) => {
+    if (!line) working = false;
+    if (working) parse_line(line, content);
+    return "";
+  });
 }
 
 function extract_first_string_literal(line: string) {
@@ -51,8 +48,6 @@ function parse_line(line: string, content: string) {
         console.log(`["${real_flag.slice(2)}", EnumFlagType.Array],`);
       } else if (content.includes("strconv.Atoi")) {
         console.log(`["${real_flag.slice(2)}", EnumFlagType.Number],`);
-      } else if (["--mangle-props", "--reserve-props"].includes(real_flag)) {
-        console.log(`["${real_flag.slice(2)}", EnumFlagType.RegExp],`);
       } else {
         console.log(`["${real_flag.slice(2)}", EnumFlagType.String],`);
       }
