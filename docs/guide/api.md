@@ -7,20 +7,20 @@
 - **Type:** `(args: string[], configs: FlagConfig[]) => string[]`
 
 ```ts
-enum EnumFlagType {
-  Truthy, // --sourcemap
-  Boolean, // --bundle, --tree-shaking=true
-  String, // --charset=utf8
-  Array, // --main-fields=main,module
-  List, // --pure:console.log
-  Pair, // --define:key=value
-  Number, // --log-limit=100
-  RegExp, // --mangle-props=_$
-}
+const truthy = 0; // --sourcemap
+const boolean = 1; // --bundle, --bundle=true
+const string = 2; // --charset=utf8
+const array = 3; // --main-fields=main,module
+const list = 4; // --pure:console.log
+const dict = 5; // --define:key=value
 
-type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type FlagType = 0 | 1 | 2 | 3 | 4 | 5;
 
-type FlagConfig = [dash_case: string, type: FlagType, alias?: string[]];
+type FlagConfig = [
+  dash_case: string,
+  type: FlagType,
+  opts?: { alias?: string[]; transform?: (value: any) => any }
+];
 ```
 
 Parse command line arguments in the esbuild way.
@@ -107,16 +107,16 @@ Although they achieved this with [es-module-lexer].
 [package-name-regex]: https://github.com/dword-design/package-name-regex
 [es-module-lexer]: https://github.com/guybedford/es-module-lexer
 
-### `resolveByEsbuild`
+### `resolve`
 
 - **Type:** `(id: string, resolveDir: string) => Promise<string | undefined>`
 
 Use esbuild to resolve a module id from the dir `resolveDir`.
 
 ```ts
-import { resolveByEsbuild } from "@hyrious/esbuild-dev";
+import { resolve as esbuildResolve } from "@hyrious/esbuild-dev";
 
-resolveByEsbuild("./a", "./src");
+esbuildResolve("./a", "./src");
 // => "./src/a.ts"
 ```
 

@@ -150,7 +150,7 @@ if (__ESM__) {
   loaderPath = require.resolve("./loader.mjs");
 }
 
-export async function resolveByEsbuild(id: string, resolveDir: string) {
+export async function resolve(id: string, resolveDir: string) {
   let result: string | undefined;
   await esbuild.build({
     stdin: {

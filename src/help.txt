@@ -18,7 +18,7 @@ Options:
                         This option cannot be used with `--loader`.
 
   --shims               Replace `import.meta.url` and `__dirname` with absolute
-                        path in .[tj]s files.
+                        path in .[tj]s files. This is enabled by default.
 
   --watch               Enable watch mode. This is built on top of the
   alias: -w             built-in `watch` option of esbuild.

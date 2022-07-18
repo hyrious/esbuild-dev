@@ -3,7 +3,7 @@ import { promises } from "fs";
 import { dirname, extname } from "path";
 import { cwd, versions } from "process";
 import { fileURLToPath, pathToFileURL, URL } from "url";
-import { resolveByEsbuild } from "./build";
+import { resolve as esbuildResolve } from "./build";
 const read = promises.readFile;
 
 async function printErrorsAndWarnings({
@@ -99,7 +99,7 @@ export async function resolve(
     url = new URL(id);
   } catch {
     const resolveDir = parentURL ? dirname(fileURLToPath(parentURL)) : cwd();
-    const path = await resolveByEsbuild(id, resolveDir);
+    const path = await esbuildResolve(id, resolveDir);
     if (path) {
       url = pathToFileURL(path);
     }

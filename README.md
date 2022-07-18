@@ -2,7 +2,7 @@
 
 Build and run your `script.ts`, like `ts-node` or `node-dev`.
 
-Require Node.js `>=16.13` to use `--enable-source-maps` and top-level await.
+Require Node.js `^14.18 || >=16` to use `--enable-source-maps` and top-level await.
 
 ### Features
 
@@ -45,7 +45,7 @@ Options:
                         This option cannot be used with `--loader`.
 
   --shims               Replace `import.meta.url` and `__dirname` with absolute
-                        path in .[tj]s files.
+                        path in .[tj]s files. This is enabled by default.
 
   --watch               Enable watch mode. This is built on top of the
   alias: -w             built-in `watch` option of esbuild.

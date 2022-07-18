@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.0.6",
-    "esbuild": "^0.14.49"
+    "esbuild": "^0.14.49",
+    "vitepress": "^1.0.0-alpha.4"
   }
 }
