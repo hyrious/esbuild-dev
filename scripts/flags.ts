@@ -36,7 +36,7 @@ function parse_line(line: string, content: string) {
   if (flag[0] !== "-") return;
 
   if (line.startsWith("isBoolFlag(")) {
-    console.log(`["${flag.slice(2)}", EnumFlagType.Boolean],`);
+    console.log(`["${flag.slice(2)}", boolean],`);
     return;
   }
 
@@ -45,17 +45,17 @@ function parse_line(line: string, content: string) {
     const sign = flag[flag.length - 1];
     if (sign === "=") {
       if (content.includes("splitWithEmptyCheck")) {
-        console.log(`["${real_flag.slice(2)}", EnumFlagType.Array],`);
+        console.log(`["${real_flag.slice(2)}", array],`);
       } else if (content.includes("strconv.Atoi")) {
-        console.log(`["${real_flag.slice(2)}", EnumFlagType.Number],`);
+        console.log(`["${real_flag.slice(2)}", string, { transform: parseInt }],`);
       } else {
-        console.log(`["${real_flag.slice(2)}", EnumFlagType.String],`);
+        console.log(`["${real_flag.slice(2)}", string],`);
       }
     } else if (sign === ":") {
       if (content.includes("equals := strings.IndexByte")) {
-        console.log(`["${real_flag.slice(2)}", EnumFlagType.Pair],`);
+        console.log(`["${real_flag.slice(2)}", dict],`);
       } else {
-        console.log(`["${real_flag.slice(2)}", EnumFlagType.List],`);
+        console.log(`["${real_flag.slice(2)}", list],`);
       }
     } else {
       throw new Error(`unknown flag ${flag}`);
@@ -63,7 +63,7 @@ function parse_line(line: string, content: string) {
     return;
   }
 
-  console.log(`["${flag.slice(2)}", EnumFlagType.Truthy],`);
+  console.log(`["${flag.slice(2)}", truthy],`);
 }
 
 main().catch(console.error);
