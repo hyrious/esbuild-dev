@@ -37,13 +37,13 @@
   "author": "hyrious <hyrious@outlook.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=16.13.0"
+    "node": "^14.18.0 || >=16.0.0"
   },
   "peerDependencies": {
     "esbuild": "*"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0",
-    "esbuild": "^0.14.47"
+    "@types/node": "^18.0.6",
+    "esbuild": "^0.14.49"
   }
 }

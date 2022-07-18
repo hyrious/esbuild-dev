@@ -62,6 +62,7 @@ await build({
   outExtension: { ".js": ".mjs" },
   logLevel: "info",
   plugins: [shebang, shaking],
+  target: ["node14.18.0", "node16.0.0"],
   define: {
     __ESM__: "true",
   },
@@ -77,6 +78,7 @@ await build({
   sourcemap: true,
   logLevel: "info",
   plugins: [shaking],
+  target: ["node14.18.0", "node16.0.0"],
   define: {
     __ESM__: "false",
   },
