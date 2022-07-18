@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- **refactor**: Correctly transform `--supported` to record of booleans.\
-  I may need to re-implement the "args" module again to fully support esbuild-style flags.
+- **refactor**: Correctly transform `--supported` to record of booleans.
+- **refactor!**: Enable `--shims` by default. You can disable it by `--shims=false`.
 
 ## 0.7.7
 

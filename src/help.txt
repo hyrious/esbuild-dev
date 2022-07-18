@@ -4,8 +4,8 @@ Usage:
   esbuild-dev external [--bare] main.ts ...
 
 Options:
-  --loader              Use `--experimental-loader` to run the file, which
-                        is helpful when using other coverage tools.
+  --loader              Use `--loader` to run the file, which is helpful
+                        when using other coverage tools.
                         In this mode, plugins are not supported.
 
   --no-warnings         Using experimental loader api will cause node

@@ -1,14 +1,11 @@
-export enum EnumFlagType {
-  Truthy, // --sourcemap
-  Boolean, // --bundle, --tree-shaking=true
-  String, // --charset=utf8
-  Array, // --main-fields=main,module
-  List, // --pure:console.log
-  Pair, // --define:key=value
-  Number, // --log-limit=100
-}
+export const truthy = 0;
+export const boolean = 1;
+export const string = 2;
+export const array = 3;
+export const list = 4;
+export const dict = 5;
 
-export type FlagType = EnumFlagType | 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type FlagType = 0 | 1 | 2 | 3 | 4 | 5;
 
 export type FlagConfig = [
   dash_case: string,
@@ -16,85 +13,87 @@ export type FlagConfig = [
   opts?: { alias?: string[]; transform?: (value: any) => any }
 ];
 
-function transformToRegExp(str: string) {
-  return new RegExp(str);
+function to_bool(str: string) {
+  if (str === "true") return true;
+  if (str === "false") return false;
+  throw new Error("Invalid boolean value: " + str);
 }
 
-function transformToBoolean(str: string) {
-  return str === "true";
+function to_array(str: string) {
+  return str ? str.split(",") : [];
 }
 
 export const EsbuildFlags: readonly FlagConfig[] = [
-  ["bundle", EnumFlagType.Boolean],
-  ["preserve-symlinks", EnumFlagType.Boolean],
-  ["splitting", EnumFlagType.Boolean],
-  ["allow-overwrite", EnumFlagType.Boolean],
-  ["watch", EnumFlagType.Boolean],
-  ["minify", EnumFlagType.Boolean],
-  ["minify-syntax", EnumFlagType.Boolean],
-  ["minify-whitespace", EnumFlagType.Boolean],
-  ["minify-identifiers", EnumFlagType.Boolean],
-  ["mangle-quoted", EnumFlagType.Boolean],
-  ["mangle-props", EnumFlagType.String, { transform: transformToRegExp }],
-  ["reserve-props", EnumFlagType.String, { transform: transformToRegExp }],
-  ["mangle-cache", EnumFlagType.String],
-  ["drop", EnumFlagType.List],
-  ["legal-comments", EnumFlagType.String],
-  ["charset", EnumFlagType.String],
-  ["tree-shaking", EnumFlagType.Boolean],
-  ["ignore-annotations", EnumFlagType.Boolean],
-  ["keep-names", EnumFlagType.Boolean],
-  ["sourcemap", EnumFlagType.Truthy],
-  ["sourcemap", EnumFlagType.String],
-  ["source-root", EnumFlagType.String],
-  ["sources-content", EnumFlagType.Boolean],
-  ["sourcefile", EnumFlagType.String],
-  ["resolve-extensions", EnumFlagType.Array],
-  ["main-fields", EnumFlagType.Array],
-  ["conditions", EnumFlagType.Array],
-  ["public-path", EnumFlagType.String],
-  ["global-name", EnumFlagType.String],
-  ["metafile", EnumFlagType.Truthy],
-  ["metafile", EnumFlagType.String],
-  ["outfile", EnumFlagType.String],
-  ["outdir", EnumFlagType.String],
-  ["outbase", EnumFlagType.String],
-  ["tsconfig", EnumFlagType.String],
-  ["tsconfig-raw", EnumFlagType.String],
-  ["entry-names", EnumFlagType.String],
-  ["chunk-names", EnumFlagType.String],
-  ["asset-names", EnumFlagType.String],
-  ["define", EnumFlagType.Pair],
-  ["log-override", EnumFlagType.Pair],
-  ["supported", EnumFlagType.Pair, { transform: transformToBoolean }],
-  ["pure", EnumFlagType.List],
-  ["loader", EnumFlagType.Pair],
-  ["loader", EnumFlagType.String],
-  ["target", EnumFlagType.Array],
-  ["out-extension", EnumFlagType.Pair],
-  ["platform", EnumFlagType.String],
-  ["format", EnumFlagType.String],
-  ["external", EnumFlagType.List],
-  ["inject", EnumFlagType.List],
-  ["jsx", EnumFlagType.String],
-  ["jsx-factory", EnumFlagType.String],
-  ["jsx-fragment", EnumFlagType.String],
-  ["banner", EnumFlagType.String],
-  ["footer", EnumFlagType.String],
-  ["banner", EnumFlagType.Pair],
-  ["footer", EnumFlagType.Pair],
-  ["log-limit", EnumFlagType.Number],
-  ["color", EnumFlagType.Boolean],
-  ["log-level", EnumFlagType.String],
+  ["bundle", boolean],
+  ["preserve-symlinks", boolean],
+  ["splitting", boolean],
+  ["allow-overwrite", boolean],
+  ["watch", boolean],
+  ["minify", boolean],
+  ["minify-syntax", boolean],
+  ["minify-whitespace", boolean],
+  ["minify-identifiers", boolean],
+  ["mangle-quoted", boolean],
+  ["mangle-props", string, { transform: RegExp }],
+  ["reserve-props", string, { transform: RegExp }],
+  ["mangle-cache", string], // --mangle-cache=cache.json
+  ["drop", list],
+  ["legal-comments", string],
+  ["charset", string],
+  ["tree-shaking", boolean],
+  ["ignore-annotations", boolean],
+  ["keep-names", boolean],
+  ["sourcemap", truthy],
+  ["sourcemap", string],
+  ["source-root", string],
+  ["sources-content", boolean],
+  ["sourcefile", string],
+  ["resolve-extensions", array],
+  ["main-fields", array],
+  ["conditions", array],
+  ["public-path", string],
+  ["global-name", string],
+  ["metafile", truthy],
+  ["metafile", string],
+  ["outfile", string],
+  ["outdir", string],
+  ["outbase", string],
+  ["tsconfig", string],
+  ["tsconfig-raw", string],
+  ["entry-names", string],
+  ["chunk-names", string],
+  ["asset-names", string],
+  ["define", dict],
+  ["log-override", dict],
+  ["supported", dict, { transform: to_bool }],
+  ["pure", list],
+  ["loader", dict],
+  ["loader", string],
+  ["target", array],
+  ["out-extension", dict],
+  ["platform", string],
+  ["format", string],
+  ["external", list],
+  ["inject", list],
+  ["jsx", string],
+  ["jsx-factory", string],
+  ["jsx-fragment", string],
+  ["banner", string],
+  ["footer", string],
+  ["banner", dict],
+  ["footer", dict],
+  ["log-limit", string, { transform: parseInt }],
+  ["color", boolean],
+  ["log-level", string],
 ];
 
 export const EsbuildDevFlags: readonly FlagConfig[] = [
-  ["no-warnings", EnumFlagType.Truthy],
-  ["loader", EnumFlagType.Truthy],
-  ["cjs", EnumFlagType.Truthy],
-  ["shims", EnumFlagType.Truthy],
-  ["watch", EnumFlagType.Truthy, { alias: ["w"] }],
-  ["plugin", EnumFlagType.List, { alias: ["p"] }],
+  ["no-warnings", boolean],
+  ["loader", boolean],
+  ["cjs", boolean],
+  ["shims", boolean],
+  ["watch", boolean, { alias: ["w"] }],
+  ["plugin", list, { alias: ["p"] }],
 ];
 
 export interface EsbuildDevOptions {
@@ -107,18 +106,18 @@ export interface EsbuildDevOptions {
 }
 
 export const EsbuildDevExternalFlags: readonly FlagConfig[] = [
-  ["bare", EnumFlagType.Truthy, { alias: ["b"] }],
+  ["bare", boolean, { alias: ["b"] }],
 ];
 
 function camelize(key: string) {
   return key.replace(/-(\w)/g, (_, w: string) => w.toUpperCase());
 }
 
-function single(arg: string, key: string, alias?: string[]) {
+function bare(arg: string, key: string, alias?: string[]) {
   return arg === "--" + key || !!(alias && alias.some(a => arg === "-" + a));
 }
 
-function equal(arg: string, key: string, alias?: string[]) {
+function equals(arg: string, key: string, alias?: string[]) {
   return (
     arg.startsWith("--" + key + "=") ||
     !!(alias && alias.some(a => arg.startsWith("-" + a + "=")))
@@ -135,77 +134,74 @@ function colon(arg: string, key: string, alias?: string[]) {
 export type Parsed = { _: string[]; [key: string]: any };
 
 /**
- * @example
- * parseFlag(parsed = {}, "--bundle", ["bundle", EnumFlagType.Truthy])
- * => true, parsed = { bundle: true }
+ * ```js
+ * parseFlag(parsed = {}, "--bundle", ["bundle", truthy])
+ * // => true, parsed = { bundle: true }
+ * ```
  */
 export function parseFlag(
   parsed: Parsed,
   arg: string,
   [flag, type, opts = {}]: FlagConfig
 ): boolean {
-  const transform = opts.transform ? opts.transform : (value: any) => value;
   const key = camelize(flag);
   switch (type) {
-    case EnumFlagType.Truthy: // can only use --sourcemap
-      if (single(arg, flag, opts.alias)) {
-        parsed[key] = transform(true);
+    case truthy:
+      if (bare(arg, flag, opts.alias)) {
+        parsed[key] = opts.transform ? opts.transform(true) : true;
         return true;
       }
       return false;
-    case EnumFlagType.Boolean: // can use both --bundle and --bundle=true
-      if (single(arg, flag, opts.alias)) {
-        parsed[key] = transform(true);
+    case boolean:
+      if (bare(arg, flag, opts.alias)) {
+        parsed[key] = true;
         return true;
       }
-      if (equal(arg, flag, opts.alias)) {
+      if (equals(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf("=") + 1);
         if (value === "true") {
-          parsed[key] = transform(true);
+          parsed[key] = opts.transform ? opts.transform(true) : true;
           return true;
         }
         if (value === "false") {
-          parsed[key] = transform(false);
+          parsed[key] = opts.transform ? opts.transform(false) : false;
           return true;
         }
       }
       return false;
-    case EnumFlagType.String:
-      if (equal(arg, flag, opts.alias)) {
-        parsed[key] = transform(arg.slice(arg.indexOf("=") + 1));
-        return true;
-      }
-      return false;
-    case EnumFlagType.Array:
-      if (equal(arg, flag, opts.alias)) {
+    case string:
+      if (equals(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf("=") + 1);
-        parsed[key] = transform(value ? value.split(",") : []);
+        parsed[key] = opts.transform ? opts.transform(value) : value;
         return true;
       }
       return false;
-    case EnumFlagType.List:
-      if (colon(arg, flag, opts.alias)) {
-        const value = arg.slice(arg.indexOf(":") + 1);
-        ((parsed[key] as string[]) ||= []).push(transform(value));
+    case array:
+      if (equals(arg, flag, opts.alias)) {
+        const value = to_array(arg.slice(arg.indexOf("=") + 1));
+        parsed[key] = opts.transform ? opts.transform(value) : value;
         return true;
       }
       return false;
-    case EnumFlagType.Pair:
+    case list:
       if (colon(arg, flag, opts.alias)) {
         const value = arg.slice(arg.indexOf(":") + 1);
-        const equalSign = value.indexOf("=");
-        if (equalSign !== -1) {
-          const subKey = value.slice(0, equalSign);
-          const result = transform(value.slice(equalSign + 1));
-          ((parsed[key] as Record<string, string>) ||= {})[subKey] = result;
+        const list = ((parsed[key] as string[]) ||= []);
+        list.push(opts.transform ? opts.transform(value) : value);
+        return true;
+      }
+      return false;
+    case dict:
+      if (colon(arg, flag, opts.alias)) {
+        const temp = arg.slice(arg.indexOf(":") + 1);
+        const equals = temp.indexOf("=");
+        if (equals !== -1) {
+          const subKey = temp.slice(0, equals);
+          const value = temp.slice(equals + 1);
+          const dict = ((parsed[key] as Record<string, string>) ||= {});
+          dict[subKey] = opts.transform ? opts.transform(value) : value;
           return true;
         }
-      }
-      return false;
-    case EnumFlagType.Number:
-      if (equal(arg, flag, opts.alias)) {
-        parsed[key] = transform(parseInt(arg.slice(arg.indexOf("=") + 1)));
-        return true;
       }
       return false;
     default:
