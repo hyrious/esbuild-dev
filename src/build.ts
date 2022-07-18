@@ -1,4 +1,4 @@
-import esbuild, { BuildOptions, Plugin } from "esbuild";
+import { build as esbuild, BuildOptions, Plugin } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
@@ -48,11 +48,14 @@ export async function build(
     sourcemap: true,
     sourcesContent: false,
     treeShaking: true,
-    outfile: join(tmpdir(), entry + extname[options.format]),
+    outfile: join(
+      tmpdir(),
+      entry.replace(/[\/\\]/g, "+") + extname[options.format]
+    ),
     ...options,
   };
   (options.plugins ||= []).push(external({ exclude: false }));
-  const result = await esbuild.build(options);
+  const result = await esbuild(options);
   return { outfile: options.outfile!, result };
 }
 
@@ -152,7 +155,7 @@ if (__ESM__) {
 
 export async function resolve(id: string, resolveDir: string) {
   let result: string | undefined;
-  await esbuild.build({
+  await esbuild({
     stdin: {
       contents: `import ${JSON.stringify(id)}`,
       resolveDir,

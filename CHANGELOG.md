@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.8.0
 
 - **refactor**: Correctly transform `--supported` to record of booleans.
 - **refactor!**: Enable `--shims` by default. You can disable it by `--shims=false`.
+- **refactor**: Temporary built file paths now have replaced `/` to `+` for better debug purpose.
 
 ## 0.7.7
 

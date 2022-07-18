@@ -1,8 +1,8 @@
 import { version as esbuildVersion } from "esbuild";
 import { argv, exit } from "process";
 import { name, version as versionText } from "../package.json";
-import { externalCommand } from "./commands/external";
 import { defaultCommand } from "./commands/default";
+import { externalCommand } from "./commands/external";
 import helpText from "./help.txt";
 
 const args = argv.slice(2);
