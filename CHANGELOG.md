@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- **fix**: Add `shortCircuit` to loader api.
+
 ## 0.8.0
 
 - **refactor**: Correctly transform `--supported` to record of booleans.
