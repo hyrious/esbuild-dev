@@ -49,6 +49,7 @@ export interface ResolveContext {
 
 export interface ResolveResult {
   format?: "builtin" | "commonjs" | "json" | "module" | "wasm" | null;
+  shortCircuit?: boolean;
   url: string;
 }
 
@@ -59,11 +60,13 @@ export type Resolver = (
 ) => ResolveResult | Promise<ResolveResult>;
 
 export interface LoadContext {
+  conditions: string[];
   format?: ResolveResult["format"];
 }
 
 export interface LoadResult {
   format: NonNullable<ResolveResult["format"]>;
+  shortCircuit?: boolean;
   source: string | ArrayBuffer | TypedArray;
 }
 
@@ -106,7 +109,7 @@ export async function resolve(
   }
 
   if (url && extname(url.pathname) in ExtToLoader) {
-    return { url: url.href, format: "module" };
+    return { url: url.href, shortCircuit: true, format: "module" };
   }
 
   return defaultResolve(id, context, defaultResolve);
@@ -132,7 +135,7 @@ export async function load(
         format: "esm",
       });
       printErrorsAndWarnings({ warnings });
-      return { source: code, format: "module" };
+      return { source: code, shortCircuit: true, format: "module" };
     } catch (err) {
       if (err.errors) {
         printErrorsAndWarnings(err);
