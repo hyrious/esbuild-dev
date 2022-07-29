@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2
+
+- **feat**: Add `--jsx-import-source` and `--jsx-dev` to `EsbuildFlags`.
+
 ## 0.8.1
 
 - **fix**: Add `shortCircuit` to loader api.
