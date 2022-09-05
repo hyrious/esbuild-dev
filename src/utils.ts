@@ -28,6 +28,11 @@ export interface ExternalPluginOptions {
   onResolve?: (args: OnResolveArgs) => void;
 
   /**
+   * Force include these paths into bundle.
+   */
+  include?: string[];
+
+  /**
    * Silently exclude some common file extensions.
    * @default true
    */
@@ -40,6 +45,7 @@ export function external(options: ExternalPluginOptions = {}): Plugin {
 
   const filter = options.filter ?? /^[\w@][^:]/;
   const callback = options.onResolve ?? noop;
+  const include = options.include ?? [];
   const exclude = options.exclude ?? true;
   const exFilter = exclude === true ? CommonExts : exclude;
 
@@ -47,6 +53,7 @@ export function external(options: ExternalPluginOptions = {}): Plugin {
     name: "external",
     setup({ onResolve }) {
       onResolve({ filter }, args => {
+        if (include.includes(args.path)) return null;
         callback(args);
         return { path: args.path, external: true };
       });

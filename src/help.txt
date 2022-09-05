@@ -27,6 +27,8 @@ Options:
   alias: -p             will try to load `style` package in your project.
                         This option can not be used outside of a package.
 
+  --include:name        Force include a package in the bundle.
+
 Sub Commands:
   external              Show potential external libraries of a file.
                         Additional arguments are passed to build options.

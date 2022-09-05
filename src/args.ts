@@ -96,6 +96,7 @@ export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["shims", boolean],
   ["watch", boolean, { alias: ["w"] }],
   ["plugin", list, { alias: ["p"] }],
+  ["include", list],
 ];
 
 export interface EsbuildDevOptions {
@@ -105,6 +106,7 @@ export interface EsbuildDevOptions {
   shims?: boolean;
   watch?: boolean;
   plugin?: string[];
+  include?: string[];
 }
 
 export const EsbuildDevExternalFlags: readonly FlagConfig[] = [

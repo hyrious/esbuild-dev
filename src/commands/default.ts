@@ -35,10 +35,13 @@ export async function defaultCommand(
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
   if (
     devOptions.loader &&
-    (devOptions.cjs || devOptions.plugin || devOptions.watch)
+    (devOptions.cjs ||
+      devOptions.plugin ||
+      devOptions.watch ||
+      devOptions.include)
   ) {
     throw new Error(
-      `--cjs, --plugin and --watch are not supported with --loader`
+      `--cjs, --plugin, --watch and --include are not supported with --loader`
     );
   }
 
@@ -124,7 +127,7 @@ export async function defaultCommand(
       ({
         outfile,
         result: { stop },
-      } = await build(entry, buildOptions));
+      } = await build(entry, buildOptions, { include: devOptions.include }));
       await run();
     };
 

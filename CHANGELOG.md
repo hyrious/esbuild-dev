@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.3
+
+- **feat**: Add `--include:name` to force include a package in the bundle.
+
 ## 0.8.2
 
 - **feat**: Add `--jsx-import-source` and `--jsx-dev` to `EsbuildFlags`.

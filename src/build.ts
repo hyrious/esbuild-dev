@@ -5,7 +5,7 @@ import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
 import { cwd, versions } from "process";
 import { pathToFileURL, URL } from "url";
-import { external, isObj } from "./utils";
+import { external, ExternalPluginOptions, isObj } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
 
@@ -33,7 +33,8 @@ let ensureTmpdir_ = true;
 
 export async function build(
   entry: string,
-  options: BuildOptions & { format: Format }
+  options: BuildOptions & { format: Format },
+  externalPluginOptions?: ExternalPluginOptions
 ) {
   if (ensureTmpdir_) {
     mkdirSync(tmpdir(), { recursive: true });
@@ -54,19 +55,37 @@ export async function build(
     ),
     ...options,
   };
-  (options.plugins ||= []).push(external({ exclude: false }));
+  (options.plugins ||= []).push(
+    external({ exclude: false, ...externalPluginOptions })
+  );
   const result = await esbuild(options);
   return { outfile: options.outfile!, result };
 }
 
-export async function importFile(path: string, options: BuildOptions = {}) {
-  const { outfile } = await build(path, { ...options, format: "esm" });
+export async function importFile(
+  path: string,
+  options: BuildOptions = {},
+  externalPluginOptions?: ExternalPluginOptions
+) {
+  const { outfile } = await build(
+    path,
+    { ...options, format: "esm" },
+    externalPluginOptions
+  );
   return import(pathToFileURL(outfile).toString());
 }
 
 let requireShim: NodeRequire | undefined;
-export async function requireFile(path: string, options: BuildOptions = {}) {
-  const { outfile } = await build(path, { ...options, format: "cjs" });
+export async function requireFile(
+  path: string,
+  options: BuildOptions = {},
+  externalPluginOptions?: ExternalPluginOptions
+) {
+  const { outfile } = await build(
+    path,
+    { ...options, format: "cjs" },
+    externalPluginOptions
+  );
   if (__ESM__) {
     requireShim ||= createRequire(import.meta.url);
     return requireShim(outfile);
