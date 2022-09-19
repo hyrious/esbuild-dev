@@ -80,6 +80,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["jsx-fragment", string],
   ["jsx-import-source", string],
   ["jsx-dev", boolean],
+  ["jsx-side-effects", boolean],
   ["banner", string],
   ["footer", string],
   ["banner", dict],

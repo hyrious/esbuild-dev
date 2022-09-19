@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.4
+
+- **feat**: Add `--jsx-side-effects` to `EsbuildFlags`.
+
 ## 0.8.3
 
 - **feat**: Add `--include:name` to force include a package in the bundle.

@@ -1,7 +1,5 @@
 {
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
-  "prettier.tabWidth": 2,
-  "prettier.endOfLine": "auto",
-  "prettier.arrowParens": "avoid"
+  "cSpell.words": ["Parens"]
 }
