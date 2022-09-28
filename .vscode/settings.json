@@ -1,5 +1,5 @@
 {
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
-  "cSpell.words": ["Parens"]
+  "cSpell.words": ["esbuild", "outfile", "Parens"]
 }

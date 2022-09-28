@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.5
+
+- **refactor**: Improve `--shims` (enabled by default) behavior.\
+  Again, it has a caveat that `--plugin` cannot be used with `--shims`.
+
 ## 0.8.4
 
 - **feat**: Add `--jsx-side-effects` to `EsbuildFlags`.
@@ -19,7 +24,11 @@
 ## 0.8.0
 
 - **refactor**: Correctly transform `--supported` to record of booleans.
-- **refactor!**: Enable `--shims` by default. You can disable it by `--shims=false`.
+
+- **refactor!**: Enable `--shims` by default. You can disable it by `--shims=false`.\
+  Caveats: `--shims` cannot be used with `--plugin`, because one `onLoad` callback can only
+  be called once per file.
+
 - **refactor**: Temporary built file paths now have replaced `/` to `+` for better debug purpose.
 
 ## 0.7.7
