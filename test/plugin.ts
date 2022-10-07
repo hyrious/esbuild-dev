@@ -1,3 +1,4 @@
+// node dist/bin.mjs -p:./test/plugin.ts test/index.ts
 import { Plugin } from "esbuild";
 import { readFile } from "fs/promises";
 

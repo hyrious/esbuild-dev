@@ -1,6 +1,9 @@
 import { ChildProcess, spawn, spawnSync } from "child_process";
 import { BuildOptions } from "esbuild";
+import { readFile } from "fs/promises";
+import { dirname } from "path";
 import { argv0, cwd, env, exit, stdin } from "process";
+import { pathToFileURL } from "url";
 import {
   EsbuildDevFlags,
   EsbuildDevOptions,
@@ -8,7 +11,7 @@ import {
   parse,
 } from "../args";
 import { build, Format, loaderPath, loadPlugins } from "../build";
-import { delay, replaceImportMeta } from "../utils";
+import { delay } from "../utils";
 
 const error = `
 [esbuild-dev] something went wrong on spawn node process
@@ -64,12 +67,67 @@ export async function defaultCommand(
     );
   } else {
     let plugins = buildOptions.plugins || [];
-    if (devOptions.shims) {
-      plugins.push(replaceImportMeta());
-    }
     if (devOptions.plugin) {
       plugins = plugins.concat(await loadPlugins(devOptions.plugin));
     }
+
+    if (devOptions.shims) {
+      const shimsFilter = /\.[cm]?[jt]s$/;
+
+      const define = buildOptions.define || {};
+      define["__dirname"] ||= "__injected_dirname";
+      define["__filename"] ||= "__injected_filename";
+      define["import.meta.url"] ||= "__injected_import_meta_url";
+      buildOptions.define = define;
+
+      function makeShims(args: { path: string }) {
+        return (
+          `const ${define["__dirname"]} = ${JSON.stringify(
+            dirname(args.path)
+          )};` +
+          `const ${define["__filename"]} = ${JSON.stringify(args.path)};` +
+          `const ${define["import.meta.url"]} = ${JSON.stringify(
+            pathToFileURL(args.path).href
+          )};`
+        );
+      }
+
+      // Hack all plugin's onLoad callback to add shims.
+      // An `onTransform` callback can be implemented to esbuild plugin system.
+      // But I don't want to make this feature too wide.
+      // See https://gist.github.com/hyrious/ac6fd074c2f6d24a306c3a0970617cbc
+      plugins = plugins.map(p => ({
+        name: `shim(${p.name})`,
+        setup({ onLoad: realOnLoad, ...build }) {
+          const onLoad: typeof realOnLoad = function (filter, callback) {
+            return realOnLoad(filter, async args => {
+              const result = await callback(args);
+              if (result && shimsFilter.test(args.path) && result.contents) {
+                result.contents = makeShims(args) + result.contents;
+              }
+              return result;
+            });
+          };
+          return p.setup({ onLoad, ...build });
+        },
+      }));
+
+      // Capture all other files.
+      plugins.push({
+        name: "replace-import-meta",
+        setup({ onLoad }) {
+          onLoad({ filter: shimsFilter }, async args => {
+            const contents = await readFile(args.path, "utf8");
+
+            return {
+              loader: "default",
+              contents: makeShims(args) + contents,
+            };
+          });
+        },
+      });
+    }
+
     buildOptions.plugins = plugins;
 
     let outfile: string;
