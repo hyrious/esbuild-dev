@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.6
+
+- **refatcor**: Hack around `--shims` to make it work with `--plugin`.
+
 ## 0.8.5
 
 - **refactor**: Improve `--shims` (enabled by default) behavior.\

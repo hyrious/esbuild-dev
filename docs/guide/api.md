@@ -26,9 +26,11 @@ type FlagConfig = [
 Parse command line arguments in the esbuild way.
 
 ```ts
-import { parse, EsbuildFlags } from "@hyrious/esbuild-dev/args";
+import { parse, array } from "@hyrious/esbuild-dev/args";
 
-parse(["--target=es6", "other args"], EsbuildFlags);
+const flags = [["target", array]];
+
+parse(["--target=es6", "other args"], flags);
 // => { target: "es6", _: ["other args"] }
 ```
 
