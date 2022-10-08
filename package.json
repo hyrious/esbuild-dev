@@ -1,6 +1,6 @@
 {
   "name": "@hyrious/esbuild-dev",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "Build and run your script.ts with esbuild",
   "repository": "hyrious/esbuild-dev",
   "main": "dist/index.js",
