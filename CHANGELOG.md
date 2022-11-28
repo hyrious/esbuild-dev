@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.7
+
+- **feat**: Add `--alias` to `EsbuildFlags`.
+
 ## 0.8.6
 
 - **refatcor**: Hack around `--shims` to make it work with `--plugin`.

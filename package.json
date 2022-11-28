@@ -43,8 +43,8 @@
     "esbuild": "*"
   },
   "devDependencies": {
-    "@types/node": "^18.7.15",
-    "esbuild": "^0.15.9",
-    "vitepress": "^1.0.0-alpha.17"
+    "@types/node": "^18.11.9",
+    "esbuild": "^0.15.16",
+    "vitepress": "^1.0.0-alpha.29"
   }
 }

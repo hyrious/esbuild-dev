@@ -12,6 +12,7 @@ function fetch(url: string) {
 
 async function main() {
   let text = await fetch(
+    // "https://raw.fastgit.org/evanw/esbuild/master/pkg/cli/cli_impl.go"
     "https://raw.githubusercontent.com/evanw/esbuild/master/pkg/cli/cli_impl.go"
   );
   let start = text.indexOf("func parseOptionsImpl(");

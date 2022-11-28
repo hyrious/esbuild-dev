@@ -75,6 +75,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["format", string],
   ["external", list],
   ["inject", list],
+  ["alias", dict],
   ["jsx", string],
   ["jsx-factory", string],
   ["jsx-fragment", string],
