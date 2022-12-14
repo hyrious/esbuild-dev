@@ -4,14 +4,10 @@ import { readFile } from "fs/promises";
 import { dirname } from "path";
 import { argv0, cwd, env, exit, stdin } from "process";
 import { pathToFileURL } from "url";
-import {
-  EsbuildDevFlags,
-  EsbuildDevOptions,
-  EsbuildFlags,
-  parse,
-} from "../args";
+import { EsbuildDevFlags, EsbuildDevOptions, EsbuildFlags, parse } from "../args";
 import { build, Format, loaderPath, loadPlugins } from "../build";
 import { delay } from "../utils";
+import { resolveMangleCache } from "./utils";
 
 const error = `
 [esbuild-dev] something went wrong on spawn node process
@@ -24,11 +20,7 @@ export function errorMessage(file: string, args: string[]) {
   return error.replace(/{(\w+)}/g, (_, key: "file" | "args") => tpl[key] || "");
 }
 
-export async function defaultCommand(
-  entry: string,
-  argsBeforeEntry: string[],
-  argsAfterEntry: string[]
-) {
+export async function defaultCommand(entry: string, argsBeforeEntry: string[], argsAfterEntry: string[]) {
   const { _: _1, ...devOptionsRaw } = parse(argsBeforeEntry, EsbuildDevFlags);
   const { _: _2, ...buildOptionsRaw } = parse(_1, EsbuildFlags);
 
@@ -36,35 +28,19 @@ export async function defaultCommand(
 
   const devOptions = { shims: true, ...devOptionsRaw } as EsbuildDevOptions;
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
-  if (
-    devOptions.loader &&
-    (devOptions.cjs ||
-      devOptions.plugin ||
-      devOptions.watch ||
-      devOptions.include)
-  ) {
-    throw new Error(
-      `--cjs, --plugin, --watch and --include are not supported with --loader`
-    );
+  if (devOptions.loader && (devOptions.cjs || devOptions.plugin || devOptions.watch || devOptions.include)) {
+    throw new Error(`--cjs, --plugin, --watch and --include are not supported with --loader`);
   }
 
   buildOptions.format = devOptions.cjs ? "cjs" : "esm";
+  resolveMangleCache(buildOptions);
 
   let spawnArgs: string[];
   if (devOptions.loader) {
-    spawnArgs = [
-      "--loader",
-      loaderPath,
-      "--enable-source-maps",
-      entry,
-      ...argsToEntry,
-    ];
+    spawnArgs = ["--loader", loaderPath, "--enable-source-maps", entry, ...argsToEntry];
     if (devOptions.noWarnings) spawnArgs.unshift("--no-warnings");
 
-    exit(
-      spawnSync(argv0, spawnArgs, { stdio: "inherit", cwd: cwd(), env })
-        .status || 0
-    );
+    exit(spawnSync(argv0, spawnArgs, { stdio: "inherit", cwd: cwd(), env }).status || 0);
   } else {
     let plugins = buildOptions.plugins || [];
     if (devOptions.plugin) {
@@ -80,18 +56,6 @@ export async function defaultCommand(
       define["import.meta.url"] ||= "__injected_import_meta_url";
       buildOptions.define = define;
 
-      function makeShims(args: { path: string }) {
-        return (
-          `const ${define["__dirname"]} = ${JSON.stringify(
-            dirname(args.path)
-          )};` +
-          `const ${define["__filename"]} = ${JSON.stringify(args.path)};` +
-          `const ${define["import.meta.url"]} = ${JSON.stringify(
-            pathToFileURL(args.path).href
-          )};`
-        );
-      }
-
       // Hack all plugin's onLoad callback to add shims.
       // An `onTransform` callback can be implemented to esbuild plugin system.
       // But I don't want to make this feature too wide.
@@ -103,7 +67,7 @@ export async function defaultCommand(
             return realOnLoad(filter, async args => {
               const result = await callback(args);
               if (result && shimsFilter.test(args.path) && result.contents) {
-                result.contents = makeShims(args) + result.contents;
+                result.contents = makeShims(define, args) + result.contents;
               }
               return result;
             });
@@ -121,7 +85,7 @@ export async function defaultCommand(
 
             return {
               loader: "default",
-              contents: makeShims(args) + contents,
+              contents: makeShims(define, args) + contents,
             };
           });
         },
@@ -203,4 +167,12 @@ export async function defaultCommand(
       });
     }
   }
+}
+
+function makeShims(define: Record<string, string>, args: { path: string }) {
+  return (
+    `const ${define["__dirname"]} = ${JSON.stringify(dirname(args.path))};` +
+    `const ${define["__filename"]} = ${JSON.stringify(args.path)};` +
+    `const ${define["import.meta.url"]} = ${JSON.stringify(pathToFileURL(args.path).href)};`
+  );
 }

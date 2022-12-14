@@ -56,7 +56,7 @@ export interface ResolveResult {
 export type Resolver = (
   id: string,
   context: ResolveContext,
-  defaultResolve: Resolver
+  defaultResolve: Resolver,
 ) => ResolveResult | Promise<ResolveResult>;
 
 export interface LoadContext {
@@ -73,7 +73,7 @@ export interface LoadResult {
 export type Loader = (
   url: string,
   context: LoadContext,
-  defaultLoad: Loader
+  defaultLoad: Loader,
 ) => LoadResult | Promise<LoadResult>;
 
 const ExtToLoader: Record<string, esbuild.Loader> = {
@@ -93,7 +93,7 @@ const ExtToLoader: Record<string, esbuild.Loader> = {
 export async function resolve(
   id: string,
   context: ResolveContext,
-  defaultResolve: Resolver
+  defaultResolve: Resolver,
 ): Promise<ResolveResult> {
   const { parentURL } = context;
 
@@ -115,11 +115,7 @@ export async function resolve(
   return defaultResolve(id, context, defaultResolve);
 }
 
-export async function load(
-  url: string,
-  context: LoadContext,
-  defaultLoad: Loader
-): Promise<LoadResult> {
+export async function load(url: string, context: LoadContext, defaultLoad: Loader): Promise<LoadResult> {
   // do a quick test if the url is not File URL, don't process it
   const path = url.startsWith("file:///") ? fileURLToPath(url) : "";
   const loader = ExtToLoader[extname(path)];

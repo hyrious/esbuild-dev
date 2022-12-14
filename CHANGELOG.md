@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.0
+
+- **feat**: Add `--packages` to `EsbuildFlags`.
+- **feat!**: Use `--packages=external` if possible and no `--include` is provided.
+
 ## 0.8.7
 
 - **feat**: Add `--alias` to `EsbuildFlags`.
@@ -189,10 +194,7 @@
 
   ```ts
   declare module "@hyrious/esbuild-dev/args" {
-    export {
-      argsToBuildOptions,
-      buildOptionsToArgs,
-    } from "@hyrious/esbuild-dev";
+    export { argsToBuildOptions, buildOptionsToArgs } from "@hyrious/esbuild-dev";
   }
   ```
 

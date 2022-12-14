@@ -1,11 +1,11 @@
-import { build as esbuild, BuildOptions, Plugin } from "esbuild";
+import { build as esbuild, version, BuildOptions, Plugin } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
 import { cwd, versions } from "process";
 import { pathToFileURL, URL } from "url";
-import { external, ExternalPluginOptions, isObj } from "./utils";
+import { external, ExternalPluginOptions, isEmpty, isObj } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
 
@@ -25,21 +25,21 @@ function findNodeModules(dir: string): string | undefined {
 }
 
 let tmpdir_: string | undefined;
-
-export const tmpdir = () =>
-  (tmpdir_ ||= join(findNodeModules(cwd()) || _tmpdir(), ".esbuild-dev"));
-
-let ensureTmpdir_ = true;
+const supportsPackagesExternal = /* @__PURE__ */ (() => {
+  const [a, b, c] = [0, 16, 5];
+  const [major, minor, patch] = version.split(".").slice(0, 3).map(Number);
+  return major > a || (major === a && minor > b) || (major === a && minor === b && patch >= c);
+})();
 
 export async function build(
   entry: string,
   options: BuildOptions & { format: Format },
-  externalPluginOptions?: ExternalPluginOptions
+  externalPluginOptions?: ExternalPluginOptions,
 ) {
-  if (ensureTmpdir_) {
-    mkdirSync(tmpdir(), { recursive: true });
-    writeFileSync(join(tmpdir(), "package.json"), '{"type":"module"}');
-    ensureTmpdir_ = false;
+  if (!tmpdir_) {
+    tmpdir_ = join(findNodeModules(cwd()) || _tmpdir(), ".esbuild-dev");
+    mkdirSync(tmpdir_, { recursive: true });
+    writeFileSync(join(tmpdir_, "package.json"), '{"type":"module"}');
   }
   options = {
     entryPoints: [entry],
@@ -49,15 +49,14 @@ export async function build(
     sourcemap: true,
     sourcesContent: false,
     treeShaking: true,
-    outfile: join(
-      tmpdir(),
-      entry.replace(/[\/\\]/g, "+") + extname[options.format]
-    ),
+    outfile: join(tmpdir_, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
     ...options,
   };
-  (options.plugins ||= []).push(
-    external({ exclude: false, ...externalPluginOptions })
-  );
+  if (isEmpty(externalPluginOptions) && supportsPackagesExternal) {
+    options.packages = "external";
+  } else {
+    (options.plugins ||= []).push(external({ exclude: false, ...externalPluginOptions }));
+  }
   const result = await esbuild(options);
   return { outfile: options.outfile!, result };
 }
@@ -65,13 +64,9 @@ export async function build(
 export async function importFile(
   path: string,
   options: BuildOptions = {},
-  externalPluginOptions?: ExternalPluginOptions
+  externalPluginOptions?: ExternalPluginOptions,
 ) {
-  const { outfile } = await build(
-    path,
-    { ...options, format: "esm" },
-    externalPluginOptions
-  );
+  const { outfile } = await build(path, { ...options, format: "esm" }, externalPluginOptions);
   return import(pathToFileURL(outfile).toString());
 }
 
@@ -79,13 +74,9 @@ let requireShim: NodeRequire | undefined;
 export async function requireFile(
   path: string,
   options: BuildOptions = {},
-  externalPluginOptions?: ExternalPluginOptions
+  externalPluginOptions?: ExternalPluginOptions,
 ) {
-  const { outfile } = await build(
-    path,
-    { ...options, format: "cjs" },
-    externalPluginOptions
-  );
+  const { outfile } = await build(path, { ...options, format: "cjs" }, externalPluginOptions);
   if (__ESM__) {
     requireShim ||= createRequire(import.meta.url);
     return requireShim(outfile);
@@ -116,9 +107,7 @@ export async function loadPlugins(args: string[]) {
           plugin = await requireOrImport(text);
         }
       } catch (err) {
-        throw new Error(
-          `cannot load plugin ${JSON.stringify(text)}: ${err.message}.`
-        );
+        throw new Error(`cannot load plugin ${JSON.stringify(text)}: ${err.message}.`);
       }
     }
     if (typeof plugin === "object") {

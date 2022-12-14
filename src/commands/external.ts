@@ -2,12 +2,9 @@ import { BuildOptions } from "esbuild";
 import { EsbuildDevExternalFlags, EsbuildFlags, parse } from "../args";
 import { build, Format } from "../build";
 import { external } from "../utils";
+import { resolveMangleCache } from "./utils";
 
-export async function externalCommand(
-  entry: string,
-  argsBeforeEntry: string[],
-  argsAfterEntry: string[]
-) {
+export async function externalCommand(entry: string, argsBeforeEntry: string[], argsAfterEntry: string[]) {
   const { _: _1, bare } = parse(argsBeforeEntry, EsbuildDevExternalFlags);
   const { _: _2, ...buildOptionsRaw } = parse(argsAfterEntry, EsbuildFlags);
 
@@ -17,6 +14,7 @@ export async function externalCommand(
   delete buildOptions.platform;
   buildOptions.format ||= "esm";
   buildOptions.target ||= "esnext";
+  resolveMangleCache(buildOptions);
 
   const collected: Record<string, true> = {};
   const onResolve = ({ path }: { path: string }) => {

@@ -10,7 +10,7 @@ export type FlagType = 0 | 1 | 2 | 3 | 4 | 5;
 export type FlagConfig = [
   dash_case: string,
   type: FlagType,
-  opts?: { alias?: string[]; transform?: (value: any) => any }
+  opts?: { alias?: string[]; transform?: (value: any) => any },
 ];
 
 function to_bool(str: string) {
@@ -73,6 +73,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["out-extension", dict],
   ["platform", string],
   ["format", string],
+  ["packages", string],
   ["external", list],
   ["inject", list],
   ["alias", dict],
@@ -111,9 +112,7 @@ export interface EsbuildDevOptions {
   include?: string[];
 }
 
-export const EsbuildDevExternalFlags: readonly FlagConfig[] = [
-  ["bare", boolean, { alias: ["b"] }],
-];
+export const EsbuildDevExternalFlags: readonly FlagConfig[] = [["bare", boolean, { alias: ["b"] }]];
 
 function camelize(key: string) {
   return key.replace(/-(\w)/g, (_, w: string) => w.toUpperCase());
@@ -124,17 +123,11 @@ function bare(arg: string, key: string, alias?: string[]) {
 }
 
 function equals(arg: string, key: string, alias?: string[]) {
-  return (
-    arg.startsWith("--" + key + "=") ||
-    !!(alias && alias.some(a => arg.startsWith("-" + a + "=")))
-  );
+  return arg.startsWith("--" + key + "=") || !!(alias && alias.some(a => arg.startsWith("-" + a + "=")));
 }
 
 function colon(arg: string, key: string, alias?: string[]) {
-  return (
-    arg.startsWith("--" + key + ":") ||
-    !!(alias && alias.some(a => arg.startsWith("-" + a + ":")))
-  );
+  return arg.startsWith("--" + key + ":") || !!(alias && alias.some(a => arg.startsWith("-" + a + ":")));
 }
 
 export type Parsed = { _: string[]; [key: string]: any };
@@ -145,11 +138,7 @@ export type Parsed = { _: string[]; [key: string]: any };
  * // => true, parsed = { bundle: true }
  * ```
  */
-export function parseFlag(
-  parsed: Parsed,
-  arg: string,
-  [flag, type, opts = {}]: FlagConfig
-): boolean {
+export function parseFlag(parsed: Parsed, arg: string, [flag, type, opts = {}]: FlagConfig): boolean {
   const key = camelize(flag);
   switch (type) {
     case truthy:
@@ -218,9 +207,11 @@ export function parseFlag(
 export function parse(args: readonly string[], configs: readonly FlagConfig[]) {
   const parsed: Parsed = { _: [] };
 
-  for (const arg of args)
-    if (!configs.some(config => parseFlag(parsed, arg, config)))
+  for (const arg of args) {
+    if (!configs.some(config => parseFlag(parsed, arg, config))) {
       parsed._.push(arg);
+    }
+  }
 
   return parsed;
 }

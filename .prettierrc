@@ -1,5 +1,7 @@
 {
   "endOfLine": "auto",
   "arrowParens": "avoid",
-  "tabWidth": 2
+  "quoteProps": "consistent",
+  "printWidth": 110,
+  "trailingComma": "all"
 }
