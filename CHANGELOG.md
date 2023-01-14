@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1
+
+- **refactor**: Lock `esbuild` to `<=0.16` to avoid breaking changes.
+
 ## 0.9.0
 
 - **feat**: Add `--packages` to `EsbuildFlags`.

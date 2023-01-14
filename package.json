@@ -40,11 +40,11 @@
     "node": "^14.18.0 || >=16.0.0"
   },
   "peerDependencies": {
-    "esbuild": "*"
+    "esbuild": "<=0.16"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
-    "esbuild": "^0.16.6",
+    "@types/node": "^18.11.18",
+    "esbuild": "^0.16.17",
     "vitepress": "^1.0.0-alpha.29"
   }
 }
