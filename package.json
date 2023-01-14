@@ -27,8 +27,9 @@
   ],
   "scripts": {
     "build": "esbuild scripts/build.ts | node --input-type=module",
-    "docs": "npx vitepress build docs",
-    "docs:dev": "npx vitepress dev docs"
+    "flags": "esbuild scripts/flags.ts | node --input-type=module",
+    "docs": "vitepress build docs",
+    "docs:dev": "vitepress dev docs"
   },
   "keywords": [
     "cli",
@@ -37,14 +38,14 @@
   "author": "hyrious <hyrious@outlook.com>",
   "license": "MIT",
   "engines": {
-    "node": "^14.18.0 || >=16.0.0"
+    "node": "^14.18 || >=16"
   },
   "peerDependencies": {
-    "esbuild": "<=0.16"
+    "esbuild": ">=0.17"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
-    "esbuild": "^0.16.17",
+    "esbuild": "^0.17.0",
     "vitepress": "^1.0.0-alpha.29"
   }
 }

@@ -48,7 +48,7 @@ Options:
                         path in .[tj]s files. This is enabled by default.
 
   --watch               Enable watch mode. This is built on top of the
-  alias: -w             built-in `watch` option of esbuild.
+  alias: -w             `context.watch()` function of esbuild.
 
   --plugin:name         Load esbuild plugins. For example, `--plugin:style`
   alias: -p             will try to load `style` package in your project.

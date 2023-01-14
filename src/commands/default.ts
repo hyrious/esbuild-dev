@@ -135,10 +135,12 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       }
     };
 
+    let watchOptions: { onRebuild: (stop: () => void) => void } | undefined;
     if (devOptions.watch) {
-      buildOptions.watch = {
-        onRebuild(_err, result) {
-          if (result) ({ stop } = result), run();
+      watchOptions = {
+        onRebuild(stop_) {
+          stop = stop_;
+          run();
         },
       };
     }
@@ -146,10 +148,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
     const restart = async () => {
       await kill();
       stop && stop();
-      ({
-        outfile,
-        result: { stop },
-      } = await build(entry, buildOptions, { include: devOptions.include }));
+      ({ outfile } = await build(entry, buildOptions, { include: devOptions.include }, watchOptions));
       await run();
     };
 

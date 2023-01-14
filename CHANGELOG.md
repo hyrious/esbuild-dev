@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0
+
+- **refactor!**: Integrate esbuild 0.17's `context` api.
+
 ## 0.9.1
 
 - **refactor**: Lock `esbuild` to `<=0.16` to avoid breaking changes.

@@ -1,4 +1,4 @@
-import { build as esbuild, version, BuildOptions, Plugin } from "esbuild";
+import { build as esbuild, context, version, BuildOptions, Plugin, BuildContext } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
@@ -35,6 +35,7 @@ export async function build(
   entry: string,
   options: BuildOptions & { format: Format },
   externalPluginOptions?: ExternalPluginOptions,
+  watchOptions?: { onRebuild: (stop: () => void) => void },
 ) {
   if (!tmpdir_) {
     tmpdir_ = join(findNodeModules(cwd()) || _tmpdir(), ".esbuild-dev");
@@ -57,8 +58,26 @@ export async function build(
   } else {
     (options.plugins ||= []).push(external({ exclude: false, ...externalPluginOptions }));
   }
-  const result = await esbuild(options);
-  return { outfile: options.outfile!, result };
+  if (watchOptions) {
+    let ctx: BuildContext;
+    (options.plugins ||= []).push({
+      name: "on-rebuild",
+      setup({ onEnd }) {
+        const stop = () => ctx.dispose();
+        let count = 0;
+        onEnd(() => {
+          if (count++ > 0) {
+            watchOptions.onRebuild(stop);
+          }
+        });
+      },
+    });
+    ctx = await context(options);
+    ctx.watch();
+  } else {
+    await esbuild(options);
+  }
+  return { outfile: options.outfile! };
 }
 
 export async function importFile(
