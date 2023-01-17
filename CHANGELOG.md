@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **refactor**: Await `context.watch()`.
+
 ## 0.10.0
 
 - **refactor!**: Integrate esbuild 0.17's `context` api.

@@ -73,7 +73,7 @@ export async function build(
       },
     });
     ctx = await context(options);
-    ctx.watch();
+    await ctx.watch();
   } else {
     await esbuild(options);
   }
