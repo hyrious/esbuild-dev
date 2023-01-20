@@ -5,9 +5,7 @@ export default defineConfig({
   description: "A simple wrapper of esbuild to run your script file.",
   base: "/esbuild-dev/",
   themeConfig: {
-    socialLinks: [
-      { icon: "github", link: "https://github.com/hyrious/esbuild-dev" },
-    ],
+    socialLinks: [{ icon: "github", link: "https://github.com/hyrious/esbuild-dev" }],
 
     editLink: {
       pattern: "https://github.com/hyrious/esbuild-dev/edit/main/docs/:path",
@@ -28,5 +26,7 @@ export default defineConfig({
         items: [{ text: "API Reference", link: "/guide/api" }],
       },
     ],
+
+    outline: "deep",
   },
 });

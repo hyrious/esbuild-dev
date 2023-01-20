@@ -29,7 +29,34 @@ projects.
 
 ## Alternatives
 
-- [<samp>esno</samp> / <samp>esmo</samp>](https://github.com/antfu/esno) &mdash; [Anthony Fu](https://github.com/antfu)\
-  It uses Node's native [`require.extensions`][reqext] for commonjs and [loaders](https://nodejs.org/api/esm.html#loaders) for es modules to achieve similar behavior.
+### [<samp>tsx</samp>](https://github.com/esbuild-kit/tsx)
+
+It uses Node's native [`require.extensions`][reqext] for commonjs and [loaders](https://nodejs.org/api/esm.html#loaders) for es modules to achieve similar behavior. There are pros and cons in compare it with mine:
+
+First of all, we're using different functions in esbuild to transform your ts files to js. `tsx` uses `transform`, while I use `build` with bundle enabled.
+
+<table><thead><tr><th></th><th><code>tsx</code> (transform)</th><th><code>@hyrious/esbuild-dev</code> (build)</th></tr></thead><tbody><tr><td>Pros</td><td>
+
+- Transforming is lighter than bundling, it may be faster
+- Can totally run in memory, cache files are just for further speed up
+
+</td><td>
+
+- Can use every esbuild build-only features, for example plugins
+- Easy to debug because you can find the bundled js file in your disk
+
+</td></tr><tr><td>Cons</td><td>
+
+- Hard to debug because cache files are minified and named in hash
+- Cannot use plugins, but you can chain other node loaders to do similar
+
+</td><td>
+
+- Cannot totally run in memory, it has to write the result to your disk
+- Bundling can be slower when you have lots of files or slow plugins
+
+</td></tr></tbody></table>
+
+Note that I also have a loader mode which is a simpler implementation in that it doesn't hack `require.extensions` and in most of the cases it is enough to do e.g. unit test with coverage report.
 
 [reqext]: https://nodejs.org/api/modules.html#requireextensions

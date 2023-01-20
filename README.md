@@ -23,53 +23,15 @@ npm i -g @hyrious/esbuild-dev esbuild
 
 ### Usage
 
-**CLI**:
-
-```
-Usage:
-  esbuild-dev [--loader] [--cjs] [--watch] [--plugin:name] main.ts ...
-  esbuild-dev external [--bare] main.ts ...
-
-Options:
-  --loader              Use `--experimental-loader` to run the file, which
-                        is helpful when using other coverage tools.
-                        In this mode, plugins are not supported.
-
-  --no-warnings         Using experimental loader api will cause node
-                        print warnings. Set this flag to turn off them all.
-                        This is only a temporary workaround to please eyes.
-
-  --cjs                 Change the outfile format to CJS. For example,
-                        `__dirname` can only be used in CJS, and
-                        `import.meta` can only be accessed in ESM.
-                        This option cannot be used with `--loader`.
-
-  --shims               Replace `import.meta.url` and `__dirname` with absolute
-                        path in .[tj]s files. This is enabled by default.
-
-  --watch               Enable watch mode. This is built on top of the
-  alias: -w             `context.watch()` function of esbuild.
-
-  --plugin:name         Load esbuild plugins. For example, `--plugin:style`
-  alias: -p             will try to load `style` package in your project.
-                        This option can not be used outside of a package.
-
-  --[esbuild-options]   Additional flags left of the filename will be passed
-                        to esbuild build options.
-
-Sub Commands:
-  external              Show potential external libraries of a file.
-                        Additional arguments are passed to build options.
-                        This command uses a custom resolve plugin to scan
-                        and gather all package name imports and exclude them.
-
-    --bare              Use bare format (one name per line, no quotes).
-    alias: -b
+```bash
+esbuild-dev [--watch] main.ts
 ```
 
-**Library**
+[Read the docs to learn more.](https://hyrious.me/esbuild-dev)
 
-[Read the Docs to Learn More](https://hyrious.me/esbuild-dev).
+### Develop
+
+The source codes in the project is carefully written in a style that esbuild won't generate interop helpers. Refer [esbuild#1831](https://github.com/evanw/esbuild/issues/1831#issuecomment-992909043) to learn how.
 
 ### License
 
