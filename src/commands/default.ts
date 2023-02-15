@@ -66,8 +66,8 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
           const onLoad: typeof realOnLoad = function (filter, callback) {
             return realOnLoad(filter, async args => {
               const result = await callback(args);
-              if (result && shimsFilter.test(args.path) && result.contents) {
-                result.contents = makeShims(define, args) + result.contents;
+              if (result && shimsFilter.test(args.path) && typeof result.contents === "string") {
+                result.contents = prependShims(define, args, result.contents);
               }
               return result;
             });
@@ -85,7 +85,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
 
             return {
               loader: "default",
-              contents: makeShims(define, args) + contents,
+              contents: prependShims(define, args, contents),
             };
           });
         },
@@ -168,10 +168,16 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
   }
 }
 
-function makeShims(define: Record<string, string>, args: { path: string }) {
-  return (
+function prependShims(define: Record<string, string>, args: { path: string }, contents: string) {
+  const shims =
     `const ${define["__dirname"]} = ${JSON.stringify(dirname(args.path))};` +
     `const ${define["__filename"]} = ${JSON.stringify(args.path)};` +
-    `const ${define["import.meta.url"]} = ${JSON.stringify(pathToFileURL(args.path).href)};`
-  );
+    `const ${define["import.meta.url"]} = ${JSON.stringify(pathToFileURL(args.path).href)};`;
+
+  if (contents.startsWith("#!")) {
+    const i = contents.indexOf("\n") + 1;
+    return contents.slice(0, i) + shims + contents.slice(i);
+  }
+
+  return shims + contents;
 }

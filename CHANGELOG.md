@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **refactor**: Await `context.watch()`.
+- **fix**: Keep shebang when prepending shims.
 
 ## 0.10.0
 
