@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.1
 
 - **refactor**: Await `context.watch()`.
 - **fix**: Keep shebang when prepending shims.
