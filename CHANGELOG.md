@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.2
+
+- **fix**: Wait for first build in watch mode.
+- **fix**: Don't run output when there's error in build result.
+
 ## 0.10.1
 
 - **refactor**: Await `context.watch()`.

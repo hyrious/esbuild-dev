@@ -1,7 +1,6 @@
 import esbuild, { PartialMessage } from "esbuild";
 import { promises } from "fs";
 import { dirname, extname } from "path";
-import { cwd, versions } from "process";
 import { fileURLToPath, pathToFileURL, URL } from "url";
 import { resolve as esbuildResolve } from "./build";
 const read = promises.readFile;
@@ -101,7 +100,7 @@ export async function resolve(
   try {
     url = new URL(id);
   } catch {
-    const resolveDir = parentURL ? dirname(fileURLToPath(parentURL)) : cwd();
+    const resolveDir = parentURL ? dirname(fileURLToPath(parentURL)) : process.cwd();
     const path = await esbuildResolve(id, resolveDir);
     if (path) {
       url = pathToFileURL(path);
@@ -127,7 +126,7 @@ export async function load(url: string, context: LoadContext, defaultLoad: Loade
         sourcefile: path,
         sourcemap: "inline",
         loader,
-        target: `node${versions.node}`,
+        target: `node${process.versions.node}`,
         format: "esm",
       });
       printErrorsAndWarnings({ warnings });

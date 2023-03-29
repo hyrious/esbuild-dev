@@ -1,8 +1,7 @@
 import { ChildProcess, spawn, spawnSync } from "child_process";
-import { BuildOptions } from "esbuild";
+import { BuildFailure, BuildOptions } from "esbuild";
 import { readFile } from "fs/promises";
 import { dirname } from "path";
-import { argv0, cwd, env, exit, stdin } from "process";
 import { pathToFileURL } from "url";
 import { EsbuildDevFlags, EsbuildDevOptions, EsbuildFlags, parse } from "../args";
 import { build, Format, loaderPath, loadPlugins } from "../build";
@@ -40,7 +39,10 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
     spawnArgs = ["--loader", loaderPath, "--enable-source-maps", entry, ...argsToEntry];
     if (devOptions.noWarnings) spawnArgs.unshift("--no-warnings");
 
-    exit(spawnSync(argv0, spawnArgs, { stdio: "inherit", cwd: cwd(), env }).status || 0);
+    process.exit(
+      spawnSync(process.argv0, spawnArgs, { stdio: "inherit", cwd: process.cwd(), env: process.env })
+        .status || 0,
+    );
   } else {
     let plugins = buildOptions.plugins || [];
     if (devOptions.plugin) {
@@ -127,7 +129,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       try {
         await kill();
         spawnArgs = ["--enable-source-maps", outfile, ...argsToEntry];
-        child = spawn(argv0, spawnArgs, { stdio: "inherit", cwd: cwd(), env });
+        child = spawn(process.argv0, spawnArgs, { stdio: "inherit", cwd: process.cwd(), env: process.env });
         child.on("close", on_close);
         child.on("error", on_error);
       } catch {
@@ -135,12 +137,12 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       }
     };
 
-    let watchOptions: { onRebuild: (stop: () => void) => void } | undefined;
+    let watchOptions: { onRebuild: (error: BuildFailure | null, stop: () => void) => void } | undefined;
     if (devOptions.watch) {
       watchOptions = {
-        onRebuild(stop_) {
+        onRebuild(error, stop_) {
           stop = stop_;
-          run();
+          if (!error) run();
         },
       };
     }
@@ -152,14 +154,14 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       await run();
     };
 
-    restart().catch(() => exit(1));
+    restart().catch(() => process.exit(1));
 
     if (devOptions.watch) {
-      stdin.on("data", async e => {
+      process.stdin.on("data", async e => {
         if (e.toString().startsWith("exit")) {
           await kill();
           stop && stop();
-          exit(0);
+          process.exit(0);
         } else if (e.toString().startsWith("rs")) {
           await restart();
         }

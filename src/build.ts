@@ -1,11 +1,19 @@
-import { build as esbuild, context, version, BuildOptions, Plugin, BuildContext } from "esbuild";
+import {
+  build as esbuild,
+  context,
+  version,
+  BuildOptions,
+  Plugin,
+  BuildContext,
+  BuildFailure,
+  Message,
+} from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
-import { cwd, versions } from "process";
 import { pathToFileURL, URL } from "url";
-import { external, ExternalPluginOptions, isEmpty, isObj } from "./utils";
+import { block, external, ExternalPluginOptions, isEmpty, isObj } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
 
@@ -31,21 +39,28 @@ const supportsPackagesExternal = /* @__PURE__ */ (() => {
   return major > a || (major === a && minor > b) || (major === a && minor === b && patch >= c);
 })();
 
+class BuildError extends Error implements BuildFailure {
+  constructor(public errors: Message[], public warnings: Message[]) {
+    super("Build failed");
+    this.name = "BuildFailure";
+  }
+}
+
 export async function build(
   entry: string,
   options: BuildOptions & { format: Format },
   externalPluginOptions?: ExternalPluginOptions,
-  watchOptions?: { onRebuild: (stop: () => void) => void },
+  watchOptions?: { onRebuild: (error: BuildFailure | null, stop: () => void) => void },
 ) {
   if (!tmpdir_) {
-    tmpdir_ = join(findNodeModules(cwd()) || _tmpdir(), ".esbuild-dev");
+    tmpdir_ = join(findNodeModules(process.cwd()) || _tmpdir(), ".esbuild-dev");
     mkdirSync(tmpdir_, { recursive: true });
     writeFileSync(join(tmpdir_, "package.json"), '{"type":"module"}');
   }
   options = {
     entryPoints: [entry],
     platform: "node",
-    target: `node${versions.node}`,
+    target: `node${process.versions.node}`,
     bundle: true,
     sourcemap: true,
     sourcesContent: false,
@@ -60,20 +75,27 @@ export async function build(
   }
   if (watchOptions) {
     let ctx: BuildContext;
+    let { promise, resolve, reject } = block();
     (options.plugins ||= []).push({
       name: "on-rebuild",
       setup({ onEnd }) {
         const stop = () => ctx.dispose();
         let count = 0;
-        onEnd(() => {
+        onEnd(({ errors, warnings }) => {
+          const error = errors.length > 0 ? new BuildError(errors, warnings) : null;
           if (count++ > 0) {
-            watchOptions.onRebuild(stop);
+            watchOptions.onRebuild(error, stop);
+          } else if (error) {
+            reject(error);
+          } else {
+            resolve();
           }
         });
       },
     });
     ctx = await context(options);
     await ctx.watch();
+    await promise;
   } else {
     await esbuild(options);
   }

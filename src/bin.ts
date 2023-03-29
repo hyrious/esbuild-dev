@@ -1,11 +1,10 @@
 import { version as esbuildVersion } from "esbuild";
-import { argv, exit } from "process";
 import { name, version as versionText } from "../package.json";
 import { defaultCommand } from "./commands/default";
 import { externalCommand } from "./commands/external";
 import helpText from "./help.txt";
 
-const args = argv.slice(2);
+const args = process.argv.slice(2);
 
 const commands = ["external"];
 
@@ -37,7 +36,7 @@ for (let i = 0; i < args.length; ++i) {
 
 if (version) console.log(`${name} ${versionText}, esbuild ${esbuildVersion}`);
 if (help || (!version && !entry)) console.log(helpText);
-if (help || !entry || version) exit(0);
+if (help || !entry || version) process.exit(0);
 
 export const entryPoint = entry!;
 
