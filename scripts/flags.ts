@@ -1,20 +1,8 @@
-import { get } from "https";
-
-function fetch(url: string) {
-  return new Promise<string>((resolve, reject) => {
-    get(url, res => {
-      const chunks: Buffer[] = [];
-      res.on("data", chunk => chunks.push(chunk));
-      res.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-    }).on("error", reject);
-  });
-}
-
 async function main() {
   let text = await fetch(
     // "https://cdn.jsdelivr.net/gh/evanw/esbuild/pkg/cli/cli_impl.go"
-    "https://raw.githubusercontent.com/evanw/esbuild/master/pkg/cli/cli_impl.go"
-  );
+    "https://github.com/evanw/esbuild/raw/main/pkg/cli/cli_impl.go"
+  ).then(r => r.text());
   let start = text.indexOf("func parseOptionsImpl(");
   let working = true;
   text = text.slice(start);
