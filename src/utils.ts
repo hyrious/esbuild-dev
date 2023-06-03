@@ -28,6 +28,12 @@ export function block<T = void>() {
   return { promise, resolve: resolve!, reject: reject! };
 }
 
+export function splitSearch(path: string) {
+  let i = path.indexOf("?");
+  if (i < 0) return [path, ""];
+  return [path.slice(0, i), path.slice(i)];
+}
+
 export interface ExternalPluginOptions {
   /**
    * Passed to `onResolve()`, mark them as external.

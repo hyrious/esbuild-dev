@@ -13,7 +13,7 @@ import { createRequire } from "module";
 import { tmpdir as _tmpdir } from "os";
 import { dirname, join } from "path";
 import { pathToFileURL, URL } from "url";
-import { block, external, ExternalPluginOptions, isEmpty, isObj } from "./utils";
+import { block, external, ExternalPluginOptions, isEmpty, isObj, splitSearch } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
 
@@ -107,8 +107,9 @@ export async function importFile(
   options: BuildOptions = {},
   externalPluginOptions?: ExternalPluginOptions,
 ) {
-  const { outfile } = await build(path, { ...options, format: "esm" }, externalPluginOptions);
-  return import(pathToFileURL(outfile).toString());
+  const [entry, search] = splitSearch(path);
+  const { outfile } = await build(entry, { ...options, format: "esm" }, externalPluginOptions);
+  return import(pathToFileURL(outfile).toString() + search);
 }
 
 let requireShim: NodeRequire | undefined;
@@ -117,12 +118,13 @@ export async function requireFile(
   options: BuildOptions = {},
   externalPluginOptions?: ExternalPluginOptions,
 ) {
-  const { outfile } = await build(path, { ...options, format: "cjs" }, externalPluginOptions);
+  const [entry, search] = splitSearch(path);
+  const { outfile } = await build(entry, { ...options, format: "cjs" }, externalPluginOptions);
   if (__ESM__) {
     requireShim ||= createRequire(import.meta.url);
-    return requireShim(outfile);
+    return requireShim(outfile + search);
   } else {
-    return require(outfile);
+    return require(outfile + search);
   }
 }
 

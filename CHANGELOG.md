@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: `importFile()` and `requireFile()` can accept path with search params.\
+  This is useful when you are running them on the same file but the file has changed since last import.
+  For example you can make an esbuild svelte **ssr** plugin that even works in watch mode:
+
+  ```js
+  onResolve({ filter: /index\.html$/ }, args => {
+    return { path: args.path, namespace: "svelte-ssr" };
+  });
+
+  onLoad({ filter: /()/, namespace: "svelte-ssr" }, async args => {
+    const svelteFile = findSvelteFile(args.path);
+    const { default: App } = await importFile(svelteFile + "?t=" + Date.now(), {
+      plugins: [svelte({ compilerOptions: { css: "none", generate: "ssr", hydratable: true } })],
+    });
+    const { html, head } = App.render();
+    return { contents: renderHTML(args.path, { html, head }), loader: "copy" };
+  });
+  ```
+
 ## 0.10.2
 
 - **fix**: Wait for first build in watch mode.
