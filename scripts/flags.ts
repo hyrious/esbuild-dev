@@ -1,3 +1,9 @@
+import { ProxyAgent, setGlobalDispatcher } from "undici";
+
+if (process.env.http_proxy) {
+  setGlobalDispatcher(new ProxyAgent(process.env.http_proxy));
+}
+
 async function main() {
   let text = await fetch(
     // "https://cdn.jsdelivr.net/gh/evanw/esbuild/pkg/cli/cli_impl.go"

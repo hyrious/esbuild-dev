@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.3
 
 - **feat**: `importFile()` and `requireFile()` can accept path with search params.\
   This is useful when you are running them on the same file but the file has changed since last import.
@@ -20,6 +20,8 @@
     return { contents: renderHTML(args.path, { html, head }), loader: "copy" };
   });
   ```
+
+- **feat**: Add `--line-limit` to `EsbuildFlags`.
 
 ## 0.10.2
 

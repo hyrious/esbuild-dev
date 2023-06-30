@@ -88,6 +88,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["banner", dict],
   ["footer", dict],
   ["log-limit", string, { transform: parseInt }],
+  ["line-limit", string, { transform: parseInt }],
   ["color", boolean],
   ["log-level", string],
 ];
