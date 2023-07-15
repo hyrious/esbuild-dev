@@ -38,6 +38,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
   ["reserve-props", string, { transform: RegExp }],
   ["mangle-cache", string], // --mangle-cache=cache.json
   ["drop", list],
+  ["drop-labels", array],
   ["legal-comments", string],
   ["charset", string],
   ["tree-shaking", boolean],

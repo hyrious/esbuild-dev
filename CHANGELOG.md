@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.4
+
+- **feat**: Add `--drop-labels` to `EsbuildFlags`.
+
 ## 0.10.3
 
 - **feat**: `importFile()` and `requireFile()` can accept path with search params.\
