@@ -1,4 +1,4 @@
-import { ProxyAgent, setGlobalDispatcher } from "undici";
+import { fetch, ProxyAgent, setGlobalDispatcher } from "undici";
 
 if (process.env.http_proxy) {
   setGlobalDispatcher(new ProxyAgent(process.env.http_proxy));

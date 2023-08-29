@@ -45,8 +45,8 @@
   },
   "devDependencies": {
     "@types/node": "^18.16.19",
-    "esbuild": "^0.18.13",
-    "undici": "^5.22.1",
-    "vitepress": "^1.0.0-beta.5"
+    "esbuild": "^0.19.2",
+    "undici": "^5.23.0",
+    "vitepress": "^1.0.0-rc.10"
   }
 }
