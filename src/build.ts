@@ -32,7 +32,9 @@ function findNodeModules(dir: string): string | undefined {
   return;
 }
 
-let tmpdir_: string | undefined;
+export const tempDirectory = /* @__PURE__ */ (() =>
+  join(findNodeModules(process.cwd()) || _tmpdir(), ".esbuild-dev"))();
+
 const supportsPackagesExternal = /* @__PURE__ */ (() => {
   const [a, b, c] = [0, 16, 5];
   const [major, minor, patch] = version.split(".").slice(0, 3).map(Number);
@@ -52,10 +54,9 @@ export async function build(
   externalPluginOptions?: ExternalPluginOptions,
   watchOptions?: { onRebuild: (error: BuildFailure | null, stop: () => void) => void },
 ) {
-  if (!tmpdir_) {
-    tmpdir_ = join(findNodeModules(process.cwd()) || _tmpdir(), ".esbuild-dev");
-    mkdirSync(tmpdir_, { recursive: true });
-    writeFileSync(join(tmpdir_, "package.json"), '{"type":"module"}');
+  if (!existsSync(tempDirectory)) {
+    mkdirSync(tempDirectory, { recursive: true });
+    writeFileSync(join(tempDirectory, "package.json"), '{"type":"module"}');
   }
   options = {
     entryPoints: [entry],
@@ -65,7 +66,7 @@ export async function build(
     sourcemap: true,
     sourcesContent: false,
     treeShaking: true,
-    outfile: join(tmpdir_, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
+    outfile: join(tempDirectory, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
     ...options,
   };
   if (isEmpty(externalPluginOptions) && supportsPackagesExternal) {

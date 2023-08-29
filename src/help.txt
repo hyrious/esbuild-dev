@@ -2,6 +2,7 @@
 Usage:
   esbuild-dev [--loader] [--cjs] [--watch] [--plugin:name] main.ts ...
   esbuild-dev external [--bare] main.ts ...
+  esbuild-dev temp
 
 Options:
   --loader              Use `--loader` to run the file, which is helpful
@@ -40,3 +41,5 @@ Sub Commands:
 
     --bare              Use bare format (one name per line, no quotes).
     alias: -b
+
+  temp                  Show the temp directory of the current project.

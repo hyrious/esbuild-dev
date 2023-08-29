@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: Add `temp` command to print the output directory.
+
 ## 0.10.4
 
 - **feat**: Add `--drop-labels` to `EsbuildFlags`.

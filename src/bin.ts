@@ -2,11 +2,12 @@ import { version as esbuildVersion } from "esbuild";
 import { name, version as versionText } from "../package.json";
 import { defaultCommand } from "./commands/default";
 import { externalCommand } from "./commands/external";
+import { tempDirectory } from "./build";
 import helpText from "./help.txt";
 
 const args = process.argv.slice(2);
 
-const commands = ["external"];
+const commands = ["external", "temp"];
 
 // pre-process the command, entry, help, version
 const command = commands.includes(args[0]) && args.shift();
@@ -32,6 +33,11 @@ for (let i = 0; i < args.length; ++i) {
     break;
   }
   argsBeforeEntry.push(arg);
+}
+
+if (command === "temp") {
+  console.log(tempDirectory);
+  process.exit(0);
 }
 
 if (version) console.log(`${name} ${versionText}, esbuild ${esbuildVersion}`);
