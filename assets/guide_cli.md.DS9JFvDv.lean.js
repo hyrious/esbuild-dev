@@ -1,0 +1,1 @@
+import{_ as s,o as i,c as a,R as e}from"./chunks/framework.lN0IFf_r.js";const u=JSON.parse('{"title":"Command Line","description":"","frontmatter":{},"headers":[],"relativePath":"guide/cli.md","filePath":"guide/cli.md"}'),n={name:"guide/cli.md"},t=e("",17),l=[t];function p(h,d,o,k,r,c){return i(),a("div",null,l)}const F=s(n,[["render",p]]);export{u as __pageData,F as default};
