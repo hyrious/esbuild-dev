@@ -37,6 +37,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
   let spawnArgs: string[];
   if (devOptions.loader) {
     spawnArgs = ["--loader", loaderPath, "--enable-source-maps", entry, ...argsToEntry];
+    if (devOptions.node) spawnArgs.splice(3, 0, ...devOptions.node);
     if (devOptions.noWarnings) spawnArgs.unshift("--no-warnings");
 
     process.exit(
@@ -129,6 +130,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       try {
         await kill();
         spawnArgs = ["--enable-source-maps", outfile, ...argsToEntry];
+        if (devOptions.node) spawnArgs.splice(1, 0, ...devOptions.node);
         child = spawn(process.argv0, spawnArgs, { stdio: "inherit", cwd: process.cwd(), env: process.env });
         child.on("close", on_close);
         child.on("error", on_error);

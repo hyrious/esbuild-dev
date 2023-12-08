@@ -30,6 +30,10 @@ Options:
 
   --include:name        Force include a package in the bundle.
 
+  --node:node-options   Append node options to the command line. For example,
+                        `--node:--env-file=.env` will result in the final
+                        command be `node --env-file=.env outfile.js`.
+
   --[esbuild-options]   Additional flags left of the filename will be passed
                         to esbuild build options.
 

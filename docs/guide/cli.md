@@ -100,3 +100,8 @@ See the API [external](./api.md#external) for more details.
 
 Anyway, when you get a syntax/runtime error, you can look at the
 `node_modules/.esbuild-dev` folder to see bundled scripts.
+
+```bash
+$ esbuild-dev temp
+# print full path to the '.esbuild-dev' folder from current place
+```

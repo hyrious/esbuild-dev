@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.10.5
 
 - **feat**: Add `temp` command to print the output directory.
+- **feat**: Add `--node` to append node options instead of relying on `NODE_OPTIONS` env.
 
 ## 0.10.4
 
