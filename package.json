@@ -2,11 +2,13 @@
   "name": "@hyrious/esbuild-dev",
   "version": "0.10.5",
   "description": "Build and run your script.ts with esbuild",
+  "author": "hyrious <hyrious@outlook.com>",
+  "license": "MIT",
   "repository": "hyrious/esbuild-dev",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "bin": "dist/bin.mjs",
-  "types": "src/index.ts",
+  "keywords": [
+    "cli",
+    "esbuild"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
@@ -20,33 +22,31 @@
     "./loader": "./dist/loader.mjs",
     "./package.json": "./package.json"
   },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "src/index.ts",
+  "bin": "dist/bin.mjs",
   "files": [
     "src",
     "dist",
     "args.d.ts"
   ],
+  "engines": {
+    "node": "^14.18 || >=16"
+  },
   "scripts": {
     "build": "esbuild scripts/build.ts | node --input-type=module",
     "flags": "esbuild scripts/flags.ts | node --input-type=module",
     "docs": "vitepress build docs",
     "docs:dev": "vitepress dev docs"
   },
-  "keywords": [
-    "cli",
-    "esbuild"
-  ],
-  "author": "hyrious <hyrious@outlook.com>",
-  "license": "MIT",
-  "engines": {
-    "node": "^14.18 || >=16"
-  },
   "peerDependencies": {
     "esbuild": ">=0.17"
   },
   "devDependencies": {
-    "@types/node": "^18.19.3",
-    "esbuild": "^0.19.8",
-    "undici": "^6.0.1",
-    "vitepress": "^1.0.0-rc.31"
+    "@types/node": "^18.19.33",
+    "esbuild": "^0.20.2",
+    "undici": "^6.18.0",
+    "vitepress": "^1.2.2"
   }
 }
