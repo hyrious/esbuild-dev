@@ -1,7 +1,7 @@
 {
   "name": "@hyrious/esbuild-dev",
   "type": "module",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "description": "Build and run your script.ts with esbuild",
   "author": "hyrious <hyrious@outlook.com>",
   "license": "MIT",
