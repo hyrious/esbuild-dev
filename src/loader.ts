@@ -1,9 +1,8 @@
-import esbuild, { PartialMessage } from "esbuild";
-import { promises } from "fs";
+import { Loader as EsbuildLoader, PartialMessage, formatMessages, transform } from "esbuild";
+import { readFile } from "fs/promises";
 import { dirname, extname } from "path";
-import { fileURLToPath, pathToFileURL, URL } from "url";
-import { resolve as esbuildResolve } from "./build";
-const read = promises.readFile;
+import { URL, fileURLToPath, pathToFileURL } from "url";
+import { resolve as esbuild_resolve } from "./index.js";
 
 async function printErrorsAndWarnings({
   errors,
@@ -13,7 +12,7 @@ async function printErrorsAndWarnings({
   warnings?: PartialMessage[];
 }) {
   if (errors && errors.length > 0) {
-    for (const string of await esbuild.formatMessages(errors, {
+    for (const string of await formatMessages(errors, {
       kind: "error",
       color: true,
     })) {
@@ -21,7 +20,7 @@ async function printErrorsAndWarnings({
     }
   }
   if (warnings && warnings.length > 0) {
-    for (const string of await esbuild.formatMessages(warnings, {
+    for (const string of await formatMessages(warnings, {
       kind: "warning",
       color: true,
     })) {
@@ -75,7 +74,7 @@ export type Loader = (
   defaultLoad: Loader,
 ) => LoadResult | Promise<LoadResult>;
 
-const ExtToLoader: Record<string, esbuild.Loader> = {
+const ExtToLoader: Record<string, EsbuildLoader> = {
   // ".js": "js",
   // ".mjs": "js",
   // ".cjs": "js",
@@ -101,7 +100,7 @@ export async function resolve(
     url = new URL(id);
   } catch {
     const resolveDir = parentURL ? dirname(fileURLToPath(parentURL)) : process.cwd();
-    const path = await esbuildResolve(id, resolveDir);
+    const path = await esbuild_resolve(id, resolveDir);
     if (path) {
       url = pathToFileURL(path);
     }
@@ -115,14 +114,14 @@ export async function resolve(
 }
 
 export async function load(url: string, context: LoadContext, defaultLoad: Loader): Promise<LoadResult> {
-  // do a quick test if the url is not File URL, don't process it
+  // Only handle file URLs.
   const path = url.startsWith("file:///") ? fileURLToPath(url) : "";
   const loader = ExtToLoader[extname(path)];
 
   if (loader) {
-    const source = await read(path, "utf8");
+    const source = await readFile(path, "utf8");
     try {
-      const { code, warnings } = await esbuild.transform(source, {
+      const { code, warnings } = await transform(source, {
         sourcefile: path,
         sourcemap: "inline",
         loader,

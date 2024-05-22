@@ -3,9 +3,8 @@ import { BuildFailure, BuildOptions } from "esbuild";
 import { readFile } from "fs/promises";
 import { dirname } from "path";
 import { pathToFileURL } from "url";
-import { EsbuildDevFlags, EsbuildDevOptions, EsbuildFlags, parse } from "../args";
-import { build, Format, loaderPath, loadPlugins } from "../build";
-import { delay } from "../utils";
+import { EsbuildDevFlags, EsbuildDevOptions, EsbuildFlags, parse } from "../args.js";
+import { Format, build, delay, loadPlugins, loaderPath } from "../index.js";
 import { resolveMangleCache } from "./utils";
 
 const error = `

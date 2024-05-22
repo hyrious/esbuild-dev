@@ -1,7 +1,6 @@
 import { BuildOptions } from "esbuild";
-import { EsbuildDevExternalFlags, EsbuildFlags, parse } from "../args";
-import { build, Format } from "../build";
-import { external } from "../utils";
+import { EsbuildDevExternalFlags, EsbuildFlags, parse } from "../args.js";
+import { Format, build, external } from "../index.js";
 import { resolveMangleCache } from "./utils";
 
 export async function externalCommand(entry: string, argsBeforeEntry: string[], argsAfterEntry: string[]) {

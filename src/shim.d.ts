@@ -3,4 +3,4 @@ declare module "*.txt" {
   export default contents;
 }
 
-declare var __ESM__: boolean;
+declare const __ESM__: boolean;

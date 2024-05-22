@@ -1,8 +1,8 @@
-import { version as esbuildVersion } from "esbuild";
-import { name, version as versionText } from "../package.json";
+import { version as esbuild_version } from "esbuild";
+import { name, version as self_version } from "../package.json";
 import { defaultCommand } from "./commands/default";
 import { externalCommand } from "./commands/external";
-import { tempDirectory } from "./build";
+import { tempDirectory } from "./index.js";
 import helpText from "./help.txt";
 
 const args = process.argv.slice(2);
@@ -12,8 +12,8 @@ const commands = ["external", "temp"];
 // pre-process the command, entry, help, version
 const command = commands.includes(args[0]) && args.shift();
 
-export let argsBeforeEntry: string[] = [];
-export let argsAfterEntry: string[] = [];
+let argsBeforeEntry: string[] = [];
+let argsAfterEntry: string[] = [];
 let entry: string | undefined;
 let help = false;
 let version = false;
@@ -40,11 +40,11 @@ if (command === "temp") {
   process.exit(0);
 }
 
-if (version) console.log(`${name} ${versionText}, esbuild ${esbuildVersion}`);
+if (version) console.log(`${name} ${self_version}, esbuild ${esbuild_version}`);
 if (help || (!version && !entry)) console.log(helpText);
 if (help || !entry || version) process.exit(0);
 
-export const entryPoint = entry!;
+const entryPoint = entry!;
 
 if (command === "external") {
   await externalCommand(entryPoint, argsBeforeEntry, argsAfterEntry);

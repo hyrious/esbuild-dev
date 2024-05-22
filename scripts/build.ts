@@ -1,6 +1,6 @@
 import { build, Plugin } from "esbuild";
-import { promises, rmSync } from "fs";
-const read = promises.readFile;
+import { rmSync } from "fs";
+import { readFile } from "fs/promises";
 
 rmSync("dist", { recursive: true, maxRetries: 3, force: true });
 
@@ -8,8 +8,7 @@ const shebang: Plugin = {
   name: "shebang",
   setup({ onLoad }) {
     onLoad({ filter: /bin\.ts$/ }, async args => {
-      const contents =
-        "#!/usr/bin/env node\n" + (await read(args.path, "utf8"));
+      const contents = "#!/usr/bin/env node\n" + (await readFile(args.path, "utf8"));
       return { contents, loader: "default" };
     });
   },
@@ -21,7 +20,7 @@ const shaking: Plugin = {
   setup({ onLoad, initialOptions: { format } }) {
     const __ESM__ = format === "esm";
     onLoad({ filter: /\b(build|index)\.ts$/ }, async args => {
-      let code = await read(args.path, "utf8");
+      let code = await readFile(args.path, "utf8");
       for (let i = 0; (i = code.indexOf("if (__ESM__) {", i)) >= 0; ++i) {
         let ifLeft = code.indexOf("{", i);
         ifLeft = code.indexOf("\n", ifLeft) + 1;
@@ -49,19 +48,26 @@ const shaking: Plugin = {
   },
 };
 
+const external: Plugin = {
+  name: "external",
+  setup({ onResolve }) {
+    onResolve({ filter: /\b(index|args)\.js$/ }, ({ path }) => {
+      path = path.replace(/^\.\./, ".");
+      return { path, external: true };
+    });
+  },
+};
+
 await build({
   entryPoints: ["src/bin.ts", "src/index.ts", "src/args.ts", "src/loader.ts"],
   bundle: true,
   platform: "node",
   format: "esm",
-  splitting: true,
   external: ["esbuild"],
   outdir: "dist",
-  minifySyntax: true,
   sourcemap: true,
-  outExtension: { ".js": ".mjs" },
   logLevel: "info",
-  plugins: [shebang, shaking],
+  plugins: [shebang, shaking, external],
   target: ["node14.18.0", "node16.0.0"],
   define: {
     __ESM__: "true",
@@ -72,10 +78,10 @@ await build({
   entryPoints: ["src/index.ts"],
   bundle: true,
   platform: "node",
-  external: ["esbuild", "*/loader.mjs"],
+  external: ["esbuild", "*/loader.js"],
   outdir: "dist",
-  minifySyntax: true,
   sourcemap: true,
+  outExtension: { ".js": ".cjs" },
   logLevel: "info",
   plugins: [shaking],
   target: ["node14.18.0", "node16.0.0"],

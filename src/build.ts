@@ -1,5 +1,5 @@
 import {
-  build as esbuild,
+  build as esbuild_build,
   context,
   version,
   BuildOptions,
@@ -10,9 +10,9 @@ import {
 } from "esbuild";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
-import { tmpdir as _tmpdir } from "os";
+import { tmpdir } from "os";
 import { dirname, join } from "path";
-import { pathToFileURL, URL } from "url";
+import { fileURLToPath, pathToFileURL, URL } from "url";
 import { block, external, ExternalPluginOptions, isEmpty, isObj, splitSearch } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
@@ -33,7 +33,7 @@ function findNodeModules(dir: string): string | undefined {
 }
 
 export const tempDirectory = /* @__PURE__ */ (() =>
-  join(findNodeModules(process.cwd()) || _tmpdir(), ".esbuild-dev"))();
+  join(findNodeModules(process.cwd()) || tmpdir(), ".esbuild-dev"))();
 
 const supportsPackagesExternal = /* @__PURE__ */ (() => {
   const [a, b, c] = [0, 16, 5];
@@ -42,7 +42,10 @@ const supportsPackagesExternal = /* @__PURE__ */ (() => {
 })();
 
 class BuildError extends Error implements BuildFailure {
-  constructor(public errors: Message[], public warnings: Message[]) {
+  constructor(
+    public errors: Message[],
+    public warnings: Message[],
+  ) {
     super("Build failed");
     this.name = "BuildFailure";
   }
@@ -98,7 +101,7 @@ export async function build(
     await ctx.watch();
     await promise;
   } else {
-    await esbuild(options);
+    await esbuild_build(options);
   }
   return { outfile: options.outfile! };
 }
@@ -200,14 +203,14 @@ async function requireOrImport(name: string): Promise<any> {
 
 export let loaderPath: string;
 if (__ESM__) {
-  loaderPath = new URL("./loader.mjs", import.meta.url).pathname;
+  loaderPath = fileURLToPath(new URL("./loader.js", import.meta.url));
 } else {
-  loaderPath = require.resolve("./loader.mjs");
+  loaderPath = require.resolve("./loader.js");
 }
 
 export async function resolve(id: string, resolveDir: string) {
   let result: string | undefined;
-  await esbuild({
+  await esbuild_build({
     stdin: {
       contents: `import ${JSON.stringify(id)}`,
       resolveDir,

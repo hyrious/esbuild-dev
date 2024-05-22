@@ -1,5 +1,6 @@
 {
   "name": "@hyrious/esbuild-dev",
+  "type": "module",
   "version": "0.10.5",
   "description": "Build and run your script.ts with esbuild",
   "author": "hyrious <hyrious@outlook.com>",
@@ -12,20 +13,20 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./args": {
-      "default": "./dist/args.mjs",
+      "default": "./dist/args.js",
       "types": "./src/args.ts"
     },
-    "./loader": "./dist/loader.mjs",
+    "./loader": "./dist/loader.js",
     "./package.json": "./package.json"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "src/index.ts",
-  "bin": "dist/bin.mjs",
+  "bin": "dist/bin.js",
   "files": [
     "src",
     "dist",
