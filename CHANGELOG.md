@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: Shim `import.meta.{dirname,filename}`.
+
 ## 0.10.5
 
 - **feat**: Add `temp` command to print the output directory.

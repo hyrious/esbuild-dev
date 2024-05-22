@@ -57,6 +57,8 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       define["__dirname"] ||= "__injected_dirname";
       define["__filename"] ||= "__injected_filename";
       define["import.meta.url"] ||= "__injected_import_meta_url";
+      define["import.meta.dirname"] ||= "__injected_dirname";
+      define["import.meta.filename"] ||= "__injected_filename";
       buildOptions.define = define;
 
       // Hack all plugin's onLoad callback to add shims.
