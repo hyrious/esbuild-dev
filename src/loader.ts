@@ -1,3 +1,4 @@
+import module from "module";
 import { Loader as EsbuildLoader, PartialMessage, formatMessages, transform } from "esbuild";
 import { readFile } from "fs/promises";
 import { dirname, extname } from "path";
@@ -139,4 +140,9 @@ export async function load(url: string, context: LoadContext, defaultLoad: Loade
   }
 
   return defaultLoad(url, context, defaultLoad);
+}
+
+if (module.register) {
+  process.setSourceMapsEnabled(true);
+  module.register(`./loader.js?${Date.now()}`, import.meta.url);
 }

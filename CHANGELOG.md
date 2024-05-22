@@ -4,6 +4,7 @@
 
 - **feat**: Shim `import.meta.{dirname,filename}`.
 - **refactor**: Use `"type": "module"` and change main file extension to `.js`.
+- **refactor**: Use `--import` instead of `--loader` when possible.
 
 ## 0.10.5
 

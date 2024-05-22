@@ -26,6 +26,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
 
   const devOptions = { shims: true, ...devOptionsRaw } as EsbuildDevOptions;
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
+  if (devOptions.import) devOptions.loader = true;
   if (devOptions.loader && (devOptions.cjs || devOptions.plugin || devOptions.watch || devOptions.include)) {
     throw new Error(`--cjs, --plugin, --watch and --include are not supported with --loader`);
   }
@@ -35,7 +36,11 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
 
   let spawnArgs: string[];
   if (devOptions.loader) {
+    const v = process.versions.node.split(".").map(e => Number.parseInt(e));
+    const register = v[0] > 20 || (v[0] === 20 && v[1] >= 6) || (v[0] === 18 && v[1] >= 19);
+
     spawnArgs = ["--loader", loaderPath, "--enable-source-maps", entry, ...argsToEntry];
+    if (register) spawnArgs[0] = "--import";
     if (devOptions.node) spawnArgs.splice(3, 0, ...devOptions.node);
     if (devOptions.noWarnings) spawnArgs.unshift("--no-warnings");
 

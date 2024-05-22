@@ -97,6 +97,7 @@ export const EsbuildFlags: readonly FlagConfig[] = [
 export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["no-warnings", boolean],
   ["loader", boolean],
+  ["import", boolean],
   ["cjs", boolean],
   ["shims", boolean],
   ["watch", boolean, { alias: ["w"] }],
@@ -108,6 +109,7 @@ export const EsbuildDevFlags: readonly FlagConfig[] = [
 export interface EsbuildDevOptions {
   noWarnings?: boolean;
   loader?: boolean;
+  import?: boolean;
   cjs?: boolean;
   shims?: boolean;
   watch?: boolean;
