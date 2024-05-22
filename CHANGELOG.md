@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.6
 
 - **feat**: Shim `import.meta.{dirname,filename}`.
 - **refactor**: Use `"type": "module"` and change main file extension to `.js`.
