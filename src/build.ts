@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { dirname, join } from "path";
-import { fileURLToPath, pathToFileURL, URL } from "url";
+import { pathToFileURL, URL } from "url";
 import { block, external, ExternalPluginOptions, isEmpty, isObj, splitSearch } from "./utils";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
@@ -203,7 +203,7 @@ async function requireOrImport(name: string): Promise<any> {
 
 export let loaderPath: string;
 if (__ESM__) {
-  loaderPath = fileURLToPath(new URL("./loader.js", import.meta.url));
+  loaderPath = new URL("./loader.js", import.meta.url).toString();
 } else {
   loaderPath = require.resolve("./loader.js");
 }

@@ -6,7 +6,7 @@ Usage:
 
 Options:
   --import              Use `--import` to run the file, which is helpful
-  --loader              when using other coverage tools.
+  alias: --loader       when using other coverage tools.
                         In this mode, plugins are not supported.
 
   --no-warnings         Using experimental loader api will cause node

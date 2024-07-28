@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.7
+
+- **fix**: Path after `--import` should be an import specifier.
+
 ## 0.10.6
 
 - **feat**: Shim `import.meta.{dirname,filename}`.
