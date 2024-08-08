@@ -8,7 +8,7 @@ import {
   BuildFailure,
   Message,
 } from "esbuild";
-import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
+import { existsSync, lstatSync, mkdirSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { dirname, join } from "path";
@@ -21,7 +21,7 @@ export type Format = keyof typeof extname;
 
 function findNodeModules(dir: string): string | undefined {
   const path = join(dir, "node_modules");
-  if (existsSync(path) && statSync(path).isDirectory()) {
+  if (existsSync(path) && lstatSync(path).isDirectory()) {
     return path;
   } else {
     const parent = dirname(dir);
@@ -42,12 +42,17 @@ const supportsPackagesExternal = /* @__PURE__ */ (() => {
 })();
 
 class BuildError extends Error implements BuildFailure {
-  constructor(
-    public errors: Message[],
-    public warnings: Message[],
-  ) {
+  constructor(public errors: Message[], public warnings: Message[]) {
     super("Build failed");
     this.name = "BuildFailure";
+  }
+}
+
+function mtime(path: string) {
+  try {
+    return lstatSync(path).mtimeMs;
+  } catch {
+    return 0;
   }
 }
 
@@ -56,6 +61,7 @@ export async function build(
   options: BuildOptions & { format: Format },
   externalPluginOptions?: ExternalPluginOptions,
   watchOptions?: { onRebuild: (error: BuildFailure | null, stop: () => void) => void },
+  cacheOptions?: { cache?: boolean },
 ) {
   if (!existsSync(tempDirectory)) {
     mkdirSync(tempDirectory, { recursive: true });
@@ -72,6 +78,9 @@ export async function build(
     outfile: join(tempDirectory, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
     ...options,
   };
+  if (cacheOptions?.cache && mtime(options.outfile!) > mtime(entry)) {
+    return { outfile: options.outfile! };
+  }
   if (isEmpty(externalPluginOptions) && supportsPackagesExternal) {
     options.packages = "external";
   } else {

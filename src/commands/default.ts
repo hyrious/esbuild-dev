@@ -24,11 +24,14 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
 
   const argsToEntry = [..._2, ...argsAfterEntry];
 
-  const devOptions = { shims: true, ...devOptionsRaw } as EsbuildDevOptions;
+  const devOptions = { shims: true, cache: true, ...devOptionsRaw } as EsbuildDevOptions;
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
   if (devOptions.import) devOptions.loader = true;
   if (devOptions.loader && (devOptions.cjs || devOptions.plugin || devOptions.watch || devOptions.include)) {
     throw new Error(`--cjs, --plugin, --watch and --include are not supported with --loader`);
+  }
+  if (devOptions.loader || devOptions.plugin || devOptions.watch) {
+    devOptions.cache = false;
   }
 
   buildOptions.format = devOptions.cjs ? "cjs" : "esm";
@@ -155,10 +158,12 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       };
     }
 
+    const externalOptions = { include: devOptions.include };
+    const cacheOptions = { cache: devOptions.cache };
     const restart = async () => {
       await kill();
       stop && stop();
-      ({ outfile } = await build(entry, buildOptions, { include: devOptions.include }, watchOptions));
+      ({ outfile } = await build(entry, buildOptions, externalOptions, watchOptions, cacheOptions));
       await run();
     };
 

@@ -104,6 +104,7 @@ export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["plugin", list, { alias: ["p"] }],
   ["include", list],
   ["node", list],
+  ["cache", boolean],
 ];
 
 export interface EsbuildDevOptions {
@@ -116,6 +117,7 @@ export interface EsbuildDevOptions {
   plugin?: string[];
   include?: string[];
   node?: string[];
+  cache?: boolean;
 }
 
 export const EsbuildDevExternalFlags: readonly FlagConfig[] = [["bare", boolean, { alias: ["b"] }]];

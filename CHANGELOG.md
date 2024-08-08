@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.8
+
+- **feat**: Add `--cache` and enable it by default.
+
 ## 0.10.7
 
 - **fix**: Path after `--import` should be an import specifier.
