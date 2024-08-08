@@ -7,7 +7,7 @@ import helpText from "./help.txt";
 
 const args = process.argv.slice(2);
 
-const commands = ["external", "temp"];
+const commands = ["external", "temp", "tmp"];
 
 // pre-process the command, entry, help, version
 const command = commands.includes(args[0]) && args.shift();
@@ -35,7 +35,7 @@ for (let i = 0; i < args.length; ++i) {
   argsBeforeEntry.push(arg);
 }
 
-if (command === "temp") {
+if (command === "temp" || command === "tmp") {
   console.log(tempDirectory);
   process.exit(0);
 }

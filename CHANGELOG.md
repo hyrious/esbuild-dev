@@ -3,6 +3,7 @@
 ## 0.10.8
 
 - **feat**: Add `--cache` and enable it by default.
+- **refactor**: Alias `temp` to `tmp`.
 
 ## 0.10.7
 
