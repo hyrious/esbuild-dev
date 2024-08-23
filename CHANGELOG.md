@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.9
+
+- **chore**: Generate type definitions.
+
 ## 0.10.8
 
 - **feat**: Add `--cache` and enable it by default.
