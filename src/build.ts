@@ -14,6 +14,7 @@ import { tmpdir } from "os";
 import { dirname, join } from "path";
 import { pathToFileURL, URL } from "url";
 import { block, external, ExternalPluginOptions, isEmpty, isObj, splitSearch } from "./utils";
+import { readFile } from "fs/promises";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
 
@@ -32,8 +33,9 @@ function findNodeModules(dir: string): string | undefined {
   return;
 }
 
-export const tempDirectory = /* @__PURE__ */ (() =>
-  join(findNodeModules(process.cwd()) || tmpdir(), ".esbuild-dev"))();
+export const tempDirectory = (cwd = process.cwd()) => {
+  return join(findNodeModules(cwd) || tmpdir(), ".esbuild-dev");
+};
 
 const supportsPackagesExternal = /* @__PURE__ */ (() => {
   const [a, b, c] = [0, 16, 5];
@@ -56,16 +58,23 @@ function mtime(path: string) {
   }
 }
 
+export interface CacheOptions {
+  cwd?: string;
+  cache?: boolean;
+  shims?: boolean;
+}
+
 export async function build(
   entry: string,
   options: BuildOptions & { format: Format },
-  externalPluginOptions?: ExternalPluginOptions,
+  externalOptions?: ExternalPluginOptions,
+  cacheOptions?: CacheOptions,
   watchOptions?: { onRebuild: (error: BuildFailure | null, stop: () => void) => void },
-  cacheOptions?: { cache?: boolean },
 ) {
-  if (!existsSync(tempDirectory)) {
-    mkdirSync(tempDirectory, { recursive: true });
-    writeFileSync(join(tempDirectory, "package.json"), '{"type":"module"}');
+  let tmpdir = tempDirectory(cacheOptions?.cwd);
+  if (!existsSync(tmpdir)) {
+    mkdirSync(tmpdir, { recursive: true });
+    writeFileSync(join(tmpdir, "package.json"), '{"type":"module"}');
   }
   options = {
     entryPoints: [entry],
@@ -75,17 +84,68 @@ export async function build(
     sourcemap: true,
     sourcesContent: false,
     treeShaking: true,
-    outfile: join(tempDirectory, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
+    outfile: join(tmpdir, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
     ...options,
   };
   if (cacheOptions?.cache && mtime(options.outfile!) > mtime(entry)) {
     return { outfile: options.outfile! };
   }
-  if (isEmpty(externalPluginOptions) && supportsPackagesExternal) {
+  if (isEmpty(externalOptions) && supportsPackagesExternal) {
     options.packages = "external";
   } else {
-    (options.plugins ||= []).push(external({ exclude: false, ...externalPluginOptions }));
+    (options.plugins ||= []).push(external({ exclude: false, ...externalOptions }));
   }
+
+  if (cacheOptions?.shims) {
+    const shimsFilter = /\.[cm]?[jt]s$/;
+
+    const define = options.define || {};
+    define["__dirname"] ||= "__injected_dirname";
+    define["__filename"] ||= "__injected_filename";
+    define["import.meta.url"] ||= "__injected_import_meta_url";
+    define["import.meta.dirname"] ||= "__injected_dirname";
+    define["import.meta.filename"] ||= "__injected_filename";
+    options.define = define;
+
+    let plugins = options.plugins || [];
+    // Hack all plugin's onLoad callback to add shims.
+    // An `onTransform` callback can be implemented to esbuild plugin system.
+    // But I don't want to make this feature too wide.
+    // See https://gist.github.com/hyrious/ac6fd074c2f6d24a306c3a0970617cbc
+    plugins = plugins.map(p => ({
+      name: `shim(${p.name})`,
+      setup({ onLoad: realOnLoad, ...build }) {
+        const onLoad: typeof realOnLoad = function (filter, callback) {
+          return realOnLoad(filter, async args => {
+            const result = await callback(args);
+            if (result && shimsFilter.test(args.path) && typeof result.contents === "string") {
+              result.contents = prependShims(define, args, result.contents);
+            }
+            return result;
+          });
+        };
+        return p.setup({ onLoad, ...build });
+      },
+    }));
+
+    // Capture all other files.
+    plugins.push({
+      name: "replace-import-meta",
+      setup({ onLoad }) {
+        onLoad({ filter: shimsFilter }, async args => {
+          const contents = await readFile(args.path, "utf8");
+
+          return {
+            loader: "default",
+            contents: prependShims(define, args, contents),
+          };
+        });
+      },
+    });
+
+    options.plugins = plugins;
+  }
+
   if (watchOptions) {
     let ctx: BuildContext;
     let { promise, resolve, reject } = block();
@@ -115,13 +175,28 @@ export async function build(
   return { outfile: options.outfile! };
 }
 
+function prependShims(define: Record<string, string>, args: { path: string }, contents: string) {
+  const shims =
+    `const ${define["__dirname"]} = ${JSON.stringify(dirname(args.path))};` +
+    `const ${define["__filename"]} = ${JSON.stringify(args.path)};` +
+    `const ${define["import.meta.url"]} = ${JSON.stringify(pathToFileURL(args.path).href)};`;
+
+  if (contents.startsWith("#!")) {
+    const i = contents.indexOf("\n") + 1;
+    return contents.slice(0, i) + shims + contents.slice(i);
+  }
+
+  return shims + contents;
+}
+
 export async function importFile(
   path: string,
   options: BuildOptions = {},
   externalPluginOptions?: ExternalPluginOptions,
+  cacheOptions?: CacheOptions,
 ) {
   const [entry, search] = splitSearch(path);
-  const { outfile } = await build(entry, { ...options, format: "esm" }, externalPluginOptions);
+  const { outfile } = await build(entry, { ...options, format: "esm" }, externalPluginOptions, cacheOptions);
   return import(pathToFileURL(outfile).toString() + search);
 }
 
@@ -130,9 +205,10 @@ export async function requireFile(
   path: string,
   options: BuildOptions = {},
   externalPluginOptions?: ExternalPluginOptions,
+  cacheOptions?: CacheOptions,
 ) {
   const [entry, search] = splitSearch(path);
-  const { outfile } = await build(entry, { ...options, format: "cjs" }, externalPluginOptions);
+  const { outfile } = await build(entry, { ...options, format: "cjs" }, externalPluginOptions, cacheOptions);
   if (__ESM__) {
     requireShim ||= createRequire(import.meta.url);
     return requireShim(outfile + search);

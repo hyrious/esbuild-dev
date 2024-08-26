@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.10
+
+- **feat**: Add `--cwd` to change the working directory, it also affects the cache file logic.
+
 ## 0.10.9
 
 - **chore**: Generate type definitions.

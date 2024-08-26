@@ -17,6 +17,7 @@ let argsAfterEntry: string[] = [];
 let entry: string | undefined;
 let help = false;
 let version = false;
+let cwd = process.cwd();
 for (let i = 0; i < args.length; ++i) {
   const arg = args[i];
   if (arg === "--help" || arg === "-h") {
@@ -32,11 +33,14 @@ for (let i = 0; i < args.length; ++i) {
     argsAfterEntry = args.slice(i + 1);
     break;
   }
+  if (arg.startsWith("--cwd=")) {
+    cwd = arg.slice("--cwd=".length);
+  }
   argsBeforeEntry.push(arg);
 }
 
 if (command === "temp" || command === "tmp") {
-  console.log(tempDirectory);
+  console.log(tempDirectory(cwd));
   process.exit(0);
 }
 

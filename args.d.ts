@@ -1,1 +1,1 @@
-export * from "./src/args";
+export * from "./dist/args";
