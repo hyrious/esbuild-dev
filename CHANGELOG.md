@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.11
 
 - **refactor**: Disable `--cache` by default, it might be too aggressive.
 

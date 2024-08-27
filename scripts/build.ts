@@ -1,59 +1,19 @@
 import { build, Plugin } from "esbuild";
-import { rmSync } from "fs";
+import { chmodSync, rmSync } from "fs";
 import { readFile } from "fs/promises";
+import { external } from "@hyrious/esbuild-plugin-external";
 
 rmSync("dist", { recursive: true, maxRetries: 3, force: true });
 
 const shebang: Plugin = {
   name: "shebang",
-  setup({ onLoad }) {
+  setup({ onLoad, onEnd }) {
     onLoad({ filter: /bin\.ts$/ }, async args => {
       const contents = "#!/usr/bin/env node\n" + (await readFile(args.path, "utf8"));
       return { contents, loader: "default" };
     });
-  },
-};
-
-// https://github.com/evanw/esbuild/issues/1747
-const shaking: Plugin = {
-  name: "shaking",
-  setup({ onLoad, initialOptions: { format } }) {
-    const __ESM__ = format === "esm";
-    onLoad({ filter: /\b(build|index)\.ts$/ }, async args => {
-      let code = await readFile(args.path, "utf8");
-      for (let i = 0; (i = code.indexOf("if (__ESM__) {", i)) >= 0; ++i) {
-        let ifLeft = code.indexOf("{", i);
-        ifLeft = code.indexOf("\n", ifLeft) + 1;
-        let ifRight = code.indexOf("} else {", ifLeft);
-
-        let elseLeft = ifRight + "} else {".length;
-        elseLeft = code.indexOf("\n", elseLeft) + 1;
-        let elseRight = code.indexOf("}", elseLeft);
-
-        if (__ESM__) {
-          code =
-            code.slice(0, elseLeft) +
-            // replace with whitespace, so that sourcemap will point to correct position
-            code.slice(elseLeft, elseRight).replace(/\S/g, " ") +
-            code.slice(elseRight);
-        } else {
-          code =
-            code.slice(0, ifLeft) +
-            code.slice(ifLeft, ifRight).replace(/\S/g, " ") +
-            code.slice(ifRight);
-        }
-      }
-      return { contents: code, loader: "default" };
-    });
-  },
-};
-
-const external: Plugin = {
-  name: "external",
-  setup({ onResolve }) {
-    onResolve({ filter: /\b(index|args)\.js$/ }, ({ path }) => {
-      path = path.replace(/^\.\./, ".");
-      return { path, external: true };
+    onEnd(() => {
+      chmodSync("dist/bin.js", 0o755);
     });
   },
 };
@@ -66,11 +26,20 @@ await build({
   external: ["esbuild"],
   outdir: "dist",
   sourcemap: true,
+  dropLabels: ["CJS"],
   logLevel: "info",
-  plugins: [shebang, shaking, external],
+  plugins: [
+    shebang,
+    external({
+      auto: [{ filter: /\.js$/ }],
+    }),
+  ],
   target: ["node14.18.0", "node16.0.0"],
   define: {
     __ESM__: "true",
+  },
+  logOverride: {
+    "empty-import-meta": "silent",
   },
 }).catch(() => process.exit(1));
 
@@ -81,11 +50,14 @@ await build({
   external: ["esbuild", "*/loader.js"],
   outdir: "dist",
   sourcemap: true,
+  dropLabels: ["ESM"],
   outExtension: { ".js": ".cjs" },
   logLevel: "info",
-  plugins: [shaking],
   target: ["node14.18.0", "node16.0.0"],
   define: {
     __ESM__: "false",
+  },
+  logOverride: {
+    "empty-import-meta": "silent",
   },
 }).catch(() => process.exit(1));

@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@hyrious/dts": "^0.2.7",
+    "@hyrious/esbuild-plugin-external": "^0.1.4",
     "@types/node": "^20.14.13",
     "esbuild": "^0.21.5",
     "undici": "^6.19.4",

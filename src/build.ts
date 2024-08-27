@@ -37,7 +37,7 @@ export const tempDirectory = (cwd = process.cwd()) => {
   return join(findNodeModules(cwd) || tmpdir(), ".esbuild-dev");
 };
 
-const supportsPackagesExternal = /* @__PURE__ */ (() => {
+const supportsPackagesExternal = /*#__PURE__*/ (() => {
   const [a, b, c] = [0, 16, 5];
   const [major, minor, patch] = version.split(".").slice(0, 3).map(Number);
   return major > a || (major === a && minor > b) || (major === a && minor === b && patch >= c);
@@ -217,12 +217,9 @@ export async function requireFile(
 ) {
   const [entry, search] = splitSearch(path);
   const { outfile } = await build(entry, { ...options, format: "cjs" }, externalPluginOptions, cacheOptions);
-  if (__ESM__) {
-    requireShim ||= createRequire(import.meta.url);
-    return requireShim(outfile + search);
-  } else {
-    return require(outfile + search);
-  }
+  ESM: requireShim ||= createRequire(import.meta.url);
+  ESM: return requireShim(outfile + search);
+  CJS: return require(outfile + search);
 }
 
 export async function loadPlugins(args: string[]) {
@@ -283,23 +280,20 @@ function guessEntry(object: any): Plugin | undefined {
 
 async function requireOrImport(name: string): Promise<any> {
   try {
-    if (__ESM__) {
-      requireShim ||= createRequire(import.meta.url);
-      return requireShim(name);
-    } else {
-      return require(name);
-    }
+    ESM: requireShim ||= createRequire(import.meta.url);
+    ESM: return requireShim(name);
+    CJS: return require(name);
   } catch {
     return import(name);
   }
 }
 
-export let loaderPath: string;
-if (__ESM__) {
-  loaderPath = new URL("./loader.js", import.meta.url).toString();
-} else {
-  loaderPath = require.resolve("./loader.js");
+function getLoaderPath() {
+  ESM: return new URL("./loader.js", import.meta.url).toString();
+  CJS: return require.resolve("./loader.js");
 }
+
+export const loaderPath = /*#__PURE__*/ getLoaderPath();
 
 export async function resolve(id: string, resolveDir: string) {
   let result: string | undefined;
