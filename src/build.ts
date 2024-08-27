@@ -64,6 +64,13 @@ export interface CacheOptions {
   shims?: boolean;
 }
 
+function normalize(path: string) {
+  if (path.startsWith("./")) {
+    path = path.slice(2);
+  }
+  return path.replace(/[\/\\]/g, "+");
+}
+
 export async function build(
   entry: string,
   options: BuildOptions & { format: Format },
@@ -84,7 +91,8 @@ export async function build(
     sourcemap: true,
     sourcesContent: false,
     treeShaking: true,
-    outfile: join(tmpdir, entry.replace(/[\/\\]/g, "+") + extname[options.format]),
+    outfile: join(tmpdir, normalize(entry) + extname[options.format]),
+    metafile: cacheOptions?.cache,
     ...options,
   };
   if (cacheOptions?.cache && mtime(options.outfile!) > mtime(entry)) {

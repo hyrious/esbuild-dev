@@ -18,14 +18,15 @@ Options:
                         can only be accessed in ESM. This option cannot be used
                         with `--import`.
 
+  --cwd=...             Set the current working directory, it also affects the
+                        logic to find the temp directory.
+
   --shims               Replace `import.meta.url` and `__dirname` with absolute
                         path in .[tj]s files. This is enabled by default.
                         You can pass `--shims=false` to disable it.
 
   --cache               Skip build if the output file is newer than the input.
-                        This option cannot be used with plugins or `--import`.
-                        It is enabled by default, You can pass `--cache=false`
-                        to disable it.
+                        It is disabled by default.
 
   --watch               Enable watch mode. This is built on top of the
   alias: -w             `context.watch()` function of esbuild.
@@ -36,7 +37,7 @@ Options:
 
   --include:name        Force include a package in the bundle.
 
-  --node:node-options   Append node options to the command line. For example,
+  --node:options        Append node options to the command line. For example,
                         `--node:--env-file=.env` will result in the final
                         command be `node --env-file=.env outfile.js`.
 
@@ -53,3 +54,6 @@ Sub Commands:
     alias: -b
 
   temp                  Show the temp directory of the current project.
+  alias: tmp
+
+    --cwd=...           Set the current working directory.

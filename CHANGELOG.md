@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **refactor**: Disable `--cache` by default, it might be too aggressive.
+
 ## 0.10.10
 
 - **feat**: Add `--cwd` to change the working directory, it also affects the cache file logic.

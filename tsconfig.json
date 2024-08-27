@@ -15,9 +15,9 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "lib": ["ESNext"],
-    "module": "ESNext",
+    "module": "Preserve",
     "target": "ESNext",
-    "moduleResolution": "Node",
+    "moduleDetection": "force",
     "types": ["node"]
   }
 }

@@ -1,8 +1,5 @@
 import { ChildProcess, spawn, spawnSync } from "child_process";
 import { BuildFailure, BuildOptions } from "esbuild";
-import { readFile } from "fs/promises";
-import { dirname } from "path";
-import { pathToFileURL } from "url";
 import { EsbuildDevFlags, EsbuildDevOptions, EsbuildFlags, parse } from "../args.js";
 import { Format, build, delay, loadPlugins, loaderPath } from "../index.js";
 import { resolveMangleCache } from "./utils";
@@ -24,14 +21,11 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
 
   const argsToEntry = [..._2, ...argsAfterEntry];
 
-  const devOptions = { shims: true, cache: true, cwd: process.cwd(), ...devOptionsRaw } as EsbuildDevOptions;
+  const devOptions = { shims: true, cwd: process.cwd(), ...devOptionsRaw } as EsbuildDevOptions;
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
   if (devOptions.import) devOptions.loader = true;
   if (devOptions.loader && (devOptions.cjs || devOptions.plugin || devOptions.watch || devOptions.include)) {
     throw new Error(`--cjs, --plugin, --watch and --include are not supported with --loader`);
-  }
-  if (devOptions.loader || devOptions.plugin || devOptions.watch) {
-    devOptions.cache = false;
   }
 
   buildOptions.format = devOptions.cjs ? "cjs" : "esm";
