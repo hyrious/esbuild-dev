@@ -92,7 +92,6 @@ export async function build(
     sourcesContent: false,
     treeShaking: true,
     outfile: join(tmpdir, normalize(entry) + extname[options.format]),
-    metafile: cacheOptions?.cache,
     ...options,
   };
   if (cacheOptions?.cache && mtime(options.outfile!) > mtime(entry)) {
