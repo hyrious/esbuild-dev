@@ -44,7 +44,10 @@ const supportsPackagesExternal = /*#__PURE__*/ (() => {
 })();
 
 class BuildError extends Error implements BuildFailure {
-  constructor(public errors: Message[], public warnings: Message[]) {
+  constructor(
+    public errors: Message[],
+    public warnings: Message[],
+  ) {
     super("Build failed");
     this.name = "BuildFailure";
   }
@@ -79,7 +82,7 @@ export async function build(
   watchOptions?: { onRebuild: (error: BuildFailure | null, stop: () => void) => void },
 ) {
   let tmpdir = tempDirectory(cacheOptions?.cwd);
-  if (!existsSync(tmpdir)) {
+  if (!existsSync(join(tmpdir, "package.json"))) {
     mkdirSync(tmpdir, { recursive: true });
     writeFileSync(join(tmpdir, "package.json"), '{"type":"module"}');
   }
