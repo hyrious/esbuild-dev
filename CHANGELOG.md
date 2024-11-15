@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **chore**: Type definitions enable code splitting.
 - **refactor**: Test `.esbuild-dev/package.json` instead of its parent dir.
 
 ## 0.10.11
