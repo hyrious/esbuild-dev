@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.10.12
 
+- **feat**: Support glob patterns in `--include`.
 - **chore**: Type definitions enable code splitting.
 - **refactor**: Test `.esbuild-dev/package.json` instead of its parent dir.
 

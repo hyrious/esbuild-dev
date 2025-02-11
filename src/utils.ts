@@ -1,4 +1,5 @@
 import { OnResolveArgs, Plugin } from "esbuild";
+import { default as pm } from "picomatch";
 
 export function noop() {}
 
@@ -67,7 +68,7 @@ export function external(options: ExternalPluginOptions = {}): Plugin {
 
   const filter = options.filter ?? /^[\w@][^:]/;
   const callback = options.onResolve ?? noop;
-  const include = options.include ?? [];
+  const include = options.include?.map(expr => pm(expr)) ?? [];
   const exclude = options.exclude ?? true;
   const exFilter = exclude === true ? CommonExts : exclude;
 
@@ -75,7 +76,7 @@ export function external(options: ExternalPluginOptions = {}): Plugin {
     name: "external",
     setup({ onResolve }) {
       onResolve({ filter }, args => {
-        if (include.includes(args.path)) return null;
+        if (include.some(match => match(args.path))) return null;
         callback(args);
         return { path: args.path, external: true };
       });
