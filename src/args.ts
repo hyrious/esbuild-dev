@@ -103,6 +103,7 @@ export const EsbuildDevFlags: readonly FlagConfig[] = [
   ["watch", boolean, { alias: ["w"] }],
   ["plugin", list, { alias: ["p"] }],
   ["include", list],
+  ["exclude", list],
   ["node", list],
   ["cache", boolean],
   ["cwd", string],
@@ -117,12 +118,17 @@ export interface EsbuildDevOptions {
   watch?: boolean;
   plugin?: string[];
   include?: string[];
+  exclude?: string[];
   node?: string[];
   cache?: boolean;
   cwd?: string;
 }
 
-export const EsbuildDevExternalFlags: readonly FlagConfig[] = [["bare", boolean, { alias: ["b"] }]];
+export const EsbuildDevExternalFlags: readonly FlagConfig[] = [
+  ["bare", boolean, { alias: ["b"] }],
+  ["include", list],
+  ["exclude", list],
+];
 
 function camelize(key: string) {
   return key.replace(/-(\w)/g, (_, w: string) => w.toUpperCase());

@@ -111,7 +111,7 @@ export async function defaultCommand(entry: string, argsBeforeEntry: string[], a
       ({ outfile } = await build(
         entry,
         buildOptions,
-        { include: devOptions.include },
+        { include: devOptions.include, exclude: devOptions.exclude },
         { cache: devOptions.cache, cwd: devOptions.cwd, shims: devOptions.shims },
         watchOptions,
       ));

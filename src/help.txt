@@ -13,10 +13,8 @@ Options:
                         print warnings. Set this flag to turn off them all.
                         This is only a temporary workaround to please eyes.
 
-  --cjs                 Change the outfile format to CJS. For example,
-                        `__dirname` can only be used in CJS, and `import.meta`
-                        can only be accessed in ESM. This option cannot be used
-                        with `--import`.
+  --cjs                 Change the output file format to CJS.
+                        Same as `--format=cjs`.
 
   --cwd=...             Set the current working directory, it also affects the
                         logic to find the temp directory.
@@ -35,7 +33,11 @@ Options:
   alias: -p             will try to load `style` package in your project.
                         Names with relative path will be bundled first.
 
-  --include:name        Force include a package in the bundle.
+  --include:name        Include module in the bundle (can use * wildcards).
+
+  --exclude:name        Exclude module from the bundle (can use * wildcards).
+                        If `--include` is not specified, all paths will be
+                        included by default.
 
   --node:options        Append node options to the command line. For example,
                         `--node:--env-file=.env` will result in the final
@@ -52,6 +54,12 @@ Sub Commands:
 
     --bare              Use bare format (one name per line, no quotes).
     alias: -b
+
+    --include:name      Include module in the bundle (can use * wildcards).
+
+    --exclude:name      Exclude module from the bundle (can use * wildcards).
+                        If `--include` is not specified, all paths will be
+                        included by default.
 
   temp                  Show the temp directory of the current project.
   alias: tmp

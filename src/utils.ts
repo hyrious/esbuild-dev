@@ -55,10 +55,15 @@ export interface ExternalPluginOptions {
   include?: string[];
 
   /**
+   * Reject these paths from included paths.
+   */
+  exclude?: string[];
+
+  /**
    * Silently exclude some common file extensions.
    * @default true
    */
-  exclude?: boolean | RegExp;
+  ignore?: boolean | RegExp;
 }
 
 export function external(options: ExternalPluginOptions = {}): Plugin {
@@ -69,14 +74,28 @@ export function external(options: ExternalPluginOptions = {}): Plugin {
   const filter = options.filter ?? /^[\w@][^:]/;
   const callback = options.onResolve ?? noop;
   const include = options.include?.map(expr => pm(expr)) ?? [];
-  const exclude = options.exclude ?? true;
-  const exFilter = exclude === true ? CommonExts : exclude;
+  const exclude = options.exclude?.map(expr => pm(expr)) ?? [];
+  if (include.length === 0 && exclude.length > 0) {
+    include.push(() => true);
+  }
+  const ignore = options.ignore ?? true;
+  const exFilter = ignore === true ? CommonExts : ignore;
 
   return {
     name: "external",
     setup({ onResolve }) {
       onResolve({ filter }, args => {
-        if (include.some(match => match(args.path))) return null;
+        // Always exclude node builtins.
+        if (args.path.startsWith("node:")) {
+          return { path: args.path, external: true };
+        }
+        if (exclude.some(match => match(args.path))) {
+          callback(args);
+          return { path: args.path, external: true };
+        }
+        if (include.some(match => match(args.path))) {
+          return null;
+        }
         callback(args);
         return { path: args.path, external: true };
       });

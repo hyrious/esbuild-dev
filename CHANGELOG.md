@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **feat**: Add `--exclude:pattern` to exclude paths.
+  When enabled without `--include`, it assumes all paths will be included, i.e. `--include:**`.
+  It does not inherit `--external` because it uses different match algorithms.
+
+  I may change the implementation (include and exclude) to match [esbuild's glob algorithm](https://github.com/evanw/esbuild/blob/main/internal/helpers/glob.go) for smaller footprint in the future.
+
 ## 0.10.12
 
 - **feat**: Support glob patterns in `--include`.

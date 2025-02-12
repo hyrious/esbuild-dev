@@ -103,7 +103,7 @@ export async function build(
   if (isEmpty(externalOptions) && supportsPackagesExternal) {
     options.packages = "external";
   } else {
-    (options.plugins ||= []).push(external({ exclude: false, ...externalOptions }));
+    (options.plugins ||= []).push(external({ ignore: false, ...externalOptions }));
   }
 
   if (cacheOptions?.shims) {

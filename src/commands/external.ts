@@ -4,7 +4,7 @@ import { Format, build, external } from "../index.js";
 import { resolveMangleCache } from "./utils";
 
 export async function externalCommand(entry: string, argsBeforeEntry: string[], argsAfterEntry: string[]) {
-  const { _: _1, bare } = parse(argsBeforeEntry, EsbuildDevExternalFlags);
+  const { _: _1, bare, ...externalOptions } = parse(argsBeforeEntry, EsbuildDevExternalFlags);
   const { _: _2, ...buildOptionsRaw } = parse(argsAfterEntry, EsbuildFlags);
 
   void _1, _2; // ignored
@@ -19,7 +19,7 @@ export async function externalCommand(entry: string, argsBeforeEntry: string[], 
   const onResolve = ({ path }: { path: string }) => {
     collected[path] = true;
   };
-  (buildOptions.plugins ||= []).push(external({ onResolve }));
+  (buildOptions.plugins ||= []).push(external({ ...externalOptions, onResolve }));
 
   try {
     await build(entry, buildOptions);
