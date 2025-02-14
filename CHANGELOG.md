@@ -4,9 +4,9 @@
 
 - **feat**: Add `--exclude:pattern` to exclude paths.
   When enabled without `--include`, it assumes all paths will be included, i.e. `--include:**`.
-  It does not inherit `--external` because it uses different match algorithms.
+  It does not inherit from `--external` which are directly passed to esbuild options.
 
-  I may change the implementation (include and exclude) to match [esbuild's glob algorithm](https://github.com/evanw/esbuild/blob/main/internal/helpers/glob.go) for smaller footprint in the future.
+  The implementation (include and exclude) is changed to matching [esbuild's glob algorithm](https://github.com/evanw/esbuild/blob/main/internal/helpers/glob.go) for smaller footprint. So the pattern only supports `*` and `**` now.
 
 ## 0.10.12
 
