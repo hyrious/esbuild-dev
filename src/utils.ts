@@ -1,5 +1,5 @@
 import { OnResolveArgs, Plugin } from "esbuild";
-import { default as pm } from "picomatch";
+import { createMatch } from "./glob";
 
 export function noop() {}
 
@@ -73,8 +73,8 @@ export function external(options: ExternalPluginOptions = {}): Plugin {
 
   const filter = options.filter ?? /^[\w@][^:]/;
   const callback = options.onResolve ?? noop;
-  const include = options.include?.map(expr => pm(expr)) ?? [];
-  const exclude = options.exclude?.map(expr => pm(expr)) ?? [];
+  const include = options.include?.map(expr => createMatch(expr)) ?? [];
+  const exclude = options.exclude?.map(expr => createMatch(expr)) ?? [];
   if (include.length === 0 && exclude.length > 0) {
     include.push(() => true);
   }
