@@ -7,8 +7,6 @@ export async function externalCommand(entry: string, argsBeforeEntry: string[], 
   const { _: _1, bare, ...externalOptions } = parse(argsBeforeEntry, EsbuildDevExternalFlags);
   const { _: _2, ...buildOptionsRaw } = parse(argsAfterEntry, EsbuildFlags);
 
-  void _1, _2; // ignored
-
   const buildOptions = buildOptionsRaw as BuildOptions & { format: Format };
   delete buildOptions.platform;
   buildOptions.format ||= "esm";

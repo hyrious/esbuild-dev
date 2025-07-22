@@ -19,7 +19,7 @@ type FlagType = 0 | 1 | 2 | 3 | 4 | 5;
 type FlagConfig = [
   dash_case: string,
   type: FlagType,
-  opts?: { alias?: string[]; transform?: (value: any) => any }
+  opts?: { alias?: string[]; transform?: (value: any) => any },
 ];
 ```
 

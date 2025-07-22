@@ -26,6 +26,7 @@ await build({
   external: ["esbuild"],
   outdir: "dist",
   sourcemap: true,
+  sourcesContent: false,
   dropLabels: ["CJS"],
   logLevel: "info",
   plugins: [
@@ -50,6 +51,7 @@ await build({
   external: ["esbuild", "*/loader.js"],
   outdir: "dist",
   sourcemap: true,
+  sourcesContent: false,
   dropLabels: ["ESM"],
   outExtension: { ".js": ".cjs" },
   logLevel: "info",
