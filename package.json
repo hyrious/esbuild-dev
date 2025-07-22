@@ -50,6 +50,7 @@
   "devDependencies": {
     "@hyrious/dts": "^0.3.3",
     "@hyrious/esbuild-plugin-external": "^0.1.4",
+    "@hyrious/esbuild-plugin-http": "^0.1.5",
     "@types/node": "^22.12.0",
     "esbuild": "^0.25.0",
     "prettier": "^3.6.2",

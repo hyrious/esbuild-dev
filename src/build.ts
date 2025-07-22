@@ -232,7 +232,7 @@ export async function loadPlugins(args: string[]) {
     if (text[0] === "{") {
       plugin = new Function("return " + text);
     } else {
-      const match = text.match(/^([@./\\\w|^{}-]+)(=(.*))?$/);
+      const match = text.match(/^([:@./\\\w|^{}-]+)(=(.*))?$/);
       if (match) {
         text = match[1];
         pluginArg = new Function("return " + match[3])();
@@ -240,20 +240,30 @@ export async function loadPlugins(args: string[]) {
         throw new Error(`invalid plugin argument: ${JSON.stringify(text)}`);
       }
       try {
-        if (text[0] === ".") {
+        if (text[0] === "." || /^[A-Za-z]:\\/.test(text)) {
           plugin = await importFile(text);
-        } else {
+        } else if (!/^esbuild-plugin-|[/@\\]/.test(text)) {
+          for (const prefix of ["esbuild-plugin-", "@hyrious/esbuild-plugin-"]) {
+            try {
+              plugin = await requireOrImport(prefix + text);
+              break;
+            } catch {
+              // Try requiring the actual name below.
+            }
+          }
+        }
+        if (!plugin) {
           plugin = await requireOrImport(text);
         }
       } catch (err) {
-        throw new Error(`cannot load plugin ${JSON.stringify(text)}: ${err.message}.`);
+        throw new Error(`cannot load plugin "${text}": ${err.message}.`);
       }
     }
     if (typeof plugin === "object") {
       plugin = plugin.default || guessEntry(plugin);
     }
     if (!plugin) {
-      throw new Error(`cannot find entry for plugin ${JSON.stringify(text)}.`);
+      throw new Error(`cannot find entry for plugin "${text}".`);
     }
     if (typeof plugin === "function") {
       plugin = plugin.call(plugin, pluginArg);

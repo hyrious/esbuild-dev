@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.13
 
 - **feat**: Add `--exclude:pattern` to exclude paths.
   When enabled without `--include`, it assumes all paths will be included, i.e. `--include:**`.
