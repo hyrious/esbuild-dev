@@ -1,9 +1,13 @@
-import { BuildOptions } from "esbuild";
+import type { BuildOptions } from "esbuild";
 import { EsbuildDevExternalFlags, EsbuildFlags, parse } from "../args.js";
-import { Format, build, external } from "../index.js";
+import { type Format, build, external } from "../index.js";
 import { resolveMangleCache } from "./utils";
 
-export async function externalCommand(entry: string, argsBeforeEntry: string[], argsAfterEntry: string[]) {
+export async function externalCommand(
+  entry: string,
+  argsBeforeEntry: string[],
+  argsAfterEntry: string[],
+): Promise<void> {
   const { _: _1, bare, ...externalOptions } = parse(argsBeforeEntry, EsbuildDevExternalFlags);
   const { _: _2, ...buildOptionsRaw } = parse(argsAfterEntry, EsbuildFlags);
 

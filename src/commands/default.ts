@@ -1,7 +1,7 @@
+import type { BuildFailure, BuildOptions } from "esbuild";
 import { ChildProcess, spawn, spawnSync } from "child_process";
-import { BuildFailure, BuildOptions } from "esbuild";
-import { EsbuildDevFlags, EsbuildDevOptions, EsbuildFlags, parse } from "../args.js";
-import { Format, build, delay, loadPlugins, loaderPath } from "../index.js";
+import { EsbuildDevFlags, type EsbuildDevOptions, EsbuildFlags, parse } from "../args.js";
+import { type Format, build, delay, loadPlugins, loaderPath } from "../index.js";
 import { resolveMangleCache } from "./utils";
 
 const error = `
@@ -10,12 +10,16 @@ const error = `
     > node --enable-source-maps {file} {args}
 `;
 
-export function errorMessage(file: string, args: string[]) {
+export function errorMessage(file: string, args: string[]): string {
   const tpl = { file, args: args.map(e => JSON.stringify(e)).join(" ") };
   return error.replace(/{(\w+)}/g, (_, key: "file" | "args") => tpl[key] || "");
 }
 
-export async function defaultCommand(entry: string, argsBeforeEntry: string[], argsAfterEntry: string[]) {
+export async function defaultCommand(
+  entry: string,
+  argsBeforeEntry: string[],
+  argsAfterEntry: string[],
+): Promise<void> {
   const { _: _1, ...devOptionsRaw } = parse(argsBeforeEntry, EsbuildDevFlags);
   const { _: _2, ...buildOptionsRaw } = parse(_1, EsbuildFlags);
 

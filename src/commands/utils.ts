@@ -1,7 +1,7 @@
-import { BuildOptions } from "esbuild";
+import type { BuildOptions } from "esbuild";
 import { readFileSync } from "fs";
 
-export function resolveMangleCache(options: BuildOptions) {
+export function resolveMangleCache(options: BuildOptions): void {
   if (typeof options.mangleCache === "string") {
     try {
       options.mangleCache = JSON.parse(readFileSync(options.mangleCache, "utf8"));

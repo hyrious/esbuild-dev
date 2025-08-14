@@ -1,13 +1,13 @@
-import { OnResolveArgs, Plugin } from "esbuild";
+import type { OnResolveArgs, Plugin } from "esbuild";
 import { createMatch } from "./glob";
 
-export function noop() {}
+export function noop(): void {}
 
 export function isObj(o: any): o is Record<string, any> {
   return typeof o === "object" && o !== null;
 }
 
-export function isEmpty(opt?: any) {
+export function isEmpty(opt?: any): boolean {
   if (!opt) return true;
   for (const key in opt) {
     if (opt[key]) return false;
@@ -15,11 +15,15 @@ export function isEmpty(opt?: any) {
   return true;
 }
 
-export function delay(ms: number) {
+export function delay(ms: number): Promise<void> {
   return new Promise<void>(r => setTimeout(r, ms));
 }
 
-export function block<T = void>() {
+export function block<T = void>(): {
+  promise: Promise<T>;
+  resolve: (v: T) => void;
+  reject: (e: any) => void;
+} {
   let resolve: (v: T) => void;
   let reject: (e: any) => void;
   let promise = new Promise<T>((res, rej) => {
@@ -29,7 +33,7 @@ export function block<T = void>() {
   return { promise, resolve: resolve!, reject: reject! };
 }
 
-export function splitSearch(path: string) {
+export function splitSearch(path: string): [string, string] {
   let i = path.indexOf("?");
   if (i < 0) return [path, ""];
   return [path.slice(0, i), path.slice(i)];

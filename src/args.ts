@@ -222,7 +222,7 @@ export function parseFlag(parsed: Parsed, arg: string, [flag, type, opts = {}]: 
   }
 }
 
-export function parse(args: readonly string[], configs: readonly FlagConfig[]) {
+export function parse(args: readonly string[], configs: readonly FlagConfig[]): Parsed {
   const parsed: Parsed = { _: [] };
 
   for (const arg of args) {

@@ -2,18 +2,18 @@ import {
   build as esbuild_build,
   context,
   version,
-  BuildOptions,
-  Plugin,
-  BuildContext,
-  BuildFailure,
-  Message,
+  type BuildOptions,
+  type Plugin,
+  type BuildContext,
+  type BuildFailure,
+  type Message,
 } from "esbuild";
 import { existsSync, lstatSync, mkdirSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { dirname, join } from "path";
 import { pathToFileURL, URL } from "url";
-import { block, external, ExternalPluginOptions, isEmpty, isObj, splitSearch } from "./utils";
+import { block, external, type ExternalPluginOptions, isEmpty, isObj, splitSearch } from "./utils";
 import { readFile } from "fs/promises";
 
 const extname = { esm: ".js", cjs: ".cjs" } as const;
@@ -33,7 +33,7 @@ function findNodeModules(dir: string): string | undefined {
   return;
 }
 
-export const tempDirectory = (cwd = process.cwd()) => {
+export const tempDirectory = (cwd: string = process.cwd()): string => {
   return join(findNodeModules(cwd) || tmpdir(), ".esbuild-dev");
 };
 
@@ -80,7 +80,7 @@ export async function build(
   externalOptions?: ExternalPluginOptions,
   cacheOptions?: CacheOptions,
   watchOptions?: { onRebuild: (error: BuildFailure | null, stop: () => void) => void },
-) {
+): Promise<{ outfile: string }> {
   let tmpdir = tempDirectory(cacheOptions?.cwd);
   if (!existsSync(join(tmpdir, "package.json"))) {
     mkdirSync(tmpdir, { recursive: true });
@@ -204,7 +204,7 @@ export async function importFile(
   options: BuildOptions = {},
   externalPluginOptions?: ExternalPluginOptions,
   cacheOptions?: CacheOptions,
-) {
+): Promise<any> {
   const [entry, search] = splitSearch(path);
   const { outfile } = await build(entry, { ...options, format: "esm" }, externalPluginOptions, cacheOptions);
   return import(pathToFileURL(outfile).toString() + search);
@@ -216,7 +216,7 @@ export async function requireFile(
   options: BuildOptions = {},
   externalPluginOptions?: ExternalPluginOptions,
   cacheOptions?: CacheOptions,
-) {
+): Promise<any> {
   const [entry, search] = splitSearch(path);
   const { outfile } = await build(entry, { ...options, format: "cjs" }, externalPluginOptions, cacheOptions);
   ESM: requireShim ||= createRequire(import.meta.url);
@@ -224,7 +224,7 @@ export async function requireFile(
   CJS: return require(outfile + search);
 }
 
-export async function loadPlugins(args: string[]) {
+export async function loadPlugins(args: string[]): Promise<Plugin[]> {
   const plugins: Plugin[] = [];
   for (let text of args) {
     let plugin: any = null;
@@ -305,9 +305,9 @@ function getLoaderPath() {
   CJS: return require.resolve("./loader.js");
 }
 
-export const loaderPath = /*#__PURE__*/ getLoaderPath();
+export const loaderPath: string = /*#__PURE__*/ getLoaderPath();
 
-export async function resolve(id: string, resolveDir: string) {
+export async function resolve(id: string, resolveDir: string): Promise<string | undefined> {
   let result: string | undefined;
   await esbuild_build({
     stdin: {

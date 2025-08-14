@@ -1,5 +1,5 @@
 import module from "module";
-import { Loader as EsbuildLoader, PartialMessage, formatMessages, transform } from "esbuild";
+import { type Loader as EsbuildLoader, type PartialMessage, formatMessages, transform } from "esbuild";
 import { readFile } from "fs/promises";
 import { dirname, extname } from "path";
 import { URL, fileURLToPath, pathToFileURL } from "url";
