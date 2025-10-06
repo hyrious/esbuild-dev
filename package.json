@@ -33,9 +33,6 @@
     "dist",
     "args.d.ts"
   ],
-  "engines": {
-    "node": "^14.18 || >=16"
-  },
   "scripts": {
     "build": "npm run build:js && npm run build:types",
     "build:js": "esbuild scripts/build.ts | node --input-type=module",
@@ -48,13 +45,13 @@
     "esbuild": ">=0.17"
   },
   "devDependencies": {
-    "@hyrious/dts": "^0.3.5",
+    "@hyrious/dts": "^0.3.6",
     "@hyrious/esbuild-plugin-external": "^0.1.4",
     "@hyrious/esbuild-plugin-http": "^0.1.5",
-    "@types/node": "^22.12.0",
-    "esbuild": "^0.25.0",
+    "@types/node": "^24.7.0",
+    "esbuild": "^0.25.10",
     "prettier": "^3.6.2",
-    "undici": "^7.12.0",
-    "vitepress": "^1.6.3"
+    "undici": "^7.16.0",
+    "vitepress": "^1.6.4"
   }
 }
