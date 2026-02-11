@@ -1,0 +1,1 @@
+import{_ as t,o as i,c as s,ae as a}from"./chunks/framework.BkSfxtxM.js";const c=JSON.parse('{"title":"What it do?","description":"","frontmatter":{},"headers":[],"relativePath":"index.md","filePath":"index.md"}'),o={name:"index.md"};function n(r,e,l,d,h,u){return i(),s("div",null,[...e[0]||(e[0]=[a("",15)])])}const m=t(o,[["render",n]]);export{c as __pageData,m as default};
