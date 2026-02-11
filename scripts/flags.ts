@@ -5,10 +5,8 @@ if (process.env.http_proxy) {
 }
 
 async function main() {
-  let text = await fetch(
-    // "https://raw.gitmirror.com/evanw/esbuild/main/pkg/cli/cli_impl.go",
-    "https://github.com/evanw/esbuild/raw/main/pkg/cli/cli_impl.go",
-  ).then(r => r.text());
+  let url = "https://github.com/evanw/esbuild/raw/main/pkg/cli/cli_impl.go";
+  let text = await fetch(url).then(r => r.text());
   let start = text.indexOf("func parseOptionsImpl(");
   let working = true;
   text = text.slice(start);

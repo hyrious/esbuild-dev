@@ -1,5 +1,5 @@
 import type { OnResolveArgs, Plugin } from "esbuild";
-import { createMatch } from "./glob";
+import { createMatch } from "./glob.js";
 
 export function noop(): void {}
 

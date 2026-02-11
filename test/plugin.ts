@@ -1,5 +1,5 @@
 // node dist/bin.js -p:./test/plugin.ts test/index.ts
-import { Plugin } from "esbuild";
+import type { Plugin } from "esbuild";
 import { readFile } from "fs/promises";
 
 export default function example(): Plugin {

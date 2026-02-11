@@ -38,7 +38,7 @@ function parseGlobPattern(text: string): GlobPart[] {
   return pattern;
 }
 
-type Match = (text: string) => boolean;
+export type Match = (text: string) => boolean;
 
 export function createMatch(text: string): Match {
   let pattern = parseGlobPattern(text);

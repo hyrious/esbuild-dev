@@ -21,6 +21,10 @@
       "types": "./dist/args.d.ts",
       "default": "./dist/args.js"
     },
+    "./glob": {
+      "types": "./dist/glob.d.ts",
+      "default": "./dist/glob.js"
+    },
     "./loader": "./dist/loader.js",
     "./package.json": "./package.json"
   },
@@ -31,12 +35,13 @@
   "files": [
     "src",
     "dist",
-    "args.d.ts"
+    "args.d.ts",
+    "glob.d.ts"
   ],
   "scripts": {
     "build": "npm run build:js && npm run build:types",
     "build:js": "esbuild scripts/build.ts | node --input-type=module",
-    "build:types": "dts src/index.ts src/args.ts -p --oxc",
+    "build:types": "dts src/index.ts src/args.ts src/glob.ts -p --oxc",
     "flags": "esbuild scripts/flags.ts | node --input-type=module",
     "docs": "vitepress build docs",
     "docs:dev": "vitepress dev docs"
@@ -45,7 +50,7 @@
     "esbuild": ">=0.17"
   },
   "devDependencies": {
-    "@hyrious/dts": "^0.3.6",
+    "@hyrious/dts": "^0.3.7",
     "@hyrious/esbuild-plugin-external": "^0.1.4",
     "@hyrious/esbuild-plugin-http": "^0.1.5",
     "@types/node": "^24.7.0",

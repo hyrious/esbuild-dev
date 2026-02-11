@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.10.14
+
+- **feat**: Export glob util `createMatch` from `/glob`.
+
 ## 0.10.13
 
-- **feat**: Add `--exclude:pattern` to exclude paths.
+- **feat!**: Add `--exclude:pattern` to exclude paths.
   When enabled without `--include`, it assumes all paths will be included, i.e. `--include:**`.
   It does not inherit from `--external` which are directly passed to esbuild options.
 

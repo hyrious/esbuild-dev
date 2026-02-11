@@ -19,7 +19,7 @@ const shebang: Plugin = {
 };
 
 await build({
-  entryPoints: ["src/bin.ts", "src/index.ts", "src/args.ts", "src/loader.ts"],
+  entryPoints: ["src/bin.ts", "src/index.ts", "src/args.ts", "src/glob.ts", "src/loader.ts"],
   bundle: true,
   platform: "node",
   format: "esm",
